@@ -9,8 +9,8 @@ from django.contrib.auth.models import Permission
 class User(AbstractUser):
     '''model for user authentication.'''
 
-    groups = models.ManyToManyField(Group, related_name='expensetracker_groups')
-    user_permissions = models.ManyToManyField(Permission, related_name='expensetracker_permissions')
+    # groups = models.ManyToManyField(Group, related_name='expensetracker_groups')
+    # user_permissions = models.ManyToManyField(Permission, related_name='expensetracker_permissions')
     username   = models.CharField(
         max_length=30, 
         unique=True,
