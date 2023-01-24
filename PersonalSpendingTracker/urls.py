@@ -15,7 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from ExpenseTracker import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path("", views.homePage, name="homePage"),
+    path("signUp/",views.signUp, name="signUp" ),
+    path("logIn/",views.logIn, name="logIn"),
+    path("logOut/",views.logOut, name="logOut"),
+
+    path("landingPage", views.landingPage, name="landingPage")
 ]
