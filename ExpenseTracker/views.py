@@ -1,6 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.views import View
-from .forms import CategoryForm
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
+from .forms import CategorySpendingLimitForm
+from .models import Category
+
+class CategoryCreateView(CreateView):
+    model = Category
+    form_class = CategorySpendingLimitForm
+    template_name = 'category_form.html'
+    success_url = reverse_lazy('home')
 
 class HomeView(View):
     def get(self, request):
