@@ -1,0 +1,170 @@
+*{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+}
+
+:root{
+    --body-color: #fff;
+    --top-menu-color: #22242A;
+    --primary-color: #3498DB;
+    --primary-color-light: #6fc4fd;
+    --secondary-color: #55B1F0;
+    --secondary-color-light: #4CCEE8;
+    --side-menu-color: #2F323A;
+    --border-color: #8FC5E9;
+}
+
+body{
+    background: var(--body-color);
+}
+
+.base header{
+    z-index: 1;
+    background: var(--top-menu-color);
+    position: fixed;
+    width: calc(100% - 0%);
+    height: 70px;
+    display: flex;
+    top: 0;
+}
+  
+.base header .top-menu{
+    width: calc(100% - 0%);
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+  
+.base header .top-menu .title{
+    color: var(--body-color);
+    font-size: 25px;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+  
+.base header .top-menu .title span{
+    color: var(--secondary-color-light);
+}
+  
+.base header .top-menu ul{
+    display: flex;
+}
+  
+.base header .top-menu ul li a{
+    background: var(--body-color);
+    color: black;
+    display: block;
+    margin: 0 10px;
+    font-size: 18px;
+    width: 34px;
+    height: 34px;
+    line-height: 35px;
+    text-align: center;
+    border-radius: 50%;
+    transition: 0.3s;
+    transition-property: background, color;
+}
+  
+.base header .top-menu ul li a:hover{
+    background: var(--secondary-color-light);
+    color: var(--body-color);
+}
+  
+.base .side-menu{
+    z-index: 1;
+    background: var(--side-menu-color);
+    position: fixed;
+    top: 70px;
+    width: 250px;
+    height: calc(100% - 9%);
+    transition: 0.3s;
+    transition-property: width;
+    overflow-y: auto;
+}
+  
+.base .side-menu .menu .item{
+    width: 250px;
+    overflow: hidden;
+}
+  
+.base .side-menu .menu .item .menu-btn{
+    display: block;
+    color: var(--body-color);
+    position: relative;
+    padding: 25px 20px;
+    transition: 0.3s;
+    transition-property: color;
+    text-decoration: none;
+}
+  
+.base .side-menu .menu .item .menu-btn:hover{
+    color: var(--secondary-color-light);
+    text-decoration: none;
+}
+  
+.base .side-menu .menu .item .menu-btn i{
+    margin-right: 20px;
+}
+  
+.base .side-menu .menu .item .menu-btn .drop-down{
+    float: right;
+    font-size: 12px;
+    margin-top: 3px;
+}
+  
+.base .side-menu .menu .item .sub-menu{
+    background: var(--primary-color);
+    overflow: hidden;
+    max-height: 0;
+    transition: 0.3s;
+    transition-property: background, max-height;
+    text-decoration: none;
+}
+
+.base .side-menu .menu .item .sub-menu a.sub-item{
+    background: var(--primary-color-light);
+    text-decoration: none;
+}
+  
+.base .side-menu .menu .item .sub-menu a{
+    display: block;
+    position: relative;
+    color: var(--body-color);
+    white-space: nowrap;
+    font-size: 15px;
+    padding: 20px;
+    transition: 0.3s;
+    transition-property: background;
+    text-decoration: none;
+}
+  
+.base .side-menu .menu .item .sub-menu a:hover{
+    background: var(--secondary-color)
+}
+  
+.base .side-menu .menu .item .sub-menu a:not(last-child){
+    border-bottom: 1px solid var(--border-color)
+}
+
+.base .side-menu .menu .item .sub-menu i{
+    padding-right: 20px;
+    font-size: 10px;
+}
+  
+.base .side-menu .menu .item:target .sub-menu{
+    max-height: 500px;
+}
+  
+.base .main-container{
+    width: (100% - 250px);
+    background: var(--body-color);
+    margin-top: 70px;
+    margin-left: 250px;
+    padding: 15px;
+    height: 100vh;
+}
