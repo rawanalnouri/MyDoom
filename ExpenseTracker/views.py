@@ -1,10 +1,29 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
+from django.contrib import messages
+from django.db.utils import IntegrityError
 
-from .forms import CategorySpendingLimitForm
+from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
+
+class CategoryView(TemplateView):
+    template_name = 'category.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = ExpenditureForm()
+        category = Category.objects.get(name=self.kwargs['category_name'])
+        context['category'] = category
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        form = ExpenditureForm(request.POST)
+        if form.is_valid():
+            category = Category.objects.get(name=kwargs['category_name'])
+            form.save(category)
+        return redirect(reverse('category', args=[category.name]))
 
 class CategoryCreateView(CreateView):
     model = Category
@@ -17,9 +36,24 @@ class CategoryCreateView(CreateView):
         kwargs['user'] = self.request.user
         return kwargs
 
+    def form_valid(self, form):
+        try:
+            form.save()
+        except IntegrityError:
+            messages.add_message(self.request, messages.ERROR, "Failed to Create Category. Please ensure the start date is before the end date.")
+            return redirect('create_category')
+        else:
+            messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
+            return redirect('home')
+    
+    def form_invalid(self, form):
+        for error in form.non_field_errors():
+            messages.add_message(self.request, messages.ERROR, error)
+        return super().form_invalid(form)
+
 class HomeView(View):
     def get(self, request):
-        return render(request, 'home.html')
+        return render(request, 'base.html')
 
 class ReportsView(View):
     def get(self, request):

@@ -25,7 +25,7 @@
             </a>
             <div class="sub-menu">
                 {% for category in user.categories %}
-                    <a href="#"><span>{{ category.name }}</span></a>
+                    <a href="{% url 'category' category.name %}"><span>{{ category.name }}</span></a>
                 {% endfor %}
                 <a href="{% url 'create_category' %}" class="sub-item"><span>Add Category</span></a>
             </div>
