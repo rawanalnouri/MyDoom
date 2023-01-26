@@ -1,4 +1,5 @@
 coverage
 Django
 Faker
-Pillowdjango-widget-tweaks==1.4.8
+Pillow
+django-widget-tweaks==1.4.8
