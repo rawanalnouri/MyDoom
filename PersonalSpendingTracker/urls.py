@@ -16,19 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ExpenseTracker import views
+from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name='home'),
-    path('reports/', ReportsView.as_view(), name='reports'),
-    path('create_category/', CategoryCreateView.as_view(), name='create_category'),
-    path('category/<str:category_name>/', CategoryView.as_view(), name='category')
-
 
     path("", views.homePage, name="homePage"),
     path("signUp/",views.signUp, name="signUp" ),
     path("logIn/",views.logIn, name="logIn"),
     path("logOut/",views.logOut, name="logOut"),
 
-    path("landingPage/<int:user_id>/", views.landingPage, name="landingPage")
+    path("landingPage/<int:user_id>/", views.landingPage, name="landingPage"),
+
+    path('admin/', admin.site.urls),
+    path('', HomeView.as_view(), name='home'),
+    path('reports/', ReportsView.as_view(), name='reports'),
+    path('create_category/', CategoryCreateView.as_view(), name='create_category'),
+    path('category/<str:category_name>/', CategoryView.as_view(), name='category')
+
 ]
