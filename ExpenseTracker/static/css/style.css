@@ -168,3 +168,40 @@ body{
     padding: 15px;
     height: 100vh;
 }
+
+.base header .top-menu .collapse-btn{
+    color: var(--body-color);
+    position: absolute;
+    margin-left: 280px;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    transition-property: color;
+}
+  
+.base header .top-menu .collapse-btn:hover{
+    color: var(--secondary-color-light);
+}
+
+.base.navcollapse .side-menu{
+    width: 70px;
+}
+
+.base.navcollapse .side-menu a span{
+    display: none;
+}
+  
+.base.navcollapse .side-menu .menu .item .menu-btn{
+    font-size: 23px;
+}
+
+.base.navcollapse .side-menu .menu .item .sub-menu i{
+    font-size: 18px;
+    padding-left: 3px;
+}
+  
+.base.navcollapse .main-container{
+    width: calc(100% - 70px);
+    margin-left: 70px;
+}
