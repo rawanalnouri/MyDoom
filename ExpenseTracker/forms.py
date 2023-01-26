@@ -1,5 +1,18 @@
 from django import forms
-from .models import Category, SpendingLimit
+from .models import Category, SpendingLimit, Expenditure
+
+class ExpenditureForm(forms.ModelForm):
+    class Meta:
+        model = Expenditure
+        fields = ['title', 'description', 'amount', 'date', 'receipt']
+    
+    def save(self, category, commit=True):
+        expenditure = super().save(commit=False)
+        category.expenditures.add(expenditure)
+        if commit:
+            expenditure.save()
+            category.save()
+        return expenditure
 
 class CategorySpendingLimitForm(forms.ModelForm):
     class Meta:
