@@ -25,5 +25,5 @@ urlpatterns = [
     path("logIn/",views.logIn, name="logIn"),
     path("logOut/",views.logOut, name="logOut"),
 
-    path("landingPage", views.landingPage, name="landingPage")
+    path("landingPage/<int:user_id>/", views.landingPage, name="landingPage")
 ]

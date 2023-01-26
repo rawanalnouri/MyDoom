@@ -17,6 +17,7 @@ def signUp(request):
             user = signUpForm.save()
             #Users redirected to their custom landing page
             login(request,user)
+
             redirectLocation = reverse('landingPage', kwargs={'user_id': request.user.id})
             return redirect(redirectLocation) 
 
@@ -36,6 +37,7 @@ def logIn(request):
                 redirectLocation = reverse('landingPage', kwargs={'user_id': user.id})
                 return redirect(redirectLocation) 
 
+
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
 
     form = LogInForm()
@@ -51,6 +53,6 @@ def logOut(request):
 @login_required(login_url='/logIn/')
 def landingPage(request, user_id):
     if request.user.is_authenticated:
-        user = User.objects.get(id = user_id)
-        return render(request, "landingPage.html", {'user':user})
+        client = User.objects.get(id = user_id)
+        return render(request, "landingPage.html", {'user':client})
     return render(request, "home.html")
