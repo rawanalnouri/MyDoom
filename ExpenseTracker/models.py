@@ -20,7 +20,7 @@ class SpendingLimit(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f'Budget for {self.user.username}'
+        return f'£{self.amount}, {self.start_date}-{self.end_date}'
 
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
