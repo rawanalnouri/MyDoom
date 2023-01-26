@@ -8,6 +8,11 @@ class CategorySpendingLimitForm(forms.ModelForm):
         widgets = {
             'spending_limit': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(CategorySpendingLimitForm, self).__init__(*args, **kwargs)
+
     start_date = forms.DateField(label="Start date [Day-Month-Year]", input_formats=['%d-%m-%Y'], 
                                  widget=forms.DateInput(format='%d-%m-%Y'))
     end_date = forms.DateField(label="End date [Day-Month-Year]", input_formats=['%d-%m-%Y'], 
@@ -23,4 +28,5 @@ class CategorySpendingLimitForm(forms.ModelForm):
         if commit:
             spending_limit.save()
             category.save()
+            self.user.categories.add(category)
         return category

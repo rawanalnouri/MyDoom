@@ -12,6 +12,11 @@ class CategoryCreateView(CreateView):
     template_name = 'category_form.html'
     success_url = reverse_lazy('home')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
 class HomeView(View):
     def get(self, request):
         return render(request, 'home.html')
