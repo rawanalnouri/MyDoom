@@ -56,19 +56,14 @@ class CategoryCreateView(CreateView):
             messages.add_message(self.request, messages.ERROR, error)
         return super().form_invalid(form)
 
-def homePage(request):
-    return render(request, "home.html")
-
 def signUp(request):
     if request.method == 'POST':
         signUpForm = SignUpForm(request.POST)
         if(signUpForm.is_valid()):
             user = signUpForm.save()
-            #Users redirected to their custom landing page
+            #Users redirected to their custom home page
             login(request,user)
-
-            redirectLocation = reverse('landingPage', kwargs={'user_id': request.user.id})
-            return redirect(redirectLocation) 
+            return redirect('home') 
 
     else:
         signUpForm = SignUpForm()
@@ -83,9 +78,7 @@ def logIn(request):
             user = authenticate(username=username, password=password) 
             if user is not None:
                 login(request, user) 
-                redirectLocation = reverse('landingPage', kwargs={'user_id': user.id})
-                return redirect(redirectLocation) 
-
+                return redirect('home') 
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
 
@@ -96,20 +89,17 @@ def logIn(request):
 @login_required(login_url='/logIn/')
 def logOut(request):
     logout(request)
-    return redirect('homePage')
+    return redirect('index')
+
+
+class IndexView(View):
+    def get(self, request):
+            return render(request, 'index.html')
 
 class HomeView(View):
     def get(self, request):
-        return render(request, 'base.html')
+        return render(request, "home.html")
 
 class ReportsView(View):
     def get(self, request):
         return render(request, 'reports.html')
-
-''' Logs in an authenticated user and takes them to their landing page'''
-@login_required(login_url='/logIn/')
-def landingPage(request, user_id):
-    if request.user.is_authenticated:
-        client = User.objects.get(id = user_id)
-        return render(request, "landingPage.html", {'user':client})
-    return render(request, "home.html")
