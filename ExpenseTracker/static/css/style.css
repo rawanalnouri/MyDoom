@@ -55,7 +55,7 @@ body{
     display: flex;
 }
   
-.base header .top-menu ul li a{
+.base header .top-menu ul li .logged-in-items{
     background: var(--body-color);
     color: black;
     display: block;
@@ -68,6 +68,22 @@ body{
     border-radius: 50%;
     transition: 0.3s;
     transition-property: background, color;
+}
+
+.base header .top-menu ul li .logged-out-items{
+    background: var(--body-color);
+    color: black;
+    display: block;
+    margin: 0 10px;
+    font-size: 13px;
+    width: 60px;
+    height: 34px;
+    line-height: 35px;
+    text-align: center;
+    border-radius: 0%;
+    transition: 0.3s;
+    transition-property: background, color;
+    text-decoration: none;
 }
   
 .base header .top-menu ul li a:hover{
