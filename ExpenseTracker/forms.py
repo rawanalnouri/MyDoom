@@ -1,5 +1,5 @@
 from django import forms
-from .models import User
+from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
 
 '''Form to allow a user to sign up to the system'''
@@ -44,3 +44,47 @@ class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
+
+class ExpenditureForm(forms.ModelForm):
+    class Meta:
+        model = Expenditure
+        fields = ['title', 'description', 'amount', 'date', 'receipt']
+    
+    def save(self, category, commit=True):
+        expenditure = super().save(commit=False)
+        category.expenditures.add(expenditure)
+        if commit:
+            expenditure.save()
+            category.save()
+        return expenditure
+
+class CategorySpendingLimitForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name','description']
+        widgets = {
+            'spending_limit': forms.Select(attrs={'class': 'form-control'}),
+        }
+    
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(CategorySpendingLimitForm, self).__init__(*args, **kwargs)
+
+    start_date = forms.DateField(label="Start date [Day-Month-Year]", input_formats=['%d-%m-%Y'], 
+                                 widget=forms.DateInput(format='%d-%m-%Y'))
+    end_date = forms.DateField(label="End date [Day-Month-Year]", input_formats=['%d-%m-%Y'], 
+                                 widget=forms.DateInput(format='%d-%m-%Y'))
+    amount = forms.DecimalField(label="Amount [GBP]", min_value=0.01)
+
+    def save(self, commit=True):
+        category = super().save(commit=False)
+        spending_limit = SpendingLimit.objects.create(start_date=self.cleaned_data['start_date'],
+                                                     end_date=self.cleaned_data['end_date'],
+                                                     amount=self.cleaned_data['amount'])
+        category.spending_limit = spending_limit
+        if commit:
+            spending_limit.save()
+            category.save()
+            self.user.categories.add(category)
+        return category

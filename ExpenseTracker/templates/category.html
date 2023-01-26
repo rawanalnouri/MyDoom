@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}{{category.name}}{% endblock %}
+
+{% block content %}
+    <h1>{{ category.name }}</h1>
+    <p>Spending Limit: {{ category.spending_limit }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ include 'partials/bootstrap_form.html' with form=form }}
+        <button type="submit" class="btn btn-secondary">Create Expenditure</button>
+    </form>
+{% endblock %}

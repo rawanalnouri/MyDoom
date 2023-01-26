@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ExpenseTracker',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -119,6 +120,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "ExpenseTracker" / "static"]
+
+# User model for authentication purposes
+AUTH_USER_MODEL = 'ExpenseTracker.User'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -128,3 +134,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model for authentication purposes
 AUTH_USER_MODEL = 'ExpenseTracker.User'
 
+
+# User model for authentication purposes
+AUTH_USER_MODEL = 'ExpenseTracker.User'
+
+from django.contrib.messages import constants as message_constants
+
+# Message level tags should use Bootstrap terms
+MESSAGE_TAGS = {
+    message_constants.DEBUG: 'dark',
+    message_constants.ERROR: 'danger',
+}

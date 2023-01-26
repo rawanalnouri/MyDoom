@@ -19,6 +19,11 @@ from ExpenseTracker import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', HomeView.as_view(), name='home'),
+    path('reports/', ReportsView.as_view(), name='reports'),
+    path('create_category/', CategoryCreateView.as_view(), name='create_category'),
+    path('category/<str:category_name>/', CategoryView.as_view(), name='category')
+
 
     path("", views.homePage, name="homePage"),
     path("signUp/",views.signUp, name="signUp" ),

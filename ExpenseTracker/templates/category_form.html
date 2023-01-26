@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Category{% endblock %}
+
+{% block content %}
+    <h4><b>Category</b></h4>
+    <h6>Create a category and set its spending limit for a selected time-frame</h6>
+    <hr>
+    <form method="post">
+        {% csrf_token %}
+        {% include 'partials/bootstrap_form.html' with form=form %}
+        <button type="submit" class="btn btn-secondary">Save</button>
+     </form>
+{% endblock %}
