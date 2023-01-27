@@ -19,16 +19,21 @@ class CategoryView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = ExpenditureForm()
-        category = Category.objects.get(name=self.kwargs['category_name'])
+        category = Category.objects.filter(name=self.kwargs['category_name'], user=self.request.user).first()
         context['category'] = category
         return context
     
     def post(self, request, *args, **kwargs):
         form = ExpenditureForm(request.POST)
-        if form.is_valid():
-            category = Category.objects.get(name=kwargs['category_name'])
+        category = Category.objects.filter(name=kwargs['category_name'], user=self.request.user).first()
+        if category and form.is_valid():
+            messages.add_message(self.request, messages.SUCCESS, "Successfully Created Expenditure")
             form.save(category)
+        else:
+            messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
+            return redirect(reverse('home'))
         return redirect(reverse('category', args=[category.name]))
+
 
 class CategoryCreateView(CreateView):
     model = Category
