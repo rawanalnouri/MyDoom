@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
@@ -20,16 +21,25 @@ class SpendingLimit(models.Model):
         ordering = ['-created_at']
     
     def __str__(self):
-        return f'Budget for {self.user.username}'
+        return f'£{self.amount}, {self.start_date} to {self.end_date}'
+
+
 
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
 
-    title = models.CharField(max_length=80)
+    title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()
-    receipt = models.ImageField(blank=True)
+    receipt = models.ImageField(upload_to='receipts/', blank=True)
+    MOOD_CHOICES = [
+        ('happy', 'Happy'),
+        ('content', 'Content'),
+        ('indifferent', 'Indifferent'),
+        ('anxious', 'Anxious')
+    ]
+    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -39,6 +49,7 @@ class Expenditure(models.Model):
 class Category(models.Model):
     '''model for storing and managing user expense categories.'''
 
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=80)
     spending_limit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')

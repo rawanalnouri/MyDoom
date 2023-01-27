@@ -7,7 +7,7 @@
 }
 
 :root{
-    --body-color: #fff;
+    --body-color: #f9f8f8;
     --top-menu-color: #22242A;
     --primary-color: #3498DB;
     --primary-color-light: #6fc4fd;
@@ -42,7 +42,7 @@ body{
   
 .base header .top-menu .title{
     color: var(--body-color);
-    font-size: 25px;
+    font-size: 20px;
     text-transform: uppercase;
     font-weight: 900;
 }
@@ -55,7 +55,7 @@ body{
     display: flex;
 }
   
-.base header .top-menu ul li a{
+.base header .top-menu ul li .logged-in-items{
     background: var(--body-color);
     color: black;
     display: block;
@@ -68,6 +68,22 @@ body{
     border-radius: 50%;
     transition: 0.3s;
     transition-property: background, color;
+}
+
+.base header .top-menu ul li .logged-out-items{
+    background: var(--body-color);
+    color: black;
+    display: block;
+    margin: 0 10px;
+    font-size: 13px;
+    width: 60px;
+    height: 34px;
+    line-height: 35px;
+    text-align: center;
+    border-radius: 0%;
+    transition: 0.3s;
+    transition-property: background, color;
+    text-decoration: none;
 }
   
 .base header .top-menu ul li a:hover{
@@ -167,4 +183,41 @@ body{
     margin-left: 250px;
     padding: 15px;
     height: 100vh;
+}
+
+.base header .top-menu .collapse-btn{
+    color: var(--body-color);
+    position: absolute;
+    margin-left: 280px;
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: 0.3s;
+    transition-property: color;
+}
+  
+.base header .top-menu .collapse-btn:hover{
+    color: var(--secondary-color-light);
+}
+
+.base.navcollapse .side-menu{
+    width: 70px;
+}
+
+.base.navcollapse .side-menu a span{
+    display: none;
+}
+  
+.base.navcollapse .side-menu .menu .item .menu-btn{
+    font-size: 23px;
+}
+
+.base.navcollapse .side-menu .menu .item .sub-menu i{
+    font-size: 18px;
+    padding-left: 3px;
+}
+  
+.base.navcollapse .main-container{
+    width: calc(100% - 70px);
+    margin-left: 70px;
 }

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Login {% endblock %}
+
+{% block content %}
+    <h1>Log in</h1>
+    <!-- Adding for loop to display all messages-->
+    {% for messsage in messages %}
+        <p><b>{{ messsage }}</b></p>
+    {% endfor %}
+
+    <form action="{% url 'logIn' %}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Log in">
+    </form>
+{% endblock %}
