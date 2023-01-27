@@ -3,12 +3,37 @@
 {% block title %}{{category.name}}{% endblock %}
 
 {% block content %}
-    <h1>{{ category.name }}</h1>
-    <p>Spending Limit: {{ category.spending_limit }}</p>
-
+    <h3>{{ category.name }}</h3>
+    <p><b>Spending Limit</b> {{ category.spending_limit }}</p>
+    <hr>
+    <p><b>Expenditure History</b></p>
+    <div class="shadow-4 rounded-3 overflow-hidden">
+        <table class="table align-middle bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Amount</th>
+                    <th>Mood</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expenditure in category.expenditures.all %}
+                    <tr>
+                        <td>{{ expenditure.title }}</td>
+                        <td class="text-muted">-£{{ expenditure.amount }}</td>
+                        {% include 'partials/mood_colors.html' with mood=expenditure.mood %}
+                        <td class="text-muted">{{ expenditure.date }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <hr>
+    <p><b>Expenditure Form</b></p>
     <form method="post">
         {% csrf_token %}
-        {{ include 'partials/bootstrap_form.html' with form=form }}
+        {% include 'partials/bootstrap_form.html' with form=form %}
         <button type="submit" class="btn btn-secondary">Create Expenditure</button>
     </form>
 {% endblock %}
