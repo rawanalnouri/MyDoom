@@ -44,18 +44,20 @@ class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
-
 class ExpenditureForm(forms.ModelForm):
     class Meta:
         model = Expenditure
-        fields = ['title', 'description', 'amount', 'date', 'receipt']
+        fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%d-%m-%Y')
+        }
     
     def save(self, category, commit=True):
-        expenditure = super().save(commit=False)
-        category.expenditures.add(expenditure)
+        expenditure = super().save()
         if commit:
-            expenditure.save()
+            category.expenditures.add(expenditure)
             category.save()
+            expenditure.save()
         return expenditure
 
 class CategorySpendingLimitForm(forms.ModelForm):
@@ -83,6 +85,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
                                                      end_date=self.cleaned_data['end_date'],
                                                      amount=self.cleaned_data['amount'])
         category.spending_limit = spending_limit
+        category.user = self.user
         if commit:
             spending_limit.save()
             category.save()

@@ -1,0 +1,15 @@
+{% if mood == "happy" %}
+<td><span class="badge bg-success">{{ mood }}</span></td>
+{% else %}
+    {% if mood == "anxious" %}
+        <td><span class="badge bg-danger">{{ mood }}</span></td>
+    {% else %}
+        {% if mood == "content" %}
+            <td><span class="badge bg-warning">{{ mood }}</span></td>
+        {% else %}
+            {% if mood == "indifferent" %}
+                <td><span class="badge bg-secondary">{{ mood }}</span></td>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endif %}
