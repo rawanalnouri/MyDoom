@@ -31,7 +31,7 @@ class SpendingLimitAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for spending limits."""
 
     list_display = [
-        'category', 'amount', 'start_date', 'end_date',
+        'category', 'amount', 'time_period',
     ]
 
 @admin.register(Notification)

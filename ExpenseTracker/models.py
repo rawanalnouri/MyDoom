@@ -8,20 +8,22 @@ from django.db.models import Q, F
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
 
-    start_date = models.DateField()
-    end_date = models.DateField()
+    TIME_CHOICES = [
+        ('daily', 'Daily'),
+        ('weekly', 'Weekly'),
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly')
+    ]
+    time_period = models.CharField(max_length=20, choices=TIME_CHOICES, blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        constraints = [
-            models.CheckConstraint(check=Q(start_date__lte=F('end_date')), name='date_start_before_end')
-        ]
         ordering = ['-created_at']
     
     def __str__(self):
-        return f'£{self.amount}, {self.start_date} to {self.end_date}'
+        return f'£{self.amount}, {self.time_period}'
 
 
 
@@ -67,8 +69,8 @@ class User(AbstractUser):
         max_length=30,
         unique=True,
         validators=[RegexValidator(
-            regex=r'^@\w{3,}$',
-            message='Username must consist of @ followed by at least three alphanumericals.'
+            regex=r'^\w{3,}$',
+            message='Username must contain at least three alphanumericals.'
         )]
     )
     first_name = models.CharField(max_length=50)
