@@ -13,23 +13,24 @@ from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
 from django.core.paginator import Paginator
 
+
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling expenditure form submissions'''
     
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):
+        context = {}
         context['form'] = ExpenditureForm()
-        category = Category.objects.filter(name=self.kwargs['categoryName'], user=self.request.user).first()
+        category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
         context['category'] = category
         # adding pagination
         paginator = Paginator(category.expenditures.all(), 15) # Show 15 expenditures per page
         page = self.request.GET.get('page')
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
-        return context
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         form = ExpenditureForm(request.POST)
@@ -43,8 +44,10 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         return redirect(reverse('category', args=[category.name]))
 
 
-class ExpenditureCreateView(View):
+class ExpenditureCreateView(LoginRequiredMixin, View):
     '''Implements a view for creating a new expenditure using a form'''
+
+    login_url = reverse_lazy('logIn')
 
     def get(self, request, *args, **kwargs):
         categoryName = kwargs.get('categoryName')
