@@ -185,6 +185,17 @@ body{
     height: 100vh;
 }
 
+#category-header {
+    font-size: 1.75rem;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+}
+
+#category-header button{
+    float: right;
+}
+
 .base header .top-menu .collapse-btn{
     color: var(--body-color);
     position: absolute;
@@ -200,24 +211,24 @@ body{
     color: var(--secondary-color-light);
 }
 
-.base.navcollapse .side-menu{
+.base.nav-collapse .side-menu{
     width: 70px;
 }
 
-.base.navcollapse .side-menu a span{
+.base.nav-collapse .side-menu a span{
     display: none;
 }
   
-.base.navcollapse .side-menu .menu .item .menu-btn{
+.base.nav-collapse .side-menu .menu .item .menu-btn{
     font-size: 23px;
 }
 
-.base.navcollapse .side-menu .menu .item .sub-menu i{
+.base.nav-collapse .side-menu .menu .item .sub-menu i{
     font-size: 18px;
     padding-left: 3px;
 }
   
-.base.navcollapse .main-container{
+.base.nav-collapse .main-container{
     width: calc(100% - 70px);
     margin-left: 70px;
 }
