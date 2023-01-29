@@ -1,4 +1,4 @@
-from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
+from ExpenseTracker.models import User, Category
 from django.test import TestCase
 from django.urls import reverse
 
