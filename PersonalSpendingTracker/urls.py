@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ExpenseTracker import views
-from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView, IndexView, ExpenditureCreateView
+from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView, IndexView
 
 
 urlpatterns = [
