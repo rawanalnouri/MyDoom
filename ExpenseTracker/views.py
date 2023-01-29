@@ -31,7 +31,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
         return render(request, self.template_name, context)
-
+    
     def post(self, request, *args, **kwargs):
         form = ExpenditureForm(request.POST)
         category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
@@ -40,31 +40,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             form.save(category)
         else:
             messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
-            return redirect(reverse('home'))
         return redirect(reverse('category', args=[category.name]))
-
-
-class ExpenditureCreateView(LoginRequiredMixin, View):
-    '''Implements a view for creating a new expenditure using a form'''
-
-    login_url = reverse_lazy('logIn')
-
-    def get(self, request, *args, **kwargs):
-        categoryName = kwargs.get('categoryName')
-        context = {'categoryName': categoryName}
-        return render(request, 'modals/createExpenditure.html', context)
-
-    def post(self, request, *args, **kwargs):
-        form = ExpenditureForm(request.POST)
-        category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
-        if category and form.is_valid():
-            messages.add_message(self.request, messages.SUCCESS, "Successfully Created Expenditure")
-            form.save(category)
-            return redirect(reverse('category', args=[category.name]))
-        else:
-            messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
-            return redirect(reverse('home'))
-
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
@@ -73,7 +49,6 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = Category
     form_class = CategorySpendingLimitForm
     template_name = 'categoryForm.html'
-    success_url = reverse_lazy('home')
     login_url = reverse_lazy('logIn')
 
     def get_form_kwargs(self):
@@ -82,14 +57,9 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        try:
-            form.save()
-        except IntegrityError:
-            messages.add_message(self.request, messages.ERROR, "Failed to Create Category. Please ensure the start date is before the end date.")
-            return redirect('createCategory')
-        else:
-            messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
-            return redirect('home')
+        category = form.save()
+        messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
+        return redirect(reverse('category', args=[category.name]))
     
     def form_invalid(self, form):
         for error in form.non_field_errors():
