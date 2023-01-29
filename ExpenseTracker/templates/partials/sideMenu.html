@@ -27,7 +27,7 @@
                 {% for category in user.categories.all %}
                     <a href="{% url 'category' category.name %}"><span>{{ category.name }}</span></a>
                 {% endfor %}
-                <a href="{% url 'create_category' %}" class="sub-item"><span>Add Category</span></a>
+                <a href="{% url 'createCategory' %}" class="sub-item"><span>Add Category</span></a>
             </div>
         </li>
         <li class="item">

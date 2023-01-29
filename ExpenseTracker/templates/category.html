@@ -3,7 +3,9 @@
 {% block title %}{{category.name}}{% endblock %}
 
 {% block content %}
-    <h3>{{ category.name }}</h3>
+    <h3 id="category-header">{{ category.name }} 
+        <button id="openExpenditureFormModal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
+    </h3>
     <p><b>Spending Limit</b> {{ category.spending_limit }}</p>
     <hr>
     <p><b>Expenditure History</b></p>
@@ -18,22 +20,32 @@
                 </tr>
             </thead>
             <tbody>
-                {% for expenditure in category.expenditures.all %}
+                {% for expenditure in expenditures %}
                     <tr>
                         <td>{{ expenditure.title }}</td>
                         <td class="text-muted">-£{{ expenditure.amount }}</td>
-                        {% include 'partials/mood_colors.html' with mood=expenditure.mood %}
+                        {% include 'partials/moodColors.html' with mood=expenditure.mood %}
                         <td class="text-muted">{{ expenditure.date }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    <hr>
-    <p><b>Expenditure Form</b></p>
-    <form method="post">
-        {% csrf_token %}
-        {% include 'partials/bootstrap_form.html' with form=form %}
-        <button type="submit" class="btn btn-secondary">Create Expenditure</button>
-    </form>
+    <div class="text-center">
+        {% if expenditures.has_previous %}
+            <a href="?page={{ expenditures.previous_page_number }}">previous</a>
+        {% endif %}
+        page {{ expenditures.number }} of {{ expenditures.paginator.num_pages }}
+        {% if expenditures.has_next %}
+            <a href="?page={{ expenditures.next_page_number }}">next</a>
+        {% endif %}
+    </div>
+   {% include 'modals/createExpenditure.html' with form=form %} 
+    <script>
+        $(document).ready(function() {
+            $("#openExpenditureFormModal").on("click", function() {
+                $("#expenditureFormModal").modal("show");
+            });
+        });
+    </script>   
 {% endblock %}
