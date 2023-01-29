@@ -44,9 +44,9 @@ class CategoryViewTest(TestCase):
         for i in range(19):
             expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
             self.category.expenditures.add(expenditure)
-        # Verify that only 15 expenditures are displayed per page
+        # Check only 15 expenditures are displayed per page
         response = self.client.get(reverse('category', args=[self.category.name]))
         self.assertEqual(len(response.context['expenditures']), 15)
-        # Verify that the next page displays the remaining 5 expenditures
+        # Check the next page displays the remaining 5 expenditures
         response = self.client.get(reverse('category', args=[self.category.name]) + '?page=2')
         self.assertEqual(len(response.context['expenditures']), 5)
