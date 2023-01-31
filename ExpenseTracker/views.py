@@ -13,13 +13,17 @@ from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
 from django.core.paginator import Paginator
 
+import random
+import datetime
+import time
+
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling expenditure form submissions'''
-    
+
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
-    
+
     def get(self, request, *args, **kwargs):
         context = {}
         context['form'] = ExpenditureForm()
@@ -31,7 +35,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
         return render(request, self.template_name, context)
-    
+
     def post(self, request, *args, **kwargs):
         form = ExpenditureForm(request.POST)
         category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
@@ -45,7 +49,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     '''Implements a view for creating a new category using a form'''
-    
+
     model = Category
     form_class = CategorySpendingLimitForm
     template_name = 'categoryForm.html'
@@ -60,7 +64,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         return redirect(reverse('category', args=[category.name]))
-    
+
     def form_invalid(self, form):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
@@ -73,7 +77,7 @@ def signUp(request):
         if(signUpForm.is_valid()):
             user = signUpForm.save()
             login(request, user)
-            return redirect('home') 
+            return redirect('home')
 
     else:
         signUpForm = SignUpForm()
@@ -86,10 +90,10 @@ def logIn(request):
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password) 
+            user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user) 
-                return redirect('home') 
+                login(request, user)
+                return redirect('home')
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
 
@@ -104,9 +108,19 @@ def logOut(request):
 
 
 class IndexView(View):
+
+
+    # queryset = City.objects.order_by('-population')[:5]
+    # for city in queryset:
+    #     labels.append(city.name)
+    #     data.append(city.population)
+
     def get(self, request):
             return render(request, 'index.html')
 
+def generateGraph(categories, spentInCategories, type):
+    dict = {'labels': categories, 'data': spentInCategories, 'type':type}
+    return dict
 
 class HomeView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the home page'''
@@ -114,12 +128,12 @@ class HomeView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self, request):
-        return render(request, "home.html")
+        return render(request, "home.html", generateGraph(["a", "b", "c"], [2, 1, 5], 'polarArea'))
 
 
 class ReportsView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the reports page'''
-    
+
     login_url = reverse_lazy('logIn')
 
     def get(self, request):
