@@ -1,9 +1,42 @@
 {% extends 'base.html' %}
-
-{% block title %}Main Page{% endblock %}
-
 {% block content %}
-    <p>Welcome to spending tracker!</p>
-{% endblock %}
-
+<div id="home-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#home-carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#home-carousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#home-carousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active" data-bs-interval="3000">
+        <img class="d-block w-100 c-img" id="home-cover">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>First slide</h5>
+          <p>Blah</p>
+        </div>
+      </div>
+      <div class="carousel-item" data-bs-interval="3000">
+        <img class="d-block w-100 c-img" id="home-cover">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Second slide</h5>
+          <p>Blah blah</p>
+        </div>
+      </div>
+      <div class="carousel-item" data-bs-interval="3000">
+        <img class="d-block w-100 c-img" id="home-cover">
+        <div class="carousel-caption d-none d-md-block">
+          <h5>Third slide</h5>
+          <p>Blah blah blah</p>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#home-carousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#home-carousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+  {% endblock %}
 
