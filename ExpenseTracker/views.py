@@ -3,7 +3,6 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib import messages
-from django.db.utils import IntegrityError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required

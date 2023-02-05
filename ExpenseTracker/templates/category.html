@@ -4,47 +4,26 @@
 
 {% block content %}
     <h3 id="category-header">{{ category.name }} 
-        <button id="openExpenditureFormModal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
+        <button id="openCreateExpenditureModal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
     </h3>
     <p><b>Spending Limit</b> {{ category.spendingLimit }}</p>
     <hr>
     <p><b>Expenditure History</b></p>
     <div class="shadow-4 rounded-3 overflow-hidden">
-        <table class="table align-middle bg-white">
-            <thead class="bg-light">
-                <tr>
-                    <th>Title</th>
-                    <th>Amount</th>
-                    <th>Mood</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for expenditure in expenditures %}
-                    <tr>
-                        <td>{{ expenditure.title }}</td>
-                        <td class="text-muted">-£{{ expenditure.amount }}</td>
-                        {% include 'partials/moodColors.html' with mood=expenditure.mood %}
-                        <td class="text-muted">{{ expenditure.date }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% include 'partials/expenditures/expendituresTable.html' with expenditures=expenditures %}
     </div>
     <div class="text-center">
-        {% if expenditures.has_previous %}
-            <a href="?page={{ expenditures.previous_page_number }}">previous</a>
-        {% endif %}
-        page {{ expenditures.number }} of {{ expenditures.paginator.num_pages }}
-        {% if expenditures.has_next %}
-            <a href="?page={{ expenditures.next_page_number }}">next</a>
-        {% endif %}
+        {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
     </div>
    {% include 'modals/createExpenditure.html' with form=form %} 
+   {% include 'modals/updateExpenditure.html' with form=form %} 
     <script>
         $(document).ready(function() {
-            $("#openExpenditureFormModal").on("click", function() {
-                $("#expenditureFormModal").modal("show");
+            $("#openCreateExpenditureModal").on("click", function() {
+                $("#createExpenditureModal").modal("show");
+            });
+            $("#openUpdateExpenditureModal").on("click", function() {
+                $("#updateExpenditureModal").modal("show");
             });
         });
     </script>   
