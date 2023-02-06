@@ -45,6 +45,8 @@ class LogInForm(forms.Form):
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
 class ExpenditureForm(forms.ModelForm):
+    expenditureForm = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+
     class Meta:
         model = Expenditure
         fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
@@ -61,6 +63,8 @@ class ExpenditureForm(forms.ModelForm):
         return expenditure
 
 class CategorySpendingLimitForm(forms.ModelForm):
+    categoryForm = forms.BooleanField(widget=forms.HiddenInput, initial=True)
+
     class Meta:
         model = Category
         fields = ['name','description']
