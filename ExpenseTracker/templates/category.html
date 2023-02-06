@@ -4,6 +4,7 @@
 
 {% block content %}
     <h3 id="category-header">{{ category.name }} 
+        <button id="openEditCategoryFormModal" class="btn btn-secondary"><i class="bi bi-pencil"></i></i> Edit Category</button>
         <button id="openExpenditureFormModal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
     </h3>
     <p><b>Spending Limit</b> {{ category.spending_limit }}</p>
@@ -40,7 +41,7 @@
             <a href="?page={{ expenditures.next_page_number }}">next</a>
         {% endif %}
     </div>
-   {% include 'modals/createExpenditure.html' with form=form %} 
+   {% include 'modals/createExpenditure.html' with form=expenditureForm %} 
     <script>
         $(document).ready(function() {
             $("#openExpenditureFormModal").on("click", function() {
@@ -48,4 +49,12 @@
             });
         });
     </script>   
+    {% include 'modals/editCategory.html' with form=editCategoryForm %} 
+    <script>
+        $(document).ready(function() {
+            $("#openEditCategoryFormModal").on("click", function() {
+                $("#editCategoryFormModal").modal("show");
+            });
+        });
+    </script>  
 {% endblock %}
