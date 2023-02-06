@@ -22,8 +22,9 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = {}
-        context['form'] = ExpenditureForm()
-        category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
+        context['expenditureForm'] = ExpenditureForm()
+        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        context['editCategoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
         context['category'] = category
         # adding pagination
         paginator = Paginator(category.expenditures.all(), 15) # Show 15 expenditures per page
@@ -32,16 +33,42 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         context['expenditures'] = expenditures
         return render(request, self.template_name, context)
     
-    def post(self, request, *args, **kwargs):
-        form = ExpenditureForm(request.POST)
-        category = Category.objects.filter(name=kwargs['categoryName'], user=self.request.user).first()
+    def handleForm(self, form, category, errorMessage, successMessage):
         if category and form.is_valid():
-            messages.add_message(self.request, messages.SUCCESS, "Successfully Created Expenditure")
+            messages.add_message(self.request, messages.SUCCESS, successMessage)
             form.save(category)
         else:
-            messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
-        return redirect(reverse('category', args=[category.name]))
+            messages.add_message(self.request, messages.ERROR, errorMessage)
+    
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        expendForm = ExpenditureForm(request.POST)
+        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user) 
 
+        if 'expenditureForm' in request.POST:
+            # self.handleForm(ExpenditureForm(request.POST), category, "Successfully Created Expenditure", "Failed to Create Expenditure")
+            # expenditureForm = ExpenditureForm(request.POST)
+            # category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+            if category and expendForm.is_valid():
+                messages.add_message(self.request, messages.SUCCESS, "Successfully Created Expenditure")
+                expendForm.save(category)
+            else:
+                messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
+            # return redirect(reverse('category', args=[category.id]))  
+        if 'categoryForm' in request.POST:
+            # self.handleForm(CategorySpendingLimitForm(request.POST), category, "Successfully Updated Category", "Failed to Update Category")
+            # category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+            if category and categForm.is_valid():
+                messages.add_message(self.request, messages.SUCCESS, "Successfully Updated Category")
+                categForm.save(category)
+            else:
+                messages.add_message(self.request, messages.ERROR, "Failed to Updated Category")
+
+        context = {
+            'expenditureForm': expendForm,
+            'categoryForm': categForm
+        }
+        return redirect(reverse('category', args=[category.id]), context=context)
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     '''Implements a view for creating a new category using a form'''
@@ -59,7 +86,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
-        return redirect(reverse('category', args=[category.name]))
+        return redirect(reverse('category', args=[category.id]))
     
     def form_invalid(self, form):
         for error in form.non_field_errors():
