@@ -32,5 +32,5 @@ urlpatterns = [
 
     path('reports/', ReportsView.as_view(), name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
-    path('category/<str:categoryName>/', CategoryView.as_view(), name='category'),
+    path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
 ]
