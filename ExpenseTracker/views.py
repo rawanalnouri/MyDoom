@@ -11,6 +11,7 @@ from .forms import SignUpForm, LogInForm
 
 from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
+from .models import User
 from django.core.paginator import Paginator
 
 
@@ -124,3 +125,26 @@ class ReportsView(LoginRequiredMixin, View):
 
     def get(self, request):
         return render(request, 'reports.html')
+
+class ProfileView(LoginRequiredMixin,View):
+    '''Implements a view for handling requests to the profile page'''
+
+
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request):
+        return render(request,'profile.html')
+
+class EditProfileView(LoginRequiredMixin,View):
+    '''Implements a view for handling requests to the edit profile page'''
+
+    model = User
+    template_name = 'editProfile.html'
+    fields = ['first_name','last_name','email']
+
+
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request):
+        return render(request, "editProfile.html")
+
