@@ -12,12 +12,15 @@
                 <p>{{user.first_name}}</p>
                 <p>Last name:</p>
                 <p>{{user.last_name}}</p>
+                <p>Username</p>
+                <p>{{user.username}}</p>
                 <p>Email:</p>
                 <p> {{user.email}}</p>
                 
     
             </div>
         </div>
+        <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary btn-sm">Edit Profile </a>
     </div>
 
 {% endblock %}
