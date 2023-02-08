@@ -52,7 +52,7 @@ class ExpenditureForm(forms.ModelForm):
         model = Expenditure
         fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}, format='%d-%m-%Y')
+            'date': forms.DateInput(attrs={'type': 'date'})
         }
     
     def save(self, category, commit=True):
