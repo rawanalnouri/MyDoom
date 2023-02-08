@@ -21,17 +21,17 @@
   <body>
     <div class="base">
       <header>
-          {% include 'partials/topMenu.html' %}
+        {% include 'partials/topMenu.html' %}
       </header>
       {% if user.is_authenticated %}
         {% include 'partials/sideMenu.html' %}
       {% endif %}
 
       <div class="main-container">
-          {% include 'partials/messages.html' %}
-          {% block content %}{% endblock %}
+        {% include 'partials/messages.html' %}
+        {% block content %}{% endblock %}
       </div>
+
     </div>
-  </div>
   </body>
 </html>
