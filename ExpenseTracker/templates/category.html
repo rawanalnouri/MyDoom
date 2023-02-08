@@ -4,26 +4,35 @@
 
 {% block content %}
     <h3 id="category-header">{{ category.name }} 
-        <button id="openCreateExpenditureModal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
+        <button id="open-create-modal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
     </h3>
     <p><b>Spending Limit</b> {{ category.spendingLimit }}</p>
     <hr>
     <p><b>Expenditure History</b></p>
     <div class="shadow-4 rounded-3 overflow-hidden">
-        {% include 'partials/expenditures/expendituresTable.html' with expenditures=expenditures %}
+        {% include 'partials/expenditures/expendituresTable.html' with category=category expenditures=expenditures %}
     </div>
     <div class="text-center">
         {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
     </div>
-   {% include 'modals/createExpenditure.html' with form=form %} 
-   {% include 'modals/updateExpenditure.html' with form=form %} 
+   {% include 'modals/expenditures/createForm.html' with form=form %} 
+   {% include 'modals/expenditures/updateForm.html' with form=form %} 
     <script>
         $(document).ready(function() {
-            $("#openCreateExpenditureModal").on("click", function() {
-                $("#createExpenditureModal").modal("show");
+            $("#open-create-modal").on("click", function() {
+                $("#create-expenditure-modal").modal("show");
             });
-            $("#openUpdateExpenditureModal").on("click", function() {
-                $("#updateExpenditureModal").modal("show");
+            $(".open-update-modal").on("click", function() {
+                var expenditureId = $(this).data('id');
+                var categoryName = $(this).data('category');
+                $.ajax({
+                    url: "/category/" + categoryName + "/update/" + expenditureId + "/",
+                    success: function(data) {
+                        $("form").attr("action", "/category/" + categoryName + "/update/" + expenditureId + "/");
+                        $("#update-expenditure-modal .update-form").html(data);
+                        $("#update-expenditure-modal").modal("show");
+                    }
+                });
             });
         });
     </script>   
