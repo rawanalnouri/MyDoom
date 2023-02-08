@@ -8,7 +8,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
-
 from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
 from django.core.paginator import Paginator
@@ -43,27 +42,15 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
         expendForm = ExpenditureForm(request.POST)
-        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user) 
+        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category) 
 
         if 'expenditureForm' in request.POST:
-            # self.handleForm(ExpenditureForm(request.POST), category, "Successfully Created Expenditure", "Failed to Create Expenditure")
-            # expenditureForm = ExpenditureForm(request.POST)
-            # category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
-            if category and expendForm.is_valid():
-                messages.add_message(self.request, messages.SUCCESS, "Successfully Created Expenditure")
-                expendForm.save(category)
-            else:
-                messages.add_message(self.request, messages.ERROR, "Failed to Create Expenditure")
-            # return redirect(reverse('category', args=[category.id]))  
-        if 'categoryForm' in request.POST:
-            # self.handleForm(CategorySpendingLimitForm(request.POST), category, "Successfully Updated Category", "Failed to Update Category")
-            # category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
-            if category and categForm.is_valid():
-                messages.add_message(self.request, messages.SUCCESS, "Successfully Updated Category")
-                categForm.save(category)
-            else:
-                messages.add_message(self.request, messages.ERROR, "Failed to Updated Category")
+            self.handleForm(expendForm, category, "Failed to Create Expenditure", "Successfully Created Expenditure")
 
+        elif 'categoryForm' in request.POST:
+            self.handleForm(categForm, category, "Failed to Updated Category", "Successfully Updated Category")
+
+        #Using hidden id to determine which form is being used and adding to context
         context = {
             'expenditureForm': expendForm,
             'categoryForm': categForm
