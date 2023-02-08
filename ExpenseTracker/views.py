@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 
-from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile 
+from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category
 from .models import User
 from django.core.paginator import Paginator
@@ -140,6 +140,16 @@ class EditProfileView(LoginRequiredMixin,View):
 
     login_url = reverse_lazy('logIn')
 
-    def get(self, request):
-        return render(request, "editProfile.html", {"form":EditProfile({"first_name":request.user.first_name, "last_name":request.user.last_name, "username":request.user.username, "email":request.user.email})})
+    def get(self,request):
+                # newForm = EditProfile({"first_name":request.user.first_name, "last_name":request.user.last_name, "username":request.user.username, "email":request.user.email})
+                newForm = SignUpForm(request.POST or None , instance=request.user)
+                if newForm.is_valid():
+                    newForm.save()
+                    messages.success(request, 'Profile updated successfully')
+                    return redirect('home')
+    
+                newForm=SignUpForm(instance=request.user)
+                return render(request, "editProfile.html", {'form': newForm})
+
+
 

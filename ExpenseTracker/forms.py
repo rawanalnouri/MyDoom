@@ -39,6 +39,7 @@ class SignUpForm(forms.ModelForm):
         )
         return new_user
 
+
 '''Form to allow a user to login'''
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
@@ -88,21 +89,23 @@ class CategorySpendingLimitForm(forms.ModelForm):
             self.user.categories.add(category)
         return category
 
-class EditProfile(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ["first_name", "last_name", "username", "email"]
+# class EditProfile(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ["first_name", "last_name", "username", "email"]
 
-    def clean(self):
-        super().clean() 
+#     def clean(self):
+#         super().clean() 
 
  
-    def save(self):
-        super().save(commit=False)
-        new_user = User.objects.create_user(
-            username=self.cleaned_data.get('username'),
-            first_name=self.cleaned_data.get('first_name'),
-            last_name=self.cleaned_data.get('last_name'),
-            email=self.cleaned_data.get('email'),
-        )
-        return new_user
+#     def save(self):
+#         super().save(commit=False)
+#         new_user = User.objects.update_user(
+#             username=self.cleaned_data.get('username'),
+#             first_name=self.cleaned_data.get('first_name'),
+#             last_name=self.cleaned_data.get('last_name'),
+#             email=self.cleaned_data.get('email'),
+#         )
+
+
+#         return new_user

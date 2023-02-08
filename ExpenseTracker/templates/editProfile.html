@@ -5,9 +5,18 @@
 {% block content %}
     <h1>Edit profile information</h1>
 
-    <form action ="" method=POST>
+    <form action ="{% url 'editProfile'%}" method=POST>
         {%csrf_token%}
         {{form.as_p}}
-        <button type="submit" typclass = "btn btn-secondary"> Update Profile </button>
+        <!-- <button type="submit" typclass = "btn btn-secondary" > Update Profile </button> -->
+        <input type="submit" class="btn btn-outline-secondary btn-sm" value = Update>
+        <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">Back</a>
 </form>  
 {% endblock %}
+
+
+<!-- <form action="{% url 'signUp' %}" method="post">
+    {% csrf_token %}
+    {% include 'partials/bootstrapForm.html' with form=form %}
+    <input type="submit" value="Sign Up">
+</form> -->
