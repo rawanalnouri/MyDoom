@@ -61,4 +61,22 @@ class ExpenditureFormTest(TestCase):
         })
         expenditure = form.save(self.category)
         self.assertEqual(expenditure.title, 'Grocery Shopping')
+        # Verify
         self.assertTrue(expenditure in self.category.expenditures.all())
+    
+    def testFormUpdate(self):
+        form = ExpenditureForm(instance=self.expenditure, data={
+            'title': 'Updated Title',
+            'description': 'Updated Description',
+            'amount': 200.00,
+            'date': datetime.date.today(),
+            'mood': 'anxious'
+        })
+        self.assertTrue(form.is_valid())
+        updated_expenditure = form.save(self.category)
+        # Verify
+        self.assertEqual(updated_expenditure.title, 'Updated Title')
+        self.assertEqual(updated_expenditure.description, 'Updated Description')
+        self.assertEqual(updated_expenditure.amount, 200)
+        self.assertEqual(updated_expenditure.date, datetime.date.today())
+        self.assertEqual(updated_expenditure.mood, 'anxious')

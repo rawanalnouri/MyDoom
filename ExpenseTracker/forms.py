@@ -42,10 +42,12 @@ class SignUpForm(forms.ModelForm):
         )
         return newUser
 
+
 '''Form to allow a user to login'''
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
+
 
 class ExpenditureForm(forms.ModelForm):
     class Meta:
@@ -62,6 +64,7 @@ class ExpenditureForm(forms.ModelForm):
             category.save()
             expenditure.save()
         return expenditure
+
 
 class CategorySpendingLimitForm(forms.ModelForm):
     class Meta:
