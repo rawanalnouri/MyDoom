@@ -12,6 +12,6 @@
     <form action="{% url 'logIn' %}" method="post">
         {% csrf_token %}
         {% include 'partials/bootstrapForm.html' with form=form %}
-        <input type="submit" value="Log in">
+        <input type="submit" value="Log in" class="button">
     </form>
 {% endblock %}
