@@ -3,18 +3,18 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib import messages
-from django.db.utils import IntegrityError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
+from django.http import HttpResponse
 from .forms import CategorySpendingLimitForm, ExpenditureForm
-from .models import Category
+from .models import Category, Expenditure
 from django.core.paginator import Paginator
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
-    '''Implements a template view for displaying a specific category and handling expenditure form submissions'''
+    '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
     
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
@@ -79,6 +79,38 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
         return super().form_invalid(form)
+
+class ExpenditureUpdateView(LoginRequiredMixin, View):
+    '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request, *args, **kwargs):
+        expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
+        form = ExpenditureForm(instance=expenditure)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+    
+    def post(self, request, *args, **kwargs):
+        expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
+        form = ExpenditureForm(instance=expenditure, data=request.POST)
+        if form.is_valid():
+            category = Category.objects.filter(name=kwargs['categoryName'], user=request.user).first()
+            form.save(category)
+            messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
+            return redirect(reverse('category', args=[kwargs['categoryName']]))
+        else:
+            messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+
+class ExpenditureDeleteView(LoginRequiredMixin, View):
+    '''Implements a view for deleting an expenditure'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
+        expenditure.delete()
+        messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
+        return redirect(reverse('category', args=[kwargs['categoryName']]))
 
 
 def signUp(request):

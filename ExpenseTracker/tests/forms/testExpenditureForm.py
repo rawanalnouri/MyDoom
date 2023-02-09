@@ -7,8 +7,8 @@ import datetime
 class ExpenditureFormTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
-        self.spendingLimit = SpendingLimit.objects.create(amount='20', time_period='daily')
-        self.category = Category.objects.create(name='Food', spending_limit=self.spendingLimit, user=self.user)
+        self.spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
+        self.category = Category.objects.create(name='Food', spendingLimit=self.spendingLimit, user=self.user)
         self.expenditure = Expenditure.objects.create(
             title='Grocery Shopping',
             description='Weekly grocery shopping',
@@ -61,4 +61,22 @@ class ExpenditureFormTest(TestCase):
         })
         expenditure = form.save(self.category)
         self.assertEqual(expenditure.title, 'Grocery Shopping')
+        # Verify
         self.assertTrue(expenditure in self.category.expenditures.all())
+    
+    def testFormUpdate(self):
+        form = ExpenditureForm(instance=self.expenditure, data={
+            'title': 'Updated Title',
+            'description': 'Updated Description',
+            'amount': 200.00,
+            'date': datetime.date.today(),
+            'mood': 'anxious'
+        })
+        self.assertTrue(form.is_valid())
+        updated_expenditure = form.save(self.category)
+        # Verify
+        self.assertEqual(updated_expenditure.title, 'Updated Title')
+        self.assertEqual(updated_expenditure.description, 'Updated Description')
+        self.assertEqual(updated_expenditure.amount, 200)
+        self.assertEqual(updated_expenditure.date, datetime.date.today())
+        self.assertEqual(updated_expenditure.mood, 'anxious')
