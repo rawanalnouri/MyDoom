@@ -50,8 +50,6 @@ class LogInForm(forms.Form):
 
 
 class ExpenditureForm(forms.ModelForm):
-    expenditureForm = forms.BooleanField(widget=forms.HiddenInput, initial=True)
-
     class Meta:
         model = Expenditure
         fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
