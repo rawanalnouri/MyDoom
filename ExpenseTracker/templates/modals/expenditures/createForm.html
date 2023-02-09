@@ -1,0 +1,18 @@
+<div class="modal fade" id="create-expenditure-modal" tabindex="-1" role="dialog" aria-labelledby="create-modal-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="create-modal-label">Create Expenditure</h5>
+                <button onclick="$('#create-expenditure-modal').modal('hide');" class="btn btn-outline">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <input type="hidden" name="expenditureForm"></input>
+                    {% csrf_token %}
+                    {% include 'partials/bootstrapForm.html' with form=form %}
+                    <button type="submit" class="btn btn-secondary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

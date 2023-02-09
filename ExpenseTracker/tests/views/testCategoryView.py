@@ -11,8 +11,9 @@ class CategoryViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.expenditure = Expenditure.objects.get(id=1)
-        self.category = Category.objects.get(id=1)
+        self.expenditure = Expenditure.objects.create(title='testexpenditure', date=datetime.date.today(), amount=10)
+        spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
+        self.category = Category.objects.create(name='testcategory', spendingLimit=spendingLimit, user=self.user)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
 
@@ -30,7 +31,7 @@ class CategoryViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('category', args=[self.category.name]))
         self.assertEqual(Expenditure.objects.count(), 2)
-        self.assertEqual(Expenditure.objects.first().title, 'testexpenditure2')
+        self.assertTrue(Expenditure.objects.filter(title='testexpenditure2').exists())
     
     def testCategoryViewPostWithInvalidData(self):
         data = {'title': '', 'date': '', 'amount': ''}

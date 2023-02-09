@@ -13,7 +13,7 @@ class CategoryCreateViewTest(TestCase):
         data = {
             'name': 'testCategory',
             'amount': 20,
-            'time_period':'daily',
+            'timePeriod':'daily',
         }
         response = self.client.post(reverse('createCategory'), data)
         self.assertEqual(response.status_code, 302)
@@ -24,7 +24,7 @@ class CategoryCreateViewTest(TestCase):
         data = {
             'name': '',
             'amount': 20,
-            'time_period':'daily',
+            'timePeriod':'daily',
         }
         response = self.client.post(reverse('createCategory'), data)
         self.assertEqual(response.status_code, 200)
