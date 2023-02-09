@@ -24,9 +24,6 @@ class SignUpViewTest(TestCase, LogInTester):
     def testUrl(self):
         self.assertEqual('/signUp/', self.url)
 
-    def testValidSignUpForm(self):
-        self.assertTrue(self.form.is_valid())
-
     def testGetSignUp(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -34,25 +31,6 @@ class SignUpViewTest(TestCase, LogInTester):
         signUpForm = response.context['form']
         self.assertTrue(isinstance(signUpForm,SignUpForm))
 
-    def testFormHasCorrectFields(self):
-        self.assertIn('first_name', self.form.fields)
-        self.assertIn('last_name', self.form.fields)
-        self.assertIn('username', self.form.fields)
-        self.assertIn('email', self.form.fields)
-        self.assertIn('new_password', self.form.fields)
-        self.assertIn('password_confirmation', self.form.fields)
-        self.assertTrue(self.form.fields['email'], forms.EmailField)
-        self.assertTrue(self.form.fields['new_password'].widget, forms.PasswordInput)
-        self.assertTrue(self.form.fields['password_confirmation'].widget, forms.PasswordInput)
-
-    def testBothPasswordsAreEqual(self):
-        self.input['password_confirmation'] = 'WrongPassword1234'
-        form = SignUpForm(data = self.input)
-        self.assertFalse(form.is_valid())
-
-    def testModelValidation(self):
-        self.input['email'] = 'email'
-        self.assertFalse(SignUpForm(data=self.input).is_valid())
 
     def testUnsuccessfulSignUp(self):
         self.input['email'] = 'email!'
@@ -60,6 +38,11 @@ class SignUpViewTest(TestCase, LogInTester):
         response = self.client.post(self.url, self.input)
         totalUsersAfter = User.objects.count()
         self.assertEqual(totalUsersBefore, totalUsersAfter)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response,'signUp.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form,SignUpForm))
+        self.assertTrue(form.is_bound)
         self.assertFalse(self.isUserLoggedIn())
 
     def testSuccessfulSignUpAndRedirect(self):
