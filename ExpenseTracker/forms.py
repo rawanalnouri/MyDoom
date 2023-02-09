@@ -67,8 +67,6 @@ class ExpenditureForm(forms.ModelForm):
 
 
 class CategorySpendingLimitForm(forms.ModelForm):
-    categoryForm = forms.BooleanField(widget=forms.HiddenInput, initial=True)
-
     class Meta:
         model = Category
         fields = ['name','description']

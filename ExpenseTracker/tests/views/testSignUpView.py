@@ -48,7 +48,6 @@ class SignUpViewTest(TestCase, LogInTester):
     def testSuccessfulSignUpAndRedirect(self):
         totalUsersBefore = User.objects.count()
         response = self.client.post(self.url, self.input, follow=True)
-        print(response)
         totalUsersAfter = User.objects.count()
         self.assertEqual(totalUsersBefore+1, totalUsersAfter)
 
