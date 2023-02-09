@@ -25,3 +25,12 @@ class TestLogOut(TestCase, LogInTester):
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'index.html')
         self.assertFalse(self.isUserLoggedIn())
+
+    def testLogOutNotShownWhenNotLoggedIn(self):
+        response = self.client.get('')
+        self.assertNotContains(response, 'logOut')
+
+    def testLogOutShownWhenLoggedIn(self):
+        self.client.login(username='bob123', password='Password123')
+        response = self.client.get('/home/')
+        self.assertContains(response, 'logOut')
