@@ -4,4 +4,25 @@
 
 {% block content %}
     <p>This is the reports page</p>
+
+    <label for= >Choose a category:</label>
+    
+    <select class="selectpicker" multiple aria-label="Default select example" data-live-search="true">
+        <option value="1">One</option>
+        <option value="2">Two</option>
+        <option value="3">Three</option>
+        <option value="4">Four</option>
+    </select>
+
+    <label for= >Choose a time period:</label>
+
+    <select name="timePeriod" id="timePeriod">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+    </select>
+
+    {% include 'partials/chart.html' %}
+
+
 {% endblock %}
