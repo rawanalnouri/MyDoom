@@ -7,15 +7,14 @@ class UserAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for users."""
 
     list_display = [
-        'username', 'first_name', 'last_name', 'email', 'is_active',
-    ]
+        'username', 'firstName', 'lastName', 'email', 'is_active']
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for categories."""
 
     list_display = [
-        'name', 'description', 'spending_limit',
+        'name', 'description', 'spendingLimit',
     ]
 
 @admin.register(Expenditure)
@@ -31,7 +30,7 @@ class SpendingLimitAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for spending limits."""
 
     list_display = [
-        'category', 'amount', 'time_period',
+        'category', 'amount', 'timePeriod',
     ]
 
 @admin.register(Notification)
