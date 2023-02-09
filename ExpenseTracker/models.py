@@ -25,6 +25,9 @@ class SpendingLimit(models.Model):
     def __str__(self):
         return f'£{self.amount}, {self.time_period}'
 
+    def getNumber(self):
+        return self.amount
+
 
 
 class Expenditure(models.Model):

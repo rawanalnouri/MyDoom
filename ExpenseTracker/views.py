@@ -145,7 +145,7 @@ class HomeView(LoginRequiredMixin, View):
                 for expence in category.expenditures.all():
                     categorySpend += float(expence.amount)
 
-                totalSpent.append(categorySpend)
+                totalSpent.append(categorySpend/float(category.spending_limit.getNumber())*100)
 
 
             return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
