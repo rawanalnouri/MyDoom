@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 
-from .forms import CategorySpendingLimitForm, ExpenditureForm
+from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile
 from .models import Category
 from .models import User
 from django.core.paginator import Paginator
@@ -141,15 +141,30 @@ class EditProfileView(LoginRequiredMixin,View):
     login_url = reverse_lazy('logIn')
 
     def get(self,request):
-                # newForm = EditProfile({"first_name":request.user.first_name, "last_name":request.user.last_name, "username":request.user.username, "email":request.user.email})
-                newForm = SignUpForm(request.POST or None , instance=request.user)
-                if newForm.is_valid():
-                    newForm.save()
-                    messages.success(request, 'Profile updated successfully')
-                    return redirect('home')
-    
-                newForm=SignUpForm(instance=request.user)
-                return render(request, "editProfile.html", {'form': newForm})
+        newForm = EditProfile(instance=request.user)
+        #user =  request.user
+        # if request.method=='POST':
+        #     newForm = EditProfileView(request.POST or None , instance=request.user)
+        #     if newForm.is_valid():
+        #         user = newForm.save()
+        #         messages.success(request, 'Profile updated successfully')
+        #         return redirect('home')
+        # else:
+        #     newForm=EditProfile(instance=request.user)
+        return render(request, "editProfile.html", {'form': newForm})
+
+    def post(self,request):
+        # newForm = EditProfile({"first_name":request.user.first_name, "last_name":request.user.last_name, "username":request.user.username, "email":request.user.email})
+        # think and edit
+        user =  request.user
+        form = EditProfile(instance=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, 'Profile updated successfully')
+            return redirect('home')
+        else:
+            return render(request, "editProfile.html", {'form': form}) 
+
 
 
 
