@@ -16,9 +16,10 @@ class CategoryCreateViewTest(TestCase):
             'timePeriod':'daily',
         }
         response = self.client.post(reverse('createCategory'), data)
+        print(response)
         self.assertEqual(response.status_code, 302)
         category = Category.objects.get(name='testCategory')
-        self.assertRedirects(response, reverse('category', args=[category.name]))
+        self.assertRedirects(response, reverse('category', args=[category.id]))
 
     def testCreateCategoryViewDisplaysErrorsOnFailure(self):
         data = {
