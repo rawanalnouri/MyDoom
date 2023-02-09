@@ -28,7 +28,7 @@ class CategoryViewTest(TestCase):
         self.assertIsInstance(response.context['expenditures'], Page)
 
     def testCategoryViewPost(self):
-        data = {'title': 'testexpenditure2', 'date': datetime.date.today(), 'amount': 10}
+        data = {'expenditureForm': 'True', 'title': 'testexpenditure2', 'date': datetime.date.today(), 'amount': 10}
         response = self.client.post(reverse('category', args=[self.category.id]), data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('category', args=[self.category.id]))

@@ -21,9 +21,10 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = {}
-        context['expenditureForm'] = ExpenditureForm()
         category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
-        context['editCategoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
+        #Forms used for modal pop-ups
+        context['expenditureForm'] = ExpenditureForm()
+        context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
         context['category'] = category
         # adding pagination
         paginator = Paginator(category.expenditures.all(), 15) # Show 15 expenditures per page
@@ -31,7 +32,8 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
         return render(request, self.template_name, context)
-    
+
+    ''' Handles saving a valid form and presenting error messages '''
     def handleForm(self, form, category, errorMessage, successMessage):
         if category and form.is_valid():
             messages.add_message(self.request, messages.SUCCESS, successMessage)

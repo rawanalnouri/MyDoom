@@ -7,10 +7,9 @@
             </div>
             <div class="modal-body">
                 <form method="post">
-                    <input type="hidden" name="categoryForm"></input>
                     {% csrf_token %}
                     {% include 'partials/bootstrapForm.html' with form=form %}
-                    <button type="submit" class="btn btn-secondary">Save</button>
+                    <button type="submit" class="btn btn-secondary" name="categoryForm">Save</button>
                 </form>
             </div>
         </div>
