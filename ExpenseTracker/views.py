@@ -132,11 +132,11 @@ class HomeView(LoginRequiredMixin, View):
 
             totalSpent = []
 
-            for category in Category.objects.filter(user=self.request.user): 
+            for category in Category.objects.filter(user=self.request.user):
 
                 # all categories
 
-                categories.append(str(category)) 
+                categories.append(str(category))
 
                 # total spend per catagory
 
