@@ -4,8 +4,8 @@
         "pk": 1,
         "fields": {
             "username": "bob123",
-            "first_name": "bob",
-            "last_name": "white",
+            "firstName": "bob",
+            "lastName": "white",
             "email": "test@email.com", 
             "password": "pbkdf2_sha256$390000$U2BlKwX3h6XYKKj6BS41PQ$4BhZbyjwVRSLm6F0iLmoz8BG4ru0xkw/7R9TPMxVKQA="
         }
@@ -19,8 +19,8 @@
             "title": "testexpenditure",
             "date": "2023-01-01",
             "amount": 10,
-            "created_at": "2023-01-16T17:41:28+00:00",
-            "updated_at": "2023-01-16T17:41:28+00:00"
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "updatedAt": "2023-01-16T17:41:28+00:00"
         }
     },
 
@@ -29,9 +29,9 @@
         "pk": 1,
         "fields": {
             "amount": 20,
-            "time_period": "daily",
-            "created_at": "2023-01-16T17:41:28+00:00",
-            "updated_at": "2023-01-16T17:41:28+00:00"
+            "timePeriod": "daily",
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "updatedAt": "2023-01-16T17:41:28+00:00"
 
         }
     },
@@ -41,10 +41,10 @@
         "pk": 1,
         "fields": {
             "name": "testcategory",
-            "spending_limit": 1,
+            "spendingLimit": 1,
             "user": 1,
-            "created_at": "2023-01-16T17:41:28+00:00",
-            "updated_at": "2023-01-16T17:41:28+00:00"
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "updatedAt": "2023-01-16T17:41:28+00:00"
         }
     }
 ]
