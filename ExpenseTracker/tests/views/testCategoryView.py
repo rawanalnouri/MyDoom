@@ -6,12 +6,13 @@ from django.core.paginator import Page
 import datetime
 
 class CategoryViewTest(TestCase):
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
+        self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.expenditure = Expenditure.objects.create(title='testexpenditure', date=datetime.date.today(), amount=10)
-        spendingLimit = SpendingLimit.objects.create(amount='20', time_period='daily')
-        self.category = Category.objects.create(name='testcategory', spending_limit=spendingLimit, user=self.user)
+        self.expenditure = Expenditure.objects.get(id=1)
+        self.category = Category.objects.get(id=1)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
 
