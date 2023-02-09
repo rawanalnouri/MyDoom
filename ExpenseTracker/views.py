@@ -93,10 +93,10 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
         if form.is_valid():
-            category = Category.objects.filter(name=kwargs['categoryName'], user=request.user).first()
+            category = Category.objects.filter(id=kwargs['categoryId'], user=request.user).first()
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
-            return redirect(reverse('category', args=[kwargs['categoryName']]))
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
@@ -110,7 +110,7 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
-        return redirect(reverse('category', args=[kwargs['categoryName']]))
+        return redirect(reverse('category', args=[kwargs['categoryId']]))
 
 
 def signUp(request):
