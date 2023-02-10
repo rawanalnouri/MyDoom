@@ -176,7 +176,7 @@ class HomeView(LoginRequiredMixin, View):
                 for expence in category.expenditures.all():
                     categorySpend += float(expence.amount)
 
-                totalSpent.append(categorySpend/float(category.spending_limit.getNumber())*100)
+                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
 
 
             return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
@@ -189,4 +189,26 @@ class ReportsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self, request):
-        return render(request, 'reports.html')
+        categories = []
+
+        totalSpent = []
+
+        for category in Category.objects.filter(user=self.request.user):
+
+            # all categories
+
+            categories.append(str(category))
+
+            # total spend per catagory
+
+            categorySpend = 0.00
+
+            for expence in category.expenditures.all():
+                categorySpend += float(expence.amount)
+
+            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+
+
+        return render(request, "reports.html", generateGraph(categories, totalSpent, 'polarArea'))
+
+        # return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
