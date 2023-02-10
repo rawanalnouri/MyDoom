@@ -5,6 +5,12 @@
 {% block content %}
     <p>This is the reports page</p>
     
+{% comment %} <p>{{user.categories.all}}</p>  {% endcomment %}
+
+
+    {% comment %} {% for x in user.categories.all %}
+        <p> {{x.name}} </p>
+    {% endfor %}  {% endcomment %}
 
 <form action="{% url 'reports' %}" method="get" id = "reportsFrom">
 {% csrf_token %}
@@ -25,6 +31,8 @@
 
  <br>
 
+ {% comment %} <br>
+
     <input type="checkbox"  id="category1" name="category1" value="a">
     <label for="category1"> a </label>
     <br>
@@ -34,8 +42,23 @@
     <input type="checkbox" id="category3" name="category3" value="c">
     <label for="category3"> c </label>
     <br>
+    <br> {% endcomment %}
+
+
+ {% for x in user.categories.all %}
+    <input type="checkbox"  id="categories" name="categories" value="{{x.name}}">
+    <label for="category"> {{x.name}} </label>
     <br>
-    <input type="submit" value="Generate Reprot" id="validateInputs">
+
+
+
+    {% endfor %} 
+
+
+
+    <input type="submit" value="Generate Reprot">
+
+
 </form>
 
 
