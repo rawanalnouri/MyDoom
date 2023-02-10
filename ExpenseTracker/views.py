@@ -15,6 +15,7 @@ from django.core.paginator import Paginator
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
+    '''Handles editing categories'''
     
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
@@ -81,6 +82,20 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
         return super().form_invalid(form)
+
+class CategoryDeleteView(LoginRequiredMixin, View):
+    '''Implements a view for deleting an expenditure'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        categoryExpenditures = category.expenditures.all()
+        for expenditure in categoryExpenditures:
+            expenditure.delete()
+        category.spendingLimit.delete()
+        category.delete()
+        messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
+        return redirect('home')
 
 class ExpenditureUpdateView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
