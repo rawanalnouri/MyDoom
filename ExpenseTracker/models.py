@@ -83,6 +83,7 @@ class User(AbstractUser):
     def full_name(self):
         return f'{self.firstName} {self.lastName}'
 
+
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''
 
