@@ -17,6 +17,7 @@
     </div>
    {% include 'modals/expenditures/createForm.html' with form=form %} 
    {% include 'modals/expenditures/updateForm.html' with form=form %} 
+   
     <script>
         $(document).ready(function() {
             $("#open-create-modal").on("click", function() {
@@ -34,6 +35,7 @@
                     }
                 });
             });
+            //
         });
     </script>   
 {% endblock %}

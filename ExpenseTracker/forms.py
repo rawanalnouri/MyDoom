@@ -79,7 +79,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
         self.user = kwargs.pop('user')
         super(CategorySpendingLimitForm, self).__init__(*args, **kwargs)
 
-    timePeriod = forms.ChoiceField(choices=SpendingLimit.TIME_CHOICES)
+    timePeriod = forms.ChoiceField(label="Time period", choices=SpendingLimit.TIME_CHOICES)
     amount = forms.DecimalField(label="Amount [GBP]", min_value=0.01)
 
     def save(self, commit=True):
