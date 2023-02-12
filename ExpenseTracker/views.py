@@ -3,13 +3,14 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib import messages
+from django.contrib.auth.views import PasswordChangeView
 from django.db.utils import IntegrityError
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 
-from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile
+from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
 from .models import Category
 from .models import User
 from django.core.paginator import Paginator
@@ -142,29 +143,41 @@ class EditProfileView(LoginRequiredMixin,View):
 
     def get(self,request):
         newForm = EditProfile(instance=request.user)
-        #user =  request.user
-        # if request.method=='POST':
-        #     newForm = EditProfileView(request.POST or None , instance=request.user)
-        #     if newForm.is_valid():
-        #         user = newForm.save()
-        #         messages.success(request, 'Profile updated successfully')
-        #         return redirect('home')
-        # else:
-        #     newForm=EditProfile(instance=request.user)
         return render(request, "editProfile.html", {'form': newForm})
 
     def post(self,request):
-        # newForm = EditProfile({"first_name":request.user.first_name, "last_name":request.user.last_name, "username":request.user.username, "email":request.user.email})
-        # think and edit
         user =  request.user
         form = EditProfile(instance=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
             messages.success(request, 'Profile updated successfully')
-            return redirect('home')
+            return redirect('profile')
         else:
             return render(request, "editProfile.html", {'form': form}) 
 
+
+class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
+    form_class = ChangePasswordForm
+    login_url = reverse_lazy('login')
+    success_url = reverse_lazy('home')
+
+
+
+#     login_url = reverse_lazy('login')
+
+#     def get(self,request):
+#         newForm = ChangePassword(instance=request.user)
+#         return render(request, "changePassword.html", {'form':newForm})
+    
+#     def post(self,request):
+#         user=request.user
+#         form = ChangePassword(instance=request.user, data=request.POST)
+#         if form.is_valid():
+#             user=form.save()
+#             messages.success(request, 'Password updated successfully')
+#             return redirect('home')
+#         else:
+#             return render(request, "changePassword.html", {'form: form'})
 
 
 

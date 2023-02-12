@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
 
@@ -93,3 +94,18 @@ class EditProfile(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "username", "email"]
+
+
+class ChangePasswordForm(PasswordChangeForm):
+    
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
+    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
+    new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
+
+    class Meta:
+        model = User
+        fields=["old_password","new_password1","new_password2"]
+
+# Had to use snake case as I am referenceing variables that already exist 
+
+
