@@ -4,7 +4,10 @@
 
 {% block content %}
     <h3 id="category-header">{{ category.name }} 
+        <button id="openEditCategoryFormModal" class="btn btn-secondary"><i class="bi bi-pencil"></i></i> Edit Category</button>
+        <button id="openDeleteCategoryModal" class="btn btn-secondary" data-bs-toggle="modal" data-target="#deleteCategoryModal"><i class="bi bi-trash3"></i> Delete Category</button>
         <button id="open-create-modal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
+    
     </h3>
     <p><b>Spending Limit</b> {{ category.spendingLimit }}</p>
     <hr>
@@ -15,11 +18,13 @@
     <div class="text-center">
         {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
     </div>
-   {% include 'modals/expenditures/createForm.html' with form=form %} 
-   {% include 'modals/expenditures/updateForm.html' with form=form %} 
-   
+   {% include 'modals/expenditures/createForm.html' with form=expenditureForm %} 
+   {% include 'modals/expenditures/updateForm.html' with form=expenditureForm %} 
+   {% include 'modals/editCategory.html' with form=categoryForm %} 
+   {% include 'modals/deleteCategory.html' %} 
+
     <script>
-        $(document).ready(function() {
+            $(document).ready(function() {
             $("#open-create-modal").on("click", function() {
                 $("#create-expenditure-modal").modal("show");
             });
@@ -35,7 +40,22 @@
                     }
                 });
             });
-            //
+            $("#openExpenditureFormModal").on("click", function() {
+                $("#expenditureFormModal").modal("show");
+            });
+
+            $("#openEditCategoryFormModal").on("click", function() {
+                $("#editCategoryFormModal").modal("show");
+            });
+
+            $("#openDeleteCategoryModal").on("click", function() {
+                $("#deleteCategoryModal").modal("show");
+            });
+
+            $("#openDeleteExpenditure").on("click", function() {
+                $("#deleteExpenditureModal").modal("show");
+            });
+            
         });
     </script>   
 {% endblock %}
