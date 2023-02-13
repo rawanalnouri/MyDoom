@@ -25,7 +25,13 @@
     options: {
       responsive: true,
       scales: {
-            beginAtZero: true
+        yAxes: [{
+          ticks:{
+            beginAtZero: true,
+            max: 100
+          }
+        }]
+            
         }
     },
   };
