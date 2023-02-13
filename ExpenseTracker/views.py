@@ -168,7 +168,7 @@ def logOut(request):
 
 class IndexView(View):
     def get(self, request):
-            return render(request, 'index.html')
+        return render(request, 'index.html')
 
 
 class HomeView(LoginRequiredMixin, View):
