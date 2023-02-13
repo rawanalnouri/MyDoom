@@ -99,7 +99,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
 class EditProfile(forms.ModelForm):
     class Meta:
         model = User
-        fields = ["first_name", "last_name", "username", "email"]
+        fields = ["firstName", "lastName", "username", "email"]
 
 
 class ChangePasswordForm(PasswordChangeForm):
