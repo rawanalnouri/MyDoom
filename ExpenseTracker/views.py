@@ -163,6 +163,21 @@ class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
 
 
 
+#     login_url = reverse_lazy('login')
+
+#     def get(self,request):
+#         newForm = ChangePassword(instance=request.user)
+#         return render(request, "changePassword.html", {'form':newForm})
+    
+#     def post(self,request):
+#         user=request.user
+#         form = ChangePassword(instance=request.user, data=request.POST)
+#         if form.is_valid():
+#             user=form.save()
+#             messages.success(request, 'Password updated successfully')
+#             return redirect('home')
+#         else:
+#             return render(request, "changePassword.html", {'form: form'})
 
 
 

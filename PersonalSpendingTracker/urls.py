@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path
 from ExpenseTracker import views
 from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView, IndexView, EditProfileView, ProfileView, ChangePassword
@@ -35,6 +36,6 @@ urlpatterns = [
     path('category/<str:categoryName>/', CategoryView.as_view(), name='category'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
-    path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html'), name='changePassword'),
+    path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html')),
 ]
 
