@@ -2,104 +2,18 @@
 
 {% block title %}Reports{% endblock %}
 
+
 {% block content %}
     <p>This is the reports page</p>
-    
-{% comment %} <p>{{user.categories.all}}</p>  {% endcomment %}
 
-
-    {% comment %} {% for x in user.categories.all %}
-        <p> {{x.name}} </p>
-    {% endfor %}  {% endcomment %}
-
-<form action="{% url 'reports' %}" method="get" id = "reportsFrom">
-{% csrf_token %}
- {% include 'partials/bootstrapForm.html' with form=form %}
-    <label for= >Choose a time period:</label>
-
-    <select name="timePeriod" id="timePeriod">
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
-    </select>
-
-    <br>
-
-
-
- <label for= >Choose categories:</label>
-
- <br>
-
- {% comment %} <br>
-
-    <input type="checkbox"  id="category1" name="category1" value="a">
-    <label for="category1"> a </label>
-    <br>
-    <input type="checkbox" id="category2" name="category2" value="b">
-    <label for="category2"> b </label>
-    <br>
-    <input type="checkbox" id="category3" name="category3" value="c">
-    <label for="category3"> c </label>
-    <br>
-    <br> {% endcomment %}
-
-
- {% for x in user.categories.all %}
-    <input type="checkbox"  id="categories" name="categories" value="{{x.name}}">
-    <label for="category"> {{x.name}} </label>
-    <br>
-
-
-
-    {% endfor %} 
-
-
-
-    <input type="submit" value="Generate Reprot">
-
-
-</form>
-
-
-<script type="text/javascript">
-(function() {
-    const form = document.querySelector('#reportsFrom');
-    const checkboxes = form.querySelectorAll('input[type=checkbox]');
-    const checkboxLength = checkboxes.length;
-    const firstCheckbox = checkboxLength > 0 ? checkboxes[0] : null;
-
-    function init() {
-        if (firstCheckbox) {
-            for (let i = 0; i < checkboxLength; i++) {
-                checkboxes[i].addEventListener('change', checkValidity);
-            }
-
-            checkValidity();
-        }
-    }
-
-    function isChecked() {
-        for (let i = 0; i < checkboxLength; i++) {
-            if (checkboxes[i].checked) return true;
-        }
-
-        return false;
-    }
-
-    function checkValidity() {
-        const errorMessage = !isChecked() ? 'At least one checkbox must be selected.' : '';
-        firstCheckbox.setCustomValidity(errorMessage);
-    }
-
-    init();
-})();
-</script>
+    <form action="{% url 'reports' %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type = "submit">
+    </form>
 
 
     {% include 'partials/chart.html' %}
 
 
 {% endblock %}
-
-

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
 
-from .forms import CategorySpendingLimitForm, ExpenditureForm
+from .forms import CategorySpendingLimitForm, ExpenditureForm, ReportForm
 from .models import Category, Expenditure
 from django.core.paginator import Paginator
 
@@ -20,7 +20,7 @@ import time
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
-    
+
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
 
@@ -54,7 +54,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
-    
+
     def post(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
@@ -160,55 +160,65 @@ class HomeView(LoginRequiredMixin, View):
 
     def get(self, request):
             categories = []
-
             totalSpent = []
-
             for category in Category.objects.filter(user=self.request.user):
-
                 # all categories
-
                 categories.append(str(category))
-
                 # total spend per catagory
-
                 categorySpend = 0.00
-
                 for expence in category.expenditures.all():
                     categorySpend += float(expence.amount)
-
                 totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
-
 
             return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
 
 
 
-class ReportsView(LoginRequiredMixin, View):
-    '''Implements a view for handling requests to the reports page'''
+'''Implements a view for handling requests to the reports page'''
+def reportsView(request):
 
-    login_url = reverse_lazy('logIn')
+    # login_url = reverse_lazy('logIn')
+    categories = []
+    totalSpent = []
 
-    def get(self, request):
-        categories = []
+    if request.method == 'POST':
+        form = ReportForm(request.POST)
+        if form.is_valid():
+            timePeriod = form.cleaned_data.get('timePeriod')
+            selectedCategory = form.cleaned_data.get('selectedCategory')
 
-        totalSpent = []
+            for selected in selectedCategory:
+                category = Category.objects.get(name=selected)
+                # all categories
+                categories.append(selected)
+                # total spend per catagory
+                categorySpend = 0.00
+                for expence in category.expenditures.all():
+                    categorySpend += float(expence.amount)
+                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
 
-        for category in Category.objects.filter(user=self.request.user):
+            dict = generateGraph(categories, totalSpent, 'bar')
+            dict.update({"form": form})
 
-            # all categories
+            return render(request, "reports.html", dict)
 
-            categories.append(str(category))
+    form = ReportForm()
+    dict = generateGraph(categories, totalSpent, 'bar')
+    dict.update({"form": form})
+    return render(request, "reports.html", dict)
 
-            # total spend per catagory
-
-            categorySpend = 0.00
-
-            for expence in category.expenditures.all():
-                categorySpend += float(expence.amount)
-
-            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
-
-
-        return render(request, "reports.html", generateGraph(categories, totalSpent, 'polarArea'))
-
-        # return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
+    # def get(self, request):
+    #     categories = []
+    #     totalSpent = []
+    #     for category in Category.objects.filter(user=self.request.user):
+    #         # all categories
+    #         categories.append(str(category))
+    #         # total spend per catagory
+    #         categorySpend = 0.00
+    #         for expence in category.expenditures.all():
+    #             categorySpend += float(expence.amount)
+    #         totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+    #
+    #     return render(request, "reports.html", generateGraph(categories, totalSpent, 'bar'))
+    #
+    #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))

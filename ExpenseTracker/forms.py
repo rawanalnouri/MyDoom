@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
-    
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
@@ -13,7 +13,7 @@ class SignUpForm(forms.ModelForm):
     firstName = forms.CharField(label="First name")
     lastName = forms.CharField(label="Last name")
     newPassword = forms.CharField(
-        label='New password', 
+        label='New password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$', #using postive lookaheads
@@ -25,7 +25,7 @@ class SignUpForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        newPassword = self.cleaned_data.get("newPassword") 
+        newPassword = self.cleaned_data.get("newPassword")
         passwordConfirmation = self.cleaned_data.get("passwordConfirmation")
         if newPassword != passwordConfirmation:
             self.add_error("passwordConfirmation", "Confirmation does not match password.")
@@ -56,7 +56,7 @@ class ExpenditureForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
-    
+
     def save(self, category, commit=True):
         expenditure = super().save()
         if commit:
@@ -73,7 +73,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
         widgets = {
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
-    
+
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
@@ -93,3 +93,21 @@ class CategorySpendingLimitForm(forms.ModelForm):
             category.save()
             self.user.categories.add(category)
         return category
+
+def createCategorySelection():
+    categoryArray = []
+    # filter for user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    for x in Category.objects.all():
+        categoryArray.append((x, x))
+    return categoryArray
+
+FAVORITE_COLORS_CHOICES = [
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+]
+
+'''Form to allow a user to select a category to generate a report for'''
+class ReportForm(forms.Form):
+    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame: ")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=createCategorySelection())

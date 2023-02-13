@@ -16,7 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ExpenseTracker import views
-from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView, IndexView, ExpenditureUpdateView, ExpenditureDeleteView
+from ExpenseTracker.views import HomeView, CategoryCreateView, CategoryView, IndexView, ExpenditureUpdateView, ExpenditureDeleteView
 
 
 urlpatterns = [
@@ -29,7 +29,7 @@ urlpatterns = [
     path('home/', HomeView.as_view(), name='home'),
     path('', IndexView.as_view(), name='index'),
 
-    path('reports/', ReportsView.as_view(), name='reports'),
+    path('reports/', views.reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('category/<str:categoryName>/', CategoryView.as_view(), name='category'),
     path('category/<str:categoryName>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
