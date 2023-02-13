@@ -6,10 +6,11 @@
                 <button onclick="$('#create-expenditure-modal').modal('hide');" class="btn btn-outline">&times;</button>
             </div>
             <div class="modal-body">
+                
                 <form method="post">
                     {% csrf_token %}
                     {% include 'partials/bootstrapForm.html' with form=form %}
-                    <button type="submit" class="btn btn-secondary">Confirm</button>
+                    <button type="submit" class="btn btn-secondary" name="expenditureForm">Confirm</button>
                 </form>
             </div>
         </div>

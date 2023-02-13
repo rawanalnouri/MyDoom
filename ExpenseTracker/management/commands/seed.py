@@ -22,8 +22,23 @@ class Command(BaseCommand):
         self.seedSpendingLimits()
         self.seedExpenditures()
         self.seedUsers()
+        self.seedBaseUser()
         self.seedCategories()
         self.seedUserCategories()
+
+    def seedBaseUser(self):
+        firstName = 'John'
+        lastName = 'Doe'
+        email = self._email(firstName, lastName)
+        username = 'johndoe'
+        User.objects.create_user(
+            username = username,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = Command.PASSWORD,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
 
     def seedUsers(self):
         userCount = 0
