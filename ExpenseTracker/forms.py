@@ -109,5 +109,5 @@ FAVORITE_COLORS_CHOICES = [
 
 '''Form to allow a user to select a category to generate a report for'''
 class ReportForm(forms.Form):
-    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame: ")
-    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=createCategorySelection())
+    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=createCategorySelection(), label = "Categories")
