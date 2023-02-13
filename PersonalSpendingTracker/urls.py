@@ -16,8 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ExpenseTracker import views
-from ExpenseTracker.views import HomeView, ReportsView, CategoryCreateView, CategoryView, IndexView
-
+from ExpenseTracker.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,11 +25,15 @@ urlpatterns = [
     path("logIn/",views.logIn, name="logIn"),
     path("logOut/",views.logOut, name="logOut"),
 
-
     path('home/', HomeView.as_view(), name='home'),
     path('', IndexView.as_view(), name='index'),
 
     path('reports/', ReportsView.as_view(), name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
-    path('category/<str:categoryName>/', CategoryView.as_view(), name='category'),
+    path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
+    path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
+    path('category/<int:categoryId>/delete/<int:expenditureId>/', ExpenditureDeleteView.as_view(), name='deleteExpenditure'),
+    path('category/<int:categoryId>/delete/', CategoryDeleteView.as_view(), name='deleteCategory'),
+
+
 ]

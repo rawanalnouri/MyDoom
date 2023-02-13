@@ -3,9 +3,11 @@ from django.urls import reverse
 from ExpenseTracker.models import User
 
 class HomeViewTest(TestCase):
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.client.login(username='testuser', password='testpassword')
+        self.user = User.objects.get(id=1)
+        self.client.force_login(self.user)
 
     def testHomeViewUsesCorrectTemplate(self):
         response = self.client.get(reverse('home'))
