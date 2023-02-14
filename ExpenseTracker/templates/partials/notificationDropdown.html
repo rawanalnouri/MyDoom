@@ -1,0 +1,10 @@
+#A Notification dropdown derived from https://medium.com/star-gazers/how-to-add-notifications-to-django-app-74df1dac984e
+<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+    {% for notification in  notifications %}
+        <div>
+          <!-- Message from <b>{{ notification.actor }}</b> -->
+          <button class="dropdown-item" type="button">{{ notification.message }}</button>			
+          </div>
+          <div class="dropdown-divider"></div>
+    {% endfor %}
+</div>
