@@ -90,7 +90,7 @@ class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     message = models.CharField(max_length=255)
     createdAt = models.DateTimeField(auto_now_add=True)
-    isSeen = models.BooleanField()
+    isSeen = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['-createdAt']
