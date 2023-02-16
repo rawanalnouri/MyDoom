@@ -25,9 +25,24 @@ class Command(BaseCommand):
         self.seedExpenditures()
         self.seedUsers()
         self.seedBaseUser()
+        self.seedAdminUser()
         self.seedCategories()
         self.seedUserCategories()
         self.seedNotifications()
+
+    def seedAdminUser(self):
+        firstName = 'admin'
+        lastName = 'admin'
+        email = self._email(firstName, lastName)
+        username = 'admin'
+        User.objects.create_superuser(
+            username = username,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = Command.PASSWORD,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created adminp user: username {username}, password {Command.PASSWORD}"))
 
     def seedBaseUser(self):
         firstName = 'John'
