@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      <h1>Users</h1>
+      <table class="table">
+        {% for user in users %}
+          <tr>
+            <td>
+              <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" >
+            </td>
+            <td>{{ user.fullName }}</td>
+            <td><a href="{% url 'showUser' user.id %}">{{ user.username }}</a></td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
