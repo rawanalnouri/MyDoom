@@ -1,11 +1,10 @@
 <!-- A Notification dropdown derived from https://medium.com/star-gazers/how-to-add-notifications-to-django-app-74df1dac984e
 https://github.com/gauthamdasu/Mini-project-blog-codes/tree/master/Simple_Chat_App -->
-<div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-    {% for notification in  notifications %}
-        <div>
-          <!-- Message from <b>{{ notification.actor }}</b> -->
-          <button class="dropdown-item" type="button">{{ notification.message }}</button>			
-          </div>
-          <div class="dropdown-divider"></div>
-    {% endfor %}
-</div>
+<li class="nav-item dropdown">
+    <a href="#" class="nav-link logged-in-items" data-bs-toggle="dropdown"><i class="bi bi-bell"></i><span class="caret"></span> </a>
+    <div class="dropdown-menu">
+            {% for notification in notifications %} 
+        <a href="#" class="dropdown-item"> {{notification.message}} </a>
+        {% endfor %}
+    </div>
+</li>
