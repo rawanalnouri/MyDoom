@@ -1,16 +1,17 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
-from django.http import HttpResponse
+from django.http import Http404
 from .forms import CategorySpendingLimitForm, ExpenditureForm
-from .models import Category, Expenditure
+from .models import Category, Expenditure, User
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -130,41 +131,42 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
         return redirect(reverse('category', args=[kwargs['categoryId']]))
 
 
-def signUp(request):
-    if request.method == 'POST':
+class SignUpView(View):
+    def get(self, request, *args, **kwargs):
+        signUpForm = SignUpForm()
+        return render(request, 'signUp.html', {'form': signUpForm})
+
+    def post(self, request, *args, **kwargs):
         signUpForm = SignUpForm(request.POST)
-        if(signUpForm.is_valid()):
+        if signUpForm.is_valid():
             user = signUpForm.save()
             login(request, user)
-            return redirect('home') 
+            return redirect('home')
+        return render(request, 'signUp.html', {'form': signUpForm})
 
-    else:
-        signUpForm = SignUpForm()
-    return render(request,'signUp.html', {'form': signUpForm})
+class LogInView(View):
+    def get(self, request, *args, **kwargs):
+        form = LogInForm()
+        return render(request, 'logIn.html', {"form": form})
 
-
-def logIn(request):
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         form = LogInForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password) 
+            user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user) 
-                return redirect('home') 
-
+                login(request, user)
+                return redirect('home')
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+        return render(request, 'logIn.html', {"form": form})
 
-    form = LogInForm()
-    return render(request, 'logIn.html', {"form": form})
+class LogOutView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('logIn')
 
-
-@login_required(login_url='/logIn/')
-def logOut(request):
-    logout(request)
-    return redirect('index')
-
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('index')
 
 class IndexView(View):
     def get(self, request):
@@ -187,3 +189,52 @@ class ReportsView(LoginRequiredMixin, View):
 
     def get(self, request):
         return render(request, 'reports.html')
+
+class ShowUserView(LoginRequiredMixin, DetailView):
+    """View that shows individual user details."""
+
+    model = User
+    template_name = 'showUser.html'
+    context_object_name = "user"
+    pk_url_kwarg = 'user_id'
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        """Generate content to be displayed in the template."""
+
+        context = super().get_context_data(*args, **kwargs)
+        user = self.get_object()
+        context['following'] = self.request.user.isFollowing(user)
+        context['followable'] = (self.request.user != user)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request, and redirect to users if user_id invalid."""
+
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return redirect(reverse('users'))
+
+class UserListView(LoginRequiredMixin, ListView):
+    """View that shows a list of all users."""
+
+    model = User
+    template_name = "users.html"
+    context_object_name = "users"
+
+class FollowToggleView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request, userId, *args, **kwargs):
+        currentUser = request.user
+        try:
+            followee = User.objects.get(id=userId)
+            currentUser.toggleFollow(followee)
+        except ObjectDoesNotExist:
+            return redirect('users')
+        else:
+            return redirect('showUser', user_id=userId)
