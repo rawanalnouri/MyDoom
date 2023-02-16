@@ -38,7 +38,7 @@ class TestLoginView(TestCase, LogInTester):
         self.assertFalse(self.isUserLoggedIn())
         form = response.context['form']
         self.assertTrue(isinstance(form, LogInForm))
-        self.assertFalse(form.is_bound)
+        self.assertTrue(form.is_bound)
         #Check for error message
         listOfMessages = list(response.context['messages'])
         self.assertEqual(len(listOfMessages),1)
@@ -52,8 +52,7 @@ class TestLoginView(TestCase, LogInTester):
         self.assertTemplateUsed(response, 'home.html')
         #No Error Messages recieved
         listOfMessages = list(response.context['messages'])
-        self.assertEqual(len(listOfMessages), 0)   
-
+        self.assertEqual(len(listOfMessages), 0)
 
 
 
