@@ -3,13 +3,16 @@ from django.views import View
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
+from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import Http404
-from .forms import CategorySpendingLimitForm, ExpenditureForm
 from .models import Category, Expenditure, User
+from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
+from .models import Category, Expenditure
+from .models import User
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -190,6 +193,7 @@ class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'reports.html')
 
+
 class ShowUserView(LoginRequiredMixin, DetailView):
     """View that shows individual user details."""
 
@@ -219,12 +223,14 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         except Http404:
             return redirect(reverse('users'))
 
+
 class UserListView(LoginRequiredMixin, ListView):
     """View that shows a list of all users."""
 
     model = User
     template_name = "users.html"
     context_object_name = "users"
+
 
 class FollowToggleView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
@@ -238,3 +244,39 @@ class FollowToggleView(LoginRequiredMixin, View):
             return redirect('users')
         else:
             return redirect('showUser', user_id=userId)
+
+
+class ProfileView(LoginRequiredMixin,View):
+    '''Implements a view for handling requests to the profile page'''
+
+
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request):
+        return render(request,'profile.html')
+
+
+class EditProfileView(LoginRequiredMixin,View):
+    '''Implements a view for handling requests to the edit profile page'''
+
+    login_url = reverse_lazy('logIn')
+
+    def get(self,request):
+        newForm = EditProfile(instance=request.user)
+        return render(request, "editProfile.html", {'form': newForm})
+
+    def post(self,request):
+        user =  request.user
+        form = EditProfile(instance=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, 'Profile updated successfully')
+            return redirect('profile')
+        else:
+            return render(request, "editProfile.html", {'form': form}) 
+
+
+class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
+    form_class = ChangePasswordForm
+    login_url = reverse_lazy('login')
+    success_url = reverse_lazy('home')
