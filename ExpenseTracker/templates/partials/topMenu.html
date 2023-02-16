@@ -3,10 +3,13 @@
     {% if user.is_authenticated %}
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
         <ul>
-            <li><a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a></li>
-            <li><a href="{% url 'logOut' %}" class='logged-in-items'><i class="bi bi-box-arrow-left"></i></a></li>
+            <li>
+                <a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a>
+            </li>
+            <li>
+                <a href="{% url 'logOut' %}" class='logged-in-items'><i class="bi bi-box-arrow-left"></i></a>
+            </li>
         </ul>
-
     {% else %}
         <ul>
             <li>
