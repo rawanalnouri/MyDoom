@@ -15,6 +15,7 @@ from .models import Category, Expenditure
 from .models import User
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -224,15 +225,9 @@ class ShowUserView(LoginRequiredMixin, DetailView):
             return redirect(reverse('users'))
 
 
-class UserListView(LoginRequiredMixin, ListView):
-    """View that shows a list of all users."""
-
-    model = User
-    template_name = "users.html"
-    context_object_name = "users"
-
-
 class FollowToggleView(LoginRequiredMixin, View):
+    '''View that handles follow/unfollow user functionality'''
+
     login_url = reverse_lazy('logIn')
 
     def get(self, request, userId, *args, **kwargs):
@@ -246,9 +241,8 @@ class FollowToggleView(LoginRequiredMixin, View):
             return redirect('showUser', user_id=userId)
 
 
-class ProfileView(LoginRequiredMixin,View):
-    '''Implements a view for handling requests to the profile page'''
-
+class ProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the profile page'''
 
     login_url = reverse_lazy('logIn')
 
@@ -256,8 +250,8 @@ class ProfileView(LoginRequiredMixin,View):
         return render(request,'profile.html')
 
 
-class EditProfileView(LoginRequiredMixin,View):
-    '''Implements a view for handling requests to the edit profile page'''
+class EditProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the edit profile page'''
 
     login_url = reverse_lazy('logIn')
 
@@ -266,17 +260,45 @@ class EditProfileView(LoginRequiredMixin,View):
         return render(request, "editProfile.html", {'form': newForm})
 
     def post(self,request):
-        user =  request.user
         form = EditProfile(instance=request.user, data=request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             messages.success(request, 'Profile updated successfully')
             return redirect('profile')
         else:
-            return render(request, "editProfile.html", {'form': form}) 
+            return render(request, "editProfile.html", {'form': form})
 
 
-class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
+class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
+    '''View that changes the user's password'''
+
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
+
+
+class UserListView(LoginRequiredMixin, ListView):
+    '''View that shows a list of all users and allows user to filter users based on username'''
+
+    model = User
+    template_name = 'users.html'
+    context_object_name = 'users'
+    paginate_by = 9 # Show 9 users per page
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query is None:
+            objectList = User.objects.all()
+        else: 
+            objectList = User.objects.filter(
+                Q(username__istartswith=query)
+            )
+        return objectList
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        users = paginator.get_page(page)
+        context['users'] = users
+        return context

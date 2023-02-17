@@ -112,6 +112,4 @@ class ChangePasswordForm(PasswordChangeForm):
         model = User
         fields=["old_password","new_password1","new_password2"]
 
-# Had to use snake case as I am referenceing variables that already exist 
-
-
+# Had to use snake case as I am referenceing variables that already exist
