@@ -35,6 +35,7 @@ urlpatterns = [
     path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
     path('category/<int:categoryId>/delete/<int:expenditureId>/', ExpenditureDeleteView.as_view(), name='deleteExpenditure'),
     path('category/<int:categoryId>/delete/', CategoryDeleteView.as_view(), name='deleteCategory'),
+
     path('profile/', ProfileView.as_view(), name='profile'),
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
     path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html'), name='changePassword'),
