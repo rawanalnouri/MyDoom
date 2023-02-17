@@ -3,13 +3,14 @@
 {% block title %}{{category.name}}{% endblock %}
 
 {% block content %}
-    <h3 id="category-header">{{ category.name }} 
+    <h3 id="category-header">{{ category.name }}
         <button id="openEditCategoryFormModal" class="btn btn-secondary"><i class="bi bi-pencil"></i></i> Edit Category</button>
         <button id="openDeleteCategoryModal" class="btn btn-secondary" data-bs-toggle="modal" data-target="#deleteCategoryModal"><i class="bi bi-trash3"></i> Delete Category</button>
         <button id="open-create-modal" class="btn btn-secondary"><i class="bi bi-plus-lg"></i> Create Expenditure</button>
-    
+
     </h3>
     <p><b>Spending Limit</b> {{ category.spendingLimit }}</p>
+    {% include 'partials/chart.html' %}
     <hr>
     <p><b>Expenditure History</b></p>
     <div class="shadow-4 rounded-3 overflow-hidden">
@@ -18,10 +19,10 @@
     <div class="text-center">
         {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
     </div>
-   {% include 'modals/expenditures/createForm.html' with form=expenditureForm %} 
-   {% include 'modals/expenditures/updateForm.html' with form=expenditureForm %} 
-   {% include 'modals/editCategory.html' with form=categoryForm %} 
-   {% include 'modals/deleteCategory.html' %} 
+   {% include 'modals/expenditures/createForm.html' with form=expenditureForm %}
+   {% include 'modals/expenditures/updateForm.html' with form=expenditureForm %}
+   {% include 'modals/editCategory.html' with form=categoryForm %}
+   {% include 'modals/deleteCategory.html' %}
 
     <script>
             $(document).ready(function() {
@@ -55,7 +56,7 @@
             $(".openDeleteExpenditure").on("click", function() {
                 $("#deleteExpenditureModal").modal("show");
             });
-            
+
         });
-    </script>   
+    </script>
 {% endblock %}

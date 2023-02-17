@@ -24,9 +24,17 @@
     },
     options: {
       responsive: true,
+      {% if type == 'bar' %}
       scales: {
-            beginAtZero: true
-        }
+        yAxes: [{
+            display: true,
+            ticks: {
+                beginAtZero: true,   // minimum value will be 0.
+                max: 100
+            }
+        }]
+    }
+    {% endif %}
     },
   };
 

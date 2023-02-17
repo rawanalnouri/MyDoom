@@ -23,7 +23,7 @@ import time
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
     '''Handles editing categories'''
-    
+
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
 
@@ -39,7 +39,25 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         page = self.request.GET.get('page')
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
-        return render(request, self.template_name, context)
+
+        categories = []
+        totalSpent = []
+        categorySpend = 0
+        for category in Category.objects.filter(id = kwargs['categoryId'], user=self.request.user):
+            # all categories
+            categories.append(str(category))
+            categories.append("Remaining Budget")
+            # total spend per catagory
+            categorySpend = 0.00
+            for expence in category.expenditures.all():
+                categorySpend += float(expence.amount)
+            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+
+        dict = generateGraph(categories, totalSpent, 'doughnut')
+        dict.update(context)
+
+        return render(request, self.template_name, dict)
 
     ''' Handles saving a valid form and presenting error messages '''
     def handleForm(self, form, category, errorMessage, successMessage):
@@ -48,11 +66,11 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             form.save(category)
         else:
             messages.add_message(self.request, messages.ERROR, errorMessage)
-    
+
     def post(self, request, *args, **kwargs):
         category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
         expendForm = ExpenditureForm(request.POST)
-        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category) 
+        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category)
 
         if 'expenditureForm' in request.POST:
             self.handleForm(expendForm, category, "Failed to Create Expenditure", "Successfully Created Expenditure")
@@ -84,7 +102,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         return redirect(reverse('category', args=[category.id]))
-    
+
     def form_invalid(self, form):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
@@ -112,7 +130,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
-    
+
     def post(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
@@ -286,14 +304,10 @@ class EditProfileView(LoginRequiredMixin,View):
             messages.success(request, 'Profile updated successfully')
             return redirect('profile')
         else:
-            return render(request, "editProfile.html", {'form': form}) 
+            return render(request, "editProfile.html", {'form': form})
 
 
 class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
-
-
-
-
