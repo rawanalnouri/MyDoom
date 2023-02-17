@@ -283,6 +283,7 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
+    paginate_by = 9 # Show 9 users per page
 
     def get_queryset(self):
         query = self.request.GET.get('q')
@@ -293,3 +294,11 @@ class UserListView(LoginRequiredMixin, ListView):
                 Q(username__istartswith=query)
             )
         return objectList
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        users = paginator.get_page(page)
+        context['users'] = users
+        return context
