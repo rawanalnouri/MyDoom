@@ -23,7 +23,14 @@
       labels: {{ labels|safe }}
     },
     options: {
+     
       responsive: true,
+      {% if type == 'doughnut' %}
+      
+      legend: {
+      display: false
+      }
+      {% endif %}
       {% if type == 'bar' %}
       scales: {
         yAxes: [{
@@ -37,9 +44,29 @@
     {% endif %}
     },
   };
+  {% if type == 'doughnut' %}
+  Chart.pluginService.register({
+  beforeDraw: function(chart) {
+    var width = chart.chart.width,
+        height = chart.chart.height,
+        ctx = chart.chart.ctx;
+    ctx.restore();
+    var fontSize = (height / 114).toFixed(2);
+    ctx.font = fontSize + "em sans-serif";
+    ctx.textBaseline = "middle";
+    var text = "hi",
+        textX = Math.round((width - ctx.measureText(text).width) / 2),
+        textY = height / 2;
+    ctx.fillText(text, textX, textY);
+    ctx.save();
+  }
+});
+ {% endif %}
 
   window.onload = function () {
     var ctx = document.getElementById("pie-chart").getContext("2d");
     window.myPie = new Chart(ctx, config);
   };
+
+
 </script>
