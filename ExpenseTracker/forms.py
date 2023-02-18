@@ -89,10 +89,10 @@ class CategorySpendingLimitForm(forms.ModelForm):
         spendingLimit = SpendingLimit.objects.create(timePeriod=self.cleaned_data['timePeriod'],
                                                      amount=self.cleaned_data['amount'])
         category.spendingLimit = spendingLimit
-        category.user = self.user
         if commit:
             spendingLimit.save()
             category.save()
+            category.users.add(self.user)
             self.user.categories.add(category)
         return category
 

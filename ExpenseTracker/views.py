@@ -27,7 +27,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = {}
-        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
         #Forms used for modal pop-ups
         context['expenditureForm'] = ExpenditureForm()
         context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
@@ -48,9 +48,9 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             messages.add_message(self.request, messages.ERROR, errorMessage)
     
     def post(self, request, *args, **kwargs):
-        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
         expendForm = ExpenditureForm(request.POST)
-        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category) 
+        categForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category) 
 
         if 'expenditureForm' in request.POST:
             self.handleForm(expendForm, category, "Failed to Create Expenditure", "Successfully Created Expenditure")
@@ -93,7 +93,7 @@ class CategoryDeleteView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
-        category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
         categoryExpenditures = category.expenditures.all()
         for expenditure in categoryExpenditures:
             expenditure.delete()
@@ -115,7 +115,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
         if form.is_valid():
-            category = Category.objects.filter(id=kwargs['categoryId'], user=request.user).first()
+            category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -231,10 +231,9 @@ class FollowToggleView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self, request, userId, *args, **kwargs):
-        currentUser = request.user
         try:
             followee = User.objects.get(id=userId)
-            currentUser.toggleFollow(followee)
+            request.user.toggleFollow(followee)
         except ObjectDoesNotExist:
             return redirect('users')
         else:

@@ -10,7 +10,7 @@ class Command(BaseCommand):
     PASSWORD = "Password123"
     SPENDING_LIMIT_COUNT = CATEGORY_COUNT = 50
     EXPENDITURE_COUNT = 50
-    USER_COUNT = 10
+    USER_COUNT = 20
 
     help = "Seeds the database for testing and development."
 
@@ -62,12 +62,12 @@ class Command(BaseCommand):
         return email
 
     def _username(self, firstName, lastName):
-        username = f'{firstName}_{lastName}'
+        username = f'{firstName.lower()}{lastName.lower()}'
         return username
     
     def seedUserCategories(self):
         for user in User.objects.all():
-            _categories = Category.objects.filter(user=user)
+            _categories = Category.objects.filter(users__in=[user])
             for category in _categories:
                 user.categories.add(category)
 
@@ -99,9 +99,9 @@ class Command(BaseCommand):
         category = Category.objects.create (
             name = name,
             description = description,
-            user = user,
             spendingLimit = spendingLimit,
         )
+        category.users.add(user)
         for expenditure in _expenditures:
             category.expenditures.add(expenditure)
 
