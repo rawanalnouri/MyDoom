@@ -52,7 +52,25 @@ body{
     align-items: center;
     padding: 0 20px;
 }
-  
+
+/* .base .header .top-menu .navbar .nav li .dropdown-menu li a {
+    white-space: normal;
+} */
+
+/* .base header .top-menu ul li a .dropdown-item{
+    width: 100px;
+    white-space: normal;
+} */
+
+#notification-item {
+    width: 300px;
+    white-space: normal;
+}
+
+/* .dropdown-item {
+    white-space: pre-wrap;
+} */
+
 .base header .top-menu .title{
     color: var(--body-color);
     font-size: 20px;
