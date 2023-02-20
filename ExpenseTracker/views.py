@@ -1,17 +1,20 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
-from django.http import HttpResponse
+from django.http import Http404
+from .models import Category, Expenditure, User
 from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
 from .models import *
 from django.core.paginator import Paginator
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -131,41 +134,42 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
         return redirect(reverse('category', args=[kwargs['categoryId']]))
 
 
-def signUp(request):
-    if request.method == 'POST':
+class SignUpView(View):
+    def get(self, request, *args, **kwargs):
+        signUpForm = SignUpForm()
+        return render(request, 'signUp.html', {'form': signUpForm})
+
+    def post(self, request, *args, **kwargs):
         signUpForm = SignUpForm(request.POST)
-        if(signUpForm.is_valid()):
+        if signUpForm.is_valid():
             user = signUpForm.save()
             login(request, user)
-            return redirect('home') 
+            return redirect('home')
+        return render(request, 'signUp.html', {'form': signUpForm})
 
-    else:
-        signUpForm = SignUpForm()
-    return render(request,'signUp.html', {'form': signUpForm})
+class LogInView(View):
+    def get(self, request, *args, **kwargs):
+        form = LogInForm()
+        return render(request, 'logIn.html', {"form": form})
 
-
-def logIn(request):
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         form = LogInForm(request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password) 
+            user = authenticate(username=username, password=password)
             if user is not None:
-                login(request, user) 
-                return redirect('home') 
-
+                login(request, user)
+                return redirect('home')
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
+        return render(request, 'logIn.html', {"form": form})
 
-    form = LogInForm()
-    return render(request, 'logIn.html', {"form": form})
+class LogOutView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('logIn')
 
-
-@login_required(login_url='/logIn/')
-def logOut(request):
-    logout(request)
-    return redirect('index')
-
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('index')
 
 class IndexView(View):
     def get(self, request):
@@ -189,17 +193,64 @@ class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         return render(request, 'reports.html')
 
-class ProfileView(LoginRequiredMixin,View):
-    '''Implements a view for handling requests to the profile page'''
 
+class ShowUserView(LoginRequiredMixin, DetailView):
+    """View that shows individual user details."""
+
+    model = User
+    template_name = 'showUser.html'
+    context_object_name = "user"
+    pk_url_kwarg = 'user_id'
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *args, **kwargs):
+        """Generate content to be displayed in the template."""
+
+        context = super().get_context_data(*args, **kwargs)
+        user = self.get_object()
+        context['following'] = self.request.user.isFollowing(user)
+        context['followable'] = (self.request.user != user)
+        return context
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request, and redirect to users if user_id invalid."""
+
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return redirect(reverse('users'))
+
+
+class FollowToggleView(LoginRequiredMixin, View):
+    '''View that handles follow/unfollow user functionality'''
+
+    login_url = reverse_lazy('logIn')
+
+    def get(self, request, userId, *args, **kwargs):
+        currentUser = request.user
+        try:
+            followee = User.objects.get(id=userId)
+            currentUser.toggleFollow(followee)
+        except ObjectDoesNotExist:
+            return redirect('users')
+        else:
+            return redirect('showUser', user_id=userId)
+
+
+class ProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the profile page'''
 
     login_url = reverse_lazy('logIn')
 
     def get(self, request):
         return render(request,'profile.html')
 
-class EditProfileView(LoginRequiredMixin,View):
-    '''Implements a view for handling requests to the edit profile page'''
+
+class EditProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the edit profile page'''
 
     login_url = reverse_lazy('logIn')
 
@@ -208,17 +259,18 @@ class EditProfileView(LoginRequiredMixin,View):
         return render(request, "editProfile.html", {'form': newForm})
 
     def post(self,request):
-        user =  request.user
         form = EditProfile(instance=request.user, data=request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             messages.success(request, 'Profile updated successfully')
             return redirect('profile')
         else:
-            return render(request, "editProfile.html", {'form': form}) 
+            return render(request, "editProfile.html", {'form': form})
 
 
-class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
+class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
+    '''View that changes the user's password'''
+
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
@@ -242,5 +294,28 @@ class EditNotificationsView(LoginRequiredMixin, View):
 
 
 
+class UserListView(LoginRequiredMixin, ListView):
+    '''View that shows a list of all users and allows user to filter users based on username'''
 
+    model = User
+    template_name = 'users.html'
+    context_object_name = 'users'
+    paginate_by = 9 # Show 9 users per page
 
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        if query is None:
+            objectList = User.objects.all()
+        else: 
+            objectList = User.objects.filter(
+                Q(username__istartswith=query)
+            )
+        return objectList
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        users = paginator.get_page(page)
+        context['users'] = users
+        return context

@@ -4,10 +4,6 @@
 
 {% block content %}
     <h1>Log in</h1>
-    <!-- Adding for loop to display all messages-->
-    {% for messsage in messages %}
-        <p><b>{{ messsage }}</b></p>
-    {% endfor %}
 
     <form action="{% url 'logIn' %}" method="post">
         {% csrf_token %}

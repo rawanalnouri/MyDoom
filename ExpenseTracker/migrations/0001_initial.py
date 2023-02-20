@@ -73,9 +73,10 @@ class Migration(migrations.Migration):
                 ('firstName', models.CharField(max_length=50)),
                 ('lastName', models.CharField(max_length=50)),
                 ('email', models.EmailField(max_length=254, unique=True)),
-                ('categories', models.ManyToManyField(related_name='categories', to='ExpenseTracker.category')),
-                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.group', verbose_name='groups')),
-                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.permission', verbose_name='user permissions')),
+                ('categories', models.ManyToManyField(related_name='categories', to='ExpenseTracker.Category')),
+                ('followers', models.ManyToManyField(related_name='followees', to=settings.AUTH_USER_MODEL)),
+                ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
+                ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
             ],
             options={
                 'verbose_name': 'user',
@@ -102,7 +103,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='expenditures',
-            field=models.ManyToManyField(related_name='expenditures', to='ExpenseTracker.expenditure'),
+            field=models.ManyToManyField(related_name='expenditures', to='ExpenseTracker.Expenditure'),
         ),
         migrations.AddField(
             model_name='category',
