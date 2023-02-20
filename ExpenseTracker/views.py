@@ -10,8 +10,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
 from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
-from .models import Category, Expenditure
-from .models import User
+from .models import *
 from django.core.paginator import Paginator
 
 
@@ -223,6 +222,24 @@ class ChangePassword(PasswordChangeView,LoginRequiredMixin,View):
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
+
+class NotificationsView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('logIn')
+
+    def get(self,request):
+        return render(request, "notifications.html")    
+
+class EditNotificationsView(LoginRequiredMixin, View):
+    '''Implements a view function ofr marking notifications as read'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        notification = Notification.objects.get(id=kwargs['notificationId'])
+        notification.isSeen = not notification.isSeen
+        notification.save()
+
+        return render(request, "notifications.html")    
+
 
 
 
