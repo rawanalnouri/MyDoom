@@ -1,0 +1,9 @@
+<tr>
+    <td> 
+        <p> {{ notification.message }}</p>
+    </td>
+    <td>
+        <a type="button" class="btn btn-secondary btn-small" data-bs-toggle="modal" data-bs-target="#fullNotificationModal{{notification.id}}"> View </a> 
+        {% include 'modals/notifications/markAsUnread.html' with notification=notification %}
+    </td>
+</tr>

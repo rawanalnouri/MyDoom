@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+    <h1>Notifications</h1>
+
+    <hr>
+    <table class="table align-middle bg-white">
+        <thead class="bg-light">
+            <tr>
+                <th>Unread Notifications</th>
+                <th></th>
+        </thead>
+        <tbody>
+            {% for notification in unreadNotifications %}
+                {% include "partials/notifications/markAsReadRow.html" with notification=notification %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <table class="table align-middle bg-white">
+        <thead class="bg-light">
+            <tr>
+                <th>Read Notifications</th>
+        </thead>
+        <tbody>
+            {% for notification in readNotifications %}
+                {% include "partials/notifications/markAsUnReadRow.html" with notification=notification %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

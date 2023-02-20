@@ -1,0 +1,22 @@
+<!-- Modal for viewing a notifcaion -->
+<div class="modal fade" id="fullNotificationModal{{notification.id}}" tabindex="-1" aria-labelledby="fullNotificationModalLabel{{notification.id}}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="fullNotificationModalLabel{{notification.id}}">Notification</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <P>
+            <strong>{{ notification.message }} </strong>
+            <br>
+            <small> Recieved notifcation {{notification.createdAt|timesince}} ago</small>
+        </P>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ok</button>
+        <a role="button" class="btn btn-primary" href="{% url 'editNotifications' notificationId=notification.id %}">Mark as Unread</a>
+      </div>
+    </div>
+  </div>
+</div>
