@@ -38,5 +38,5 @@ class NotificationAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for notifications."""
 
     list_display = [
-        'user', 'message',
+        'user', 'message', 'isSeen',
     ]
