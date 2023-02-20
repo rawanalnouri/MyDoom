@@ -1,10 +1,34 @@
 <!-- A Notification dropdown derived from https://medium.com/star-gazers/how-to-add-notifications-to-django-app-74df1dac984e
-https://github.com/gauthamdasu/Mini-project-blog-codes/tree/master/Simple_Chat_App -->
-<li class="nav-item dropdown">
-    <a href="#" class="nav-link logged-in-items" data-bs-toggle="dropdown"><i class="bi bi-bell"></i><span class="caret"></span> </a>
-    <div class="dropdown-menu">
-            {% for notification in notifications %} 
-        <a href="#" class="dropdown-item"> {{notification.message}} </a>
-        {% endfor %}
+https://github.com/gauthamdasu/Mini-project-blog-codes/tree/master/Simple_Chat_App 
+https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNTG8q&index=9&ab_channel=CodeWithStein-->
+<li class="nav-item dropdown" id="scrollable-menu ">
+    <a href="#" class="nav-link logged-in-items" data-bs-toggle="dropdown">
+        <i class="bi bi-bell"></i><span class="care badge bg-danger badge-dot"></span> 
+    </a>
+    <div class="dropdown-menu" style="text-align: center;">        
+        {% if not unreadNotifications %}
+            <p> <strong>No new notifications!</strong> </p> 
+            <div class="dropdown-divider"></div>
+        {% else %}
+            <p> <strong> New notifications!</strong>  </p> 
+            <div class="dropdown-divider"></div>
+            {% for notification in unreadNotifications %} 
+                <p id="notification-item"> {{notification.message}} </p>
+                <div class="dropdown-divider"></div>
+            {% endfor %}
+        {% endif %}
+
+        <a class="dropdown-item" href="{% url 'notifications' %}">View all Notifications</a>
     </div>
 </li>
+
+
+<!-- ATTEMPT TO ADD MODALS FROM DROPDOWN BUT NOT WOKRING YET! -->
+<!-- <script>
+    $(document).ready(function() {
+        $("#notification-item").on("click", function() {
+            $("#fullNotificationModal").modal("show");
+        });
+        
+    });
+</script> -->
