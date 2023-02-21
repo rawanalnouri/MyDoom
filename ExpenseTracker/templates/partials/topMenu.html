@@ -2,7 +2,9 @@
     <div class="title">Spending <span>Tracker</span></div>
     {% if user.is_authenticated %}
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
-        <p style="color: white;" >Points:</p>
+        <p style="color: white;" >Points: {{points.pointsNum}}</p>
+      
+    
         <ul>
             
             <li><a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a></li>

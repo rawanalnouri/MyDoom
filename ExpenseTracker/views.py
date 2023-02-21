@@ -10,10 +10,10 @@ from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
 from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
-from .models import Category, Expenditure
+from .models import Category, Expenditure, Points
 from .models import User
 from django.core.paginator import Paginator
-
+from .helpers.pointsHelper import addPoints
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
@@ -78,6 +78,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
+        ##add points
         return redirect(reverse('category', args=[category.id]))
     
     def form_invalid(self, form):
@@ -137,6 +138,11 @@ def signUp(request):
         signUpForm = SignUpForm(request.POST)
         if(signUpForm.is_valid()):
             user = signUpForm.save()
+            pointsObject = Points()
+            pointsObject.user=user
+            pointsObject.pointsNum=50
+            pointsObject.save()
+          
             login(request, user)
             return redirect('home') 
 
@@ -153,7 +159,8 @@ def logIn(request):
             password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=password) 
             if user is not None:
-                login(request, user) 
+                login(request, user)
+            # check for first login and add points 
                 return redirect('home') 
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
