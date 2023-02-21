@@ -6,7 +6,7 @@
     <h1>Notifications</h1>
 
     <hr>
-    <table class="table align-middle bg-white">
+    <table class="table align-middle bg-white notification-table">
         <thead class="bg-light">
             <tr>
                 <th>Unread Notifications</th>
@@ -19,11 +19,13 @@
         </tbody>
     </table>
 
-    <table class="table align-middle bg-white">
+    <table class="table align-middle bg-white notification-table">
         <thead class="bg-light">
             <tr>
-                <th>Read Notifications</th>
-                <th></th>
+                <th class="w-auto">Read Notifications</th>
+                <th class="text-end">
+                    <a role="button" class="btn btn-outline-secondary btn-sm" href="{% url 'deleteAllNotifications' %}"  style="text-align: center;">Clear All</a>
+                </th>
         </thead>
         <tbody>
             {% for notification in readNotifications %}

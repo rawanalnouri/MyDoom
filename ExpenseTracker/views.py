@@ -280,10 +280,11 @@ class NotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self,request):
+        createNotification(request.user, "Test", "Gelooooodfgfg sdgsdg  sgsfg sgsg")
         return render(request, "notifications.html")    
 
 class EditNotificationsView(LoginRequiredMixin, View):
-    '''Implements a view function ofr marking notifications as read'''
+    '''Implements a view function for marking notifications as read'''
     login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
@@ -293,6 +294,21 @@ class EditNotificationsView(LoginRequiredMixin, View):
 
         return render(request, "notifications.html")    
 
+class deleteNotificationsView(LoginRequiredMixin, View):
+    '''Implements a view function for deleting a notification'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        Notification.objects.get(id=kwargs['notificationId']).delete()
+        return render(request, "notifications.html")  
+
+class DeleteAllNotifications(LoginRequiredMixin, View):
+    '''Implements a view function for deleting all read notifications'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        Notification.objects.filter(user = request.user, isSeen = True).delete()
+        return render(request, "notifications.html")  
 
 
 class UserListView(LoginRequiredMixin, ListView):

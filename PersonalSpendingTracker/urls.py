@@ -29,6 +29,8 @@ urlpatterns = [
     path('home/', HomeView.as_view(), name='home'),
     path('', IndexView.as_view(), name='index'),
     path('notifications/', NotificationsView.as_view(), name='notifications'),
+    path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
+    path('deleteNotifcations/<int:notificationId>/', deleteNotificationsView.as_view(), name='deleteNotifcations'),
 
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
 
