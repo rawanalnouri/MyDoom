@@ -11,10 +11,6 @@ def addPoints(request,n):
     pointsObject.save()
 
 
-# def checkLogin(request):
-#     if request.user.last_login.date() != datetime.today():
-#         return true
-
 
 
 
