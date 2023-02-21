@@ -13,9 +13,12 @@ https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNT
             <p style="text-align: center;"> Unread Notifications - {{unreadNotifications.count}}  </p> 
             <div class="dropdown-divider"></div>
             {% for notification in unreadNotifications %} 
-                <h6 id="notification-item"> <strong>{{notification.title}}</strong> </h6>
-                <p id="notification-item"> {{notification.message}} </p>
-                <div class="dropdown-divider"></div>
+                <div id="notification-item" >
+                    <h6> <strong>{{notification.title}}</strong> </h6>
+                    <p> {{notification.message}} </p>
+                    <p id="timestamp"> {{notification.createdAt|timesince}} ago </p>
+                </div>
+            <div class="dropdown-divider"></div>
             {% endfor %}
         {% endif %}
 
