@@ -15,6 +15,7 @@ from .models import *
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from .helpers.utils import createNotification
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
