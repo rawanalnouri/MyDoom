@@ -5,20 +5,21 @@ https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNT
     <a href="#" class="nav-link logged-in-items" data-bs-toggle="dropdown">
         <i class="bi bi-bell"></i><span class="care badge bg-danger badge-dot"></span> 
     </a>
-    <div class="dropdown-menu" style="text-align: center;">        
+    <div class="dropdown-menu">        
         {% if not unreadNotifications %}
-            <p> <strong>No new notifications!</strong> </p> 
+            <p style="text-align: center;"> No new notifications! </p> 
             <div class="dropdown-divider"></div>
         {% else %}
-            <p> <strong> New notifications!</strong>  </p> 
+            <p style="text-align: center;"> Unread Notifications - {{unreadNotifications.count}}  </p> 
             <div class="dropdown-divider"></div>
             {% for notification in unreadNotifications %} 
+                <h6 id="notification-item"> <strong>{{notification.title}}</strong> </h6>
                 <p id="notification-item"> {{notification.message}} </p>
                 <div class="dropdown-divider"></div>
             {% endfor %}
         {% endif %}
 
-        <a class="dropdown-item" href="{% url 'notifications' %}">View all Notifications</a>
+        <a class="dropdown-item" href="{% url 'notifications' %}" style="text-align: center;">View All</a>
     </div>
 </li>
 

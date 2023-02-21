@@ -56,8 +56,8 @@ body{
 #notification-item {
     width: 300px;
     white-space: normal;
+    padding-left: 6px;
 }
-
 
 .base header .top-menu .title{
     color: var(--body-color);
