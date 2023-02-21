@@ -14,6 +14,7 @@ from .models import Category, Expenditure, Points
 from .models import User
 from django.core.paginator import Paginator
 from .helpers.pointsHelper import addPoints
+from django.utils.timezone import datetime
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
@@ -160,7 +161,12 @@ def logIn(request):
             user = authenticate(username=username, password=password) 
             if user is not None:
                 login(request, user)
-            # check for first login and add points 
+
+                if request.user.last_login.date() != datetime.now().date():
+                    # check if it is the users first time logging in that day, only add points if this is their first login of the day 
+                    addPoints(request,5)
+
+
                 return redirect('home') 
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")

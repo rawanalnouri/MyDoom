@@ -1,6 +1,6 @@
 
 from ExpenseTracker.models import Points
-import datetime
+from django.utils.timezone import datetime
 
 def addPoints(request,n):
     user = request.user
@@ -9,6 +9,11 @@ def addPoints(request,n):
     points = Points.objects.get(user=request.user).pointsNum
     pointsObject.pointsNum = points+n
     pointsObject.save()
+
+
+# def checkLogin(request):
+#     if request.user.last_login.date() != datetime.today():
+#         return true
 
 
 
