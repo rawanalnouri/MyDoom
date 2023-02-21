@@ -1,9 +1,13 @@
 <tr>
     <td> 
-        <p> {{ notification.message }}</p>
+        <div id="notification-item" >
+            <h6> <strong>{{notification.title}}</strong> </h6>
+            <p> {{notification.message}} </p>
+            <p id="timestamp">Recieved on {{notification.createdAt}}</p>
+        </div>
+        
     </td>
     <td>
-        <a type="button" class="btn btn-secondary btn-small" data-bs-toggle="modal" data-bs-target="#fullNotificationModal{{notification.id}}"> View </a> 
-        {% include 'modals/notifications/markAsRead.html' with notification=notification %}
+        <a role="button" class="btn btn-secondary btn-small" href="{% url 'editNotifications' notificationId=notification.id %}">Mark as Read</a>
     </td>
 </tr>
