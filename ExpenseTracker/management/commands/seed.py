@@ -159,10 +159,12 @@ class Command(BaseCommand):
             
         
     def _createNotifcation(self, user):
+        title = self.faker.word() + " " + self.faker.word()
         message = self.faker.sentence()
         isSeen = random.choice([True, False])
         Notification.objects.create(
             user=user,
+            title=title,
             message=message,
             isSeen = isSeen
         )
