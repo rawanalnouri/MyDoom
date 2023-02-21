@@ -80,6 +80,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         ##add points
+        addPoints(self.request,5)
         return redirect(reverse('category', args=[category.id]))
     
     def form_invalid(self, form):
