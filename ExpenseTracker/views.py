@@ -16,6 +16,7 @@ from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from .helpers.utils import createNotification
+from .contextProcessor import getNotifications
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -280,7 +281,22 @@ class NotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self,request):
-        return render(request, "notifications.html")    
+        context = {}
+        allNotifications = getNotifications(request)
+        # adding pagination
+        unreadPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 unread notifications per page
+        unreadPage = self.request.GET.get('page')
+        unreadNotificationPaginated = unreadPaginator.get_page(unreadPage)
+        context['unreadNotificationsPaginated'] = unreadNotificationPaginated
+
+        readPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 unread notifications per page
+        readPage = self.request.GET.get('page')
+        readNotificationPaginated = readPaginator.get_page(readPage)
+        context['readNotificationsPaginated'] = readNotificationPaginated
+
+        return render(request, "notifications.html", context) 
+        # return render(request, "notifications.html")    
+
 
 class EditNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for marking notifications as read'''

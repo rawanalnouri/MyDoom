@@ -88,6 +88,23 @@ body{
     max-height: calc(100vh - 150px);
   }
 
+/* Links used: */
+/* https://www.w3schools.com/css/tryit.asp?filename=trycss_buttons_hover */
+/* https://stackoverflow.com/questions/33911049/btn-xs-no-longer-a-valid-option-in-bootstrap-4 */
+#pagination-button{
+    padding: .25rem .4rem;
+    font-size: .875rem;
+    line-height: .5;
+    border-radius: .2rem;
+    transition-duration: 0.4s;
+    border: 2px solid #e7e7e7;
+    color: black
+}
+
+#pagination-button:hover{
+    background-color: #e7e7e7;
+}
+
 .base header .top-menu .title{
     color: var(--body-color);
     font-size: 20px;
