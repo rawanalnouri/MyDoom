@@ -6,10 +6,9 @@ from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
-from django.contrib.auth.decorators import login_required
-from .forms import SignUpForm, LogInForm
+from .forms import SignUpForm, LogInForm, PostForm
 from django.http import Http404
-from .models import Category, Expenditure, User
+from .models import Category, Expenditure, User, Post
 from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
 from .models import Category, Expenditure
 from .models import User
@@ -23,7 +22,6 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     '''Handles editing categories'''
     
     template_name = 'category.html'
-    login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
     
     def get(self, request, *args, **kwargs):
         context = {}
@@ -64,6 +62,10 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'categoryForm': categForm
         }
         return redirect(reverse('category', args=[category.id]), context=context)
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     '''Implements a view for creating a new category using a form'''
@@ -87,10 +89,13 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
         return super().form_invalid(form)
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
 
 class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
@@ -101,10 +106,13 @@ class CategoryDeleteView(LoginRequiredMixin, View):
         category.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
         return redirect('home')
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
 
 class ExpenditureUpdateView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
-    login_url = reverse_lazy('logIn')
 
     def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
@@ -122,17 +130,22 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         else:
             messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class ExpenditureDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
         return redirect(reverse('category', args=[kwargs['categoryId']]))
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class SignUpView(View):
@@ -147,6 +160,7 @@ class SignUpView(View):
             login(request, user)
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
+
 
 class LogInView(View):
     def get(self, request, *args, **kwargs):
@@ -165,12 +179,16 @@ class LogInView(View):
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
 
+
 class LogOutView(LoginRequiredMixin, View):
-    login_url = reverse_lazy('logIn')
 
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect('index')
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
 
 class IndexView(View):
     def get(self, request):
@@ -180,19 +198,21 @@ class IndexView(View):
 class HomeView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the home page'''
 
-    login_url = reverse_lazy('logIn')
-
     def get(self, request):
         return render(request, "home.html")
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class ReportsView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the reports page'''
-    
-    login_url = reverse_lazy('logIn')
 
     def get(self, request):
         return render(request, 'reports.html')
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class ShowUserView(LoginRequiredMixin, DetailView):
@@ -202,7 +222,6 @@ class ShowUserView(LoginRequiredMixin, DetailView):
     template_name = 'showUser.html'
     context_object_name = "user"
     pk_url_kwarg = 'user_id'
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -224,11 +243,12 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         except Http404:
             return redirect(reverse('users'))
 
+    def handle_no_permission(self):
+        return redirect('logIn')
+
 
 class FollowToggleView(LoginRequiredMixin, View):
     '''View that handles follow/unfollow user functionality'''
-
-    login_url = reverse_lazy('logIn')
 
     def get(self, request, userId, *args, **kwargs):
         try:
@@ -237,22 +257,25 @@ class FollowToggleView(LoginRequiredMixin, View):
         except ObjectDoesNotExist:
             return redirect('users')
         else:
-            return redirect('showUser', user_id=userId)
+            # Redirect to the previous page or URL
+            return redirect(request.META.get('HTTP_REFERER', 'users'))
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class ProfileView(LoginRequiredMixin, View):
     '''View that handles requests to the profile page'''
 
-    login_url = reverse_lazy('logIn')
-
     def get(self, request):
         return render(request,'profile.html')
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class EditProfileView(LoginRequiredMixin, View):
     '''View that handles requests to the edit profile page'''
-
-    login_url = reverse_lazy('logIn')
 
     def get(self,request):
         newForm = EditProfile(instance=request.user)
@@ -267,6 +290,8 @@ class EditProfileView(LoginRequiredMixin, View):
         else:
             return render(request, "editProfile.html", {'form': form})
 
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
     '''View that changes the user's password'''
@@ -282,7 +307,7 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
-    paginate_by = 9 # Show 9 users per page
+    paginate_by = 8 # Show 8 users per page
 
     def get_queryset(self):
         query = self.request.GET.get('q')
@@ -293,11 +318,43 @@ class UserListView(LoginRequiredMixin, ListView):
                 Q(username__istartswith=query)
             )
         return objectList
+    
+    def isFollowing(self, user):
+        '''Method to check if the current user is following a given user'''
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        return self.request.user.followers.filter(pk=user.pk).exists()
+
+    def get_context_data(self, *args, **kwargs):
+        """Generate content to be displayed in the template."""
+
+        context = super().get_context_data(*args, **kwargs)
         paginator = Paginator(self.get_queryset(), self.paginate_by)
         page = self.request.GET.get('page')
         users = paginator.get_page(page)
         context['users'] = users
+        context['posts'] = Post.objects.all().order_by('-createdAt')[:5][::-1]
+        context['curUser'] = self.request.user
+        context['isFollowing'] = self.isFollowing
         return context
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+class ChatView(LoginRequiredMixin, CreateView):
+    """Class-based generic view for new post handling."""
+
+    model = Post
+    form_class = PostForm
+    http_method_names = ['post']
+
+    def form_valid(self, form):
+        """Process a valid form."""
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        """Return URL to redirect the user after valid form handling."""
+        return reverse('users')
+
+    def handle_no_permission(self):
+        return redirect('logIn')

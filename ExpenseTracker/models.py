@@ -26,7 +26,6 @@ class SpendingLimit(models.Model):
         return f'£{self.amount}, {self.timePeriod}'
 
 
-
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
 
@@ -65,6 +64,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class User(AbstractUser):
     '''model for user authentication.'''
 
@@ -85,7 +85,7 @@ class User(AbstractUser):
     )
 
     class Meta:
-        ordering = ['-username']
+        ordering = ['username']
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
@@ -144,3 +144,16 @@ class Notification(models.Model):
     
     def __str__(self):
         return self.message
+
+
+class Post(models.Model):
+    """Posts by users."""
+
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.CharField(max_length=280)
+    createdAt = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        """Model options."""
+
+        ordering = ['createdAt']
