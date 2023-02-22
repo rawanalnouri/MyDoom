@@ -1,0 +1,7 @@
+<table class="table">
+    {% for post in posts %}
+      {% include 'partials/users/chat/postsAsTableRow.html' with post=post %}
+    {% empty %}
+      <p>There are no posts yet.</p>
+    {% endfor %}
+</table>  

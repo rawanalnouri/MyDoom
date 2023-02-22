@@ -1,0 +1,79 @@
+{% load humanize %}
+
+{% if post.author == curUser %}
+<div class="card mb-3 speech-right">
+{% else %}
+<div class="card bg-light mb-3 speech-left">
+{% endif %}
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-2">
+        <img src="{{ post.author.miniGravatar }}" alt="Gravatar of author {{ post.author.username }}" class="rounded-circle" width="50" height="50">
+      </div>
+      <div class="col-md-10">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h6 class="card-title">
+                <span class="font-weight-bold">
+                    {{ post.author.fullName }}
+                </span>
+                &nbsp;&middot;&nbsp;
+                <span class="text-muted">
+                    {{ post.author.username }}
+                </span>
+            </h6>
+          </div>
+          <div class="ml-auto">
+            <span class="text-muted">
+              {{ post.createdAt|naturaltime }}
+            </span>
+          </div>
+        </div>
+        <p class="card-text">{{ post.text }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.speech-left {
+	position: relative;
+	border-radius: .4em;
+}
+
+.speech-left:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 11px solid transparent;
+	border-right-color: #ebebeb;
+	border-left: 0;
+	border-top: 0;
+	margin-top: -7px;
+	margin-left: -14px;
+}
+
+.speech-right {
+	position: relative;
+	background: #ebebeb;
+	border-radius: .4em;
+}
+
+.speech-right:after {
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 0;
+	height: 0;
+	border: 11px solid transparent;
+	border-left-color: #ebebeb;
+	border-right: 0;
+	border-bottom: 0;
+	margin-top: -7px;
+	margin-right: -14px;
+}
+</style>

@@ -3,38 +3,24 @@
 {% block title %}Users{% endblock %}
 
 {% block content %}
+<ul class="nav nav-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="user-tab" data-bs-toggle="tab" data-bs-target="#user" type="button" role="tab" aria-controls="user" aria-selected="true">Users</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="chat-tab" data-bs-toggle="tab" data-bs-target="#chat" type="button" role="tab" aria-controls="chat" aria-selected="false">Chat</button>
+  </li>
+</ul>
+<div class="tab-content" id="myTabContent">
+  <div class="tab-pane fade show active" id="user" role="tabpanel" aria-labelledby="user-tab">
 
-<div class="container">
-  <div class="row">
-    <div class="col-12">
-      <h3>Users</h3>
+    {% include 'partials/users/userList.html' with users=users %}
 
-      {% include 'partials/users/searchBar.html' %}
+  </div>
+  <div class="tab-pane fade" id="chat" role="tabpanel" aria-labelledby="chat-tab">
+    
+    {% include 'partials/users/postList.html' with posts=posts %}
 
-      <table class="table align-middle bg-white">
-        <thead class="bg-light">
-          <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Username</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in users %}
-            <tr>
-              <td>
-                <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
-              </td>
-              <td>{{ user.fullName }}</td>
-              <td><a href="{% url 'showUser' user.id %}">{{ user.username }}</a></td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      {% include 'partials/users/pagination.html' %}
-
-    </div>
   </div>
 </div>
 
