@@ -300,7 +300,7 @@ class deleteNotificationsView(LoginRequiredMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         Notification.objects.get(id=kwargs['notificationId']).delete()
-        return render(request, "notifications.html")  
+        return redirect("notifications")  
 
 class DeleteAllNotifications(LoginRequiredMixin, View):
     '''Implements a view function for deleting all read notifications'''
@@ -308,7 +308,7 @@ class DeleteAllNotifications(LoginRequiredMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         Notification.objects.filter(user = request.user, isSeen = True).delete()
-        return render(request, "notifications.html")  
+        return redirect("notifications")  
 
 
 class UserListView(LoginRequiredMixin, ListView):
