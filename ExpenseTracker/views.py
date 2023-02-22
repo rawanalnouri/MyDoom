@@ -280,7 +280,6 @@ class NotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self,request):
-        createNotification(request.user, "Test", "Gelooooodfgfg sdgsdg  sgsfg sgsg")
         return render(request, "notifications.html")    
 
 class EditNotificationsView(LoginRequiredMixin, View):
@@ -292,7 +291,8 @@ class EditNotificationsView(LoginRequiredMixin, View):
         notification.isSeen = not notification.isSeen
         notification.save()
 
-        return render(request, "notifications.html")    
+        # Making the user stay on whichever page they called this request  
+        return redirect(request.META['HTTP_REFERER'])
 
 class deleteNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for deleting a notification'''
