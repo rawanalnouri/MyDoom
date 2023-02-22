@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
-from .models import User, Category, SpendingLimit, Expenditure
+from .models import User, Category, SpendingLimit, Expenditure, Post
 from django.core.validators import RegexValidator
 
 
@@ -113,3 +113,19 @@ class ChangePasswordForm(PasswordChangeForm):
         fields=["old_password","new_password1","new_password2"]
 
 # Had to use snake case as I am referenceing variables that already exist
+
+
+class PostForm(forms.ModelForm):
+    """Form to ask user for post text.
+
+    The post author must be by the post creator.
+    """
+
+    class Meta:
+        """Form options."""
+
+        model = Post
+        fields = ['text']
+        widgets = {
+            'text': forms.Textarea()
+        }
