@@ -3,7 +3,7 @@
     {% if user.is_authenticated %}
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
         <ul>
-            {% include 'partials/notificationDropdown.html' %}
+            {% include 'partials/notifications/notificationDropdown.html' %}
             <li>
                 <a href="{% url 'logOut' %}" class='logged-in-items'><i class="bi bi-box-arrow-left"></i></a>
             </li>
