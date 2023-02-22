@@ -289,13 +289,12 @@ class NotificationsView(LoginRequiredMixin, View):
         unreadNotificationPaginated = unreadPaginator.get_page(unreadPage)
         context['unreadNotificationsPaginated'] = unreadNotificationPaginated
 
-        readPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 unread notifications per page
+        readPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 read notifications per page
         readPage = self.request.GET.get('page')
         readNotificationPaginated = readPaginator.get_page(readPage)
         context['readNotificationsPaginated'] = readNotificationPaginated
 
         return render(request, "notifications.html", context) 
-        # return render(request, "notifications.html")    
 
 
 class EditNotificationsView(LoginRequiredMixin, View):
