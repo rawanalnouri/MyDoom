@@ -21,8 +21,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.seedSpendingLimits()
         self.seedExpenditures()
-        self.seedUsers()
         self.seedBaseUser()
+        self.seedUsers()
         self.seedCategories()
         self.seedUserCategories()
 
@@ -47,7 +47,7 @@ class Command(BaseCommand):
             lastName = self.faker.unique.last_name()
             email = self._email(firstName, lastName)
             username = self._username(firstName, lastName)
-            User.objects.create_user(
+            user = User.objects.create_user(
                 username = username,
                 firstName = firstName,
                 lastName = lastName,
@@ -55,6 +55,8 @@ class Command(BaseCommand):
                 password = Command.PASSWORD,
             )
             userCount += 1
+            for followee in random.sample(list(User.objects.all()), random.randint(0, User.objects.count())):
+                user.followers.add(followee)
         self.stdout.write(self.style.SUCCESS(f"Number of created users: {userCount}"))
 
     def _email(self, firstName, lastName):
