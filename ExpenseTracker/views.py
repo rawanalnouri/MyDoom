@@ -289,7 +289,7 @@ class NotificationsView(LoginRequiredMixin, View):
         unreadNotificationPaginated = unreadPaginator.get_page(unreadPage)
         context['unreadNotificationsPaginated'] = unreadNotificationPaginated
 
-        readPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 read notifications per page
+        readPaginator = Paginator(allNotifications['readNotifications'], 5) # Show 5 read notifications per page
         readPage = self.request.GET.get('page')
         readNotificationPaginated = readPaginator.get_page(readPage)
         context['readNotificationsPaginated'] = readNotificationPaginated
@@ -314,7 +314,9 @@ class deleteNotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
-        Notification.objects.get(id=kwargs['notificationId']).delete()
+        notification = Notification.objects.get(id=kwargs['notificationId'])
+        if notification.isSeen:
+            Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect("notifications")  
 
 class DeleteAllNotifications(LoginRequiredMixin, View):
