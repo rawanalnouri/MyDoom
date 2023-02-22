@@ -65,7 +65,7 @@ body{
     margin-bottom: 0.3rem;
 }
 
-#timestamp{
+#notification-timestamp{
     margin-top: 2px;
     font-size: small;
     color: grey
@@ -81,7 +81,12 @@ body{
     color: white;
   }
 
-
+  /* Link used: https://stackoverflow.com/questions/68241427/how-to-make-a-scrollable-dropdown-menu-in-bootstrap-5 */
+#scrollable-menu {
+    overflow: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px);
+  }
 
 .base header .top-menu .title{
     color: var(--body-color);
