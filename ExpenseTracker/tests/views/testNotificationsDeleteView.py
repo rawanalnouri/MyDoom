@@ -1,3 +1,5 @@
+''' Tests for deleting a single read notification'''
+
 from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
