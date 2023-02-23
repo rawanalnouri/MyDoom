@@ -46,5 +46,29 @@
             "createdAt": "2023-01-16T17:41:28+00:00",
             "updatedAt": "2023-01-16T17:41:28+00:00"
         }
+    },
+
+    {
+        "model": "ExpenseTracker.notification",
+        "pk": 1,
+        "fields": {
+            "user": 1,
+            "title": "Unread Test Notification",
+            "message": "This is an unread test notification",
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "isSeen": false
+        }
+    },
+
+    {
+        "model": "ExpenseTracker.notification",
+        "pk": 2,
+        "fields": {
+            "user": 1,
+            "title": "Read Test Notification",
+            "message": "This is a read test notification",
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "isSeen": true
+        }
     }
 ]
