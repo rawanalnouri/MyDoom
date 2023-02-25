@@ -20,8 +20,8 @@ class NotificationModelTestCase(TestCase):
         )
 
         self.notification = Notification.objects.create(
-            user = self.user
-            title = "Test Title"
+            user = self.user,
+            title = "Test Title",
             message = "This is a notification message text for test purposes."
         )
 
