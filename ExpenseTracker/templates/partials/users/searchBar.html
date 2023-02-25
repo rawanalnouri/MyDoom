@@ -1,11 +1,8 @@
 <form class="form-inline my-2 my-lg-0" action="{% url 'users' %}" method="get">
     <div class="input-group">
-      <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search..." aria-label="Search">
+      <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search users..." aria-label="Search" id="user-search-input">
       <div class="input-group-append">
         <button class="btn btn-outline-dark my-2 my-sm-0" type="submit"><i class="bi bi-search"></i></button>
-      </div>
-      <div class="input-group-append">
-        <a href="{% url 'users' %}" class="btn btn-outline-secondary my-2 my-sm-0">Display All Users</a>
       </div>
     </div>
 </form>
