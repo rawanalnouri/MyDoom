@@ -2,10 +2,31 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
-    <h1>Sign up</h1>
-    <form action="{% url 'signUp' %}" method="post">
-        {% csrf_token %}
-        {% include 'partials/bootstrapForm.html' with form=form %}
-        <input type="submit" value="Sign Up" class="button">
-    </form>
+    <div class="content-signup">
+        <div class="container container-content-signup rounded-corner">
+          <div class="row">
+            <div class="col-md-6">
+              <img src="" alt="Image" class="img-fluid">
+            </div>
+            <div class="col-md-6 contents">
+              <div class="row justify-content-center">
+                <div class="col-md-8">
+                  <div class="mb-4">
+                  <h3>Sign up</h3>
+                  <!--<p class="mb-4">Blah blah.</p>-->
+                </div>
+                <form action="{% url 'signUp' %}" method="post">
+                    {% csrf_token %}
+                    {% include 'partials/bootstrapForm.html' with form=form %}
+                    <input type="submit" value="Sign Up" class="button">
+                </form>
+                  
+                </div>
+              </div>
+              
+            </div>
+            
+          </div>
+        </div>
+      </div>
 {% endblock %}
