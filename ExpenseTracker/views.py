@@ -215,6 +215,66 @@ class ReportsView(LoginRequiredMixin, View):
         return redirect('logIn')
 
 
+class ProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the profile page'''
+
+    def get(self, request):
+        return render(request,'profile.html')
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
+class EditProfileView(LoginRequiredMixin, View):
+    '''View that handles requests to the edit profile page'''
+
+    def get(self,request):
+        newForm = EditProfile(instance=request.user)
+        return render(request, "editProfile.html", {'form': newForm})
+
+    def post(self,request):
+        form = EditProfile(instance=request.user, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Profile updated successfully')
+            return redirect('profile')
+        else:
+            return render(request, "editProfile.html", {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
+class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
+    '''View that changes the user's password'''
+
+    form_class = ChangePasswordForm
+    login_url = reverse_lazy('login')
+    success_url = reverse_lazy('home')
+
+
+class UserListView(LoginRequiredMixin, ListView):
+    '''View that shows a list of all users and allows user to filter users based on username'''
+
+    model = User
+    template_name = 'users.html'
+    context_object_name = 'users'
+    paginate_by = 15
+
+    def get_context_data(self, *args, **kwargs):
+        """Generate content to be displayed in the template."""
+
+        context = super().get_context_data(*args, **kwargs)
+        paginator = Paginator(self.get_queryset(), self.paginate_by)
+        page = self.request.GET.get('page')
+        users = paginator.get_page(page)
+        context['users'] = users
+        return context
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
 class ShowUserView(LoginRequiredMixin, DetailView):
     """View that shows individual user details."""
 
@@ -264,82 +324,6 @@ class FollowToggleView(LoginRequiredMixin, View):
         return redirect('logIn')
 
 
-class ProfileView(LoginRequiredMixin, View):
-    '''View that handles requests to the profile page'''
-
-    def get(self, request):
-        return render(request,'profile.html')
-    
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-
-class EditProfileView(LoginRequiredMixin, View):
-    '''View that handles requests to the edit profile page'''
-
-    def get(self,request):
-        newForm = EditProfile(instance=request.user)
-        return render(request, "editProfile.html", {'form': newForm})
-
-    def post(self,request):
-        form = EditProfile(instance=request.user, data=request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully')
-            return redirect('profile')
-        else:
-            return render(request, "editProfile.html", {'form': form})
-
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
-    '''View that changes the user's password'''
-
-    form_class = ChangePasswordForm
-    login_url = reverse_lazy('login')
-    success_url = reverse_lazy('home')
-
-
-class UserListView(LoginRequiredMixin, ListView):
-    '''View that shows a list of all users and allows user to filter users based on username'''
-
-    model = User
-    template_name = 'users.html'
-    context_object_name = 'users'
-    paginate_by = 8 # Show 8 users per page
-
-    def get_queryset(self):
-        query = self.request.GET.get('q')
-        if query is None:
-            objectList = User.objects.all()
-        else: 
-            objectList = User.objects.filter(
-                Q(username__istartswith=query)
-            )
-        return objectList
-    
-    def isFollowing(self, user):
-        '''Method to check if the current user is following a given user'''
-
-        return self.request.user.followers.filter(pk=user.pk).exists()
-
-    def get_context_data(self, *args, **kwargs):
-        """Generate content to be displayed in the template."""
-
-        context = super().get_context_data(*args, **kwargs)
-        paginator = Paginator(self.get_queryset(), self.paginate_by)
-        page = self.request.GET.get('page')
-        users = paginator.get_page(page)
-        context['users'] = users
-        context['posts'] = Post.objects.all().order_by('-createdAt')[:5][::-1]
-        context['curUser'] = self.request.user
-        context['isFollowing'] = self.isFollowing
-        return context
-    
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 class ChatView(LoginRequiredMixin, CreateView):
     """Class-based generic view for new post handling."""
 
@@ -358,3 +342,14 @@ class ChatView(LoginRequiredMixin, CreateView):
 
     def handle_no_permission(self):
         return redirect('logIn')
+
+
+def searchUsers(request):
+    query = request.GET.get('q')
+    if query is None:
+        users = User.objects.all()
+    else: 
+        users = User.objects.filter(
+            Q(username__istartswith=query)
+        )
+    return render(request, 'partials/users/searchResults.html', {'users': users})

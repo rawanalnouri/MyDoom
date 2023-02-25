@@ -40,9 +40,11 @@ urlpatterns = [
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
     path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html'), name='changePassword'),
 
-    path('user/<int:user_id>', ShowUserView.as_view(), name='showUser'),
+    path('user/<int:user_id>/', ShowUserView.as_view(), name='showUser'),
     path('users/', UserListView.as_view(), name='users'),
-    path('followToggle/<int:userId>', FollowToggleView.as_view(), name='followToggle'),
+    path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
+    path('searchUsers/', views.searchUsers, name='searchUsers'),
+
     path('users/chat', ChatView.as_view(), name='chat'),
 ]
 
