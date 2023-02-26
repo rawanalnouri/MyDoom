@@ -144,16 +144,3 @@ class Notification(models.Model):
     
     def __str__(self):
         return self.message
-
-
-class Post(models.Model):
-    """Posts by users."""
-
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    text = models.CharField(max_length=280)
-    createdAt = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        """Model options."""
-
-        ordering = ['createdAt']

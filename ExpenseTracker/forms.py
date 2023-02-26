@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
-from .models import User, Category, SpendingLimit, Expenditure, Post
+from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
 
 
@@ -23,7 +23,6 @@ class SignUpForm(forms.ModelForm):
     )
     passwordConfirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
-
     def clean(self):
         super().clean()
         newPassword = self.cleaned_data.get("newPassword") 
@@ -42,7 +41,6 @@ class SignUpForm(forms.ModelForm):
             password=self.cleaned_data.get('newPassword'),
         )
         return newUser
-
 
 
 '''Form to allow a user to login'''
@@ -76,7 +74,6 @@ class CategorySpendingLimitForm(forms.ModelForm):
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
     
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(CategorySpendingLimitForm, self).__init__(*args, **kwargs)
@@ -96,6 +93,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
             self.user.categories.add(category)
         return category
 
+
 class EditProfile(forms.ModelForm):
     class Meta:
         model = User
@@ -113,23 +111,6 @@ class ChangePasswordForm(PasswordChangeForm):
         fields=["old_password","new_password1","new_password2"]
 
 # Had to use snake case as I am referenceing variables that already exist
-
-
-class PostForm(forms.ModelForm):
-    """
-    Form to ask user for post text.
-
-    The post author must be by the post creator.
-    """
-
-    class Meta:
-        """Form options."""
-
-        model = Post
-        fields = ['text']
-        widgets = {
-            'text': forms.Textarea()
-        }
 
 
 class ShareCategoryForm(forms.ModelForm):

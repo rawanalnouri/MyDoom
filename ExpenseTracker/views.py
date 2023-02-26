@@ -6,9 +6,9 @@ from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
-from .forms import SignUpForm, LogInForm, PostForm
+from .forms import SignUpForm, LogInForm
 from django.http import Http404
-from .models import Category, Expenditure, User, Post
+from .models import Category, Expenditure, User
 from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm, ShareCategoryForm
 from .models import Category, Expenditure
 from .models import User
@@ -343,26 +343,6 @@ class FollowToggleView(LoginRequiredMixin, View):
             # Redirect to the previous page or URL
             return redirect(request.META.get('HTTP_REFERER', 'users'))
     
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-
-class ChatView(LoginRequiredMixin, CreateView):
-    """Class-based generic view for new post handling."""
-
-    model = Post
-    form_class = PostForm
-    http_method_names = ['post']
-
-    def form_valid(self, form):
-        """Process a valid form."""
-        form.instance.author = self.request.user
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        """Return URL to redirect the user after valid form handling."""
-        return reverse('users')
-
     def handle_no_permission(self):
         return redirect('logIn')
 

@@ -30,7 +30,7 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
 
     path('reports/', ReportsView.as_view(), name='reports'),
-    
+
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
@@ -46,7 +46,5 @@ urlpatterns = [
     path('users/', UserListView.as_view(), name='users'),
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', views.searchUsers, name='searchUsers'),
-
-    path('users/chat', ChatView.as_view(), name='chat'),
 ]
 
