@@ -303,7 +303,7 @@ class ShowUserView(LoginRequiredMixin, DetailView):
 
     model = User
     template_name = 'showUser.html'
-    context_object_name = "user"
+    context_object_name = "otherUser"
     pk_url_kwarg = 'user_id'
 
     def dispatch(self, request, *args, **kwargs):
@@ -313,9 +313,9 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         """Generate content to be displayed in the template."""
 
         context = super().get_context_data(*args, **kwargs)
-        user = self.get_object()
-        context['following'] = self.request.user.isFollowing(user)
-        context['followable'] = (self.request.user != user)
+        otherUser = self.get_object()
+        context['following'] = self.request.user.isFollowing(otherUser)
+        context['followable'] = (self.request.user != otherUser)
         return context
 
     def get(self, request, *args, **kwargs):

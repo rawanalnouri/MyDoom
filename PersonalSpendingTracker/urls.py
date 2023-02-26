@@ -14,9 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.urls import path
-from ExpenseTracker import views
 from ExpenseTracker.views import *
 
 urlpatterns = [
@@ -45,6 +43,6 @@ urlpatterns = [
     path('user/<int:user_id>/', ShowUserView.as_view(), name='showUser'),
     path('users/', UserListView.as_view(), name='users'),
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
-    path('searchUsers/', views.searchUsers, name='searchUsers'),
+    path('searchUsers/', searchUsers, name='searchUsers'),
 ]
 

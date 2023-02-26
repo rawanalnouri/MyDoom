@@ -6,6 +6,7 @@
                 <button onclick="$('#share-category-modal').modal('hide');" class="btn btn-outline">&times;</button>
             </div>
             <div class="modal-body">
+                <p>Select a user to share this category with.</p>
                 <form method="post">
                     {% csrf_token %}
                     <div class="update-form"></div>
