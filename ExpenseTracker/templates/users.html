@@ -6,35 +6,33 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-12">
-      <h3>Users</h3>
-
-      {% include 'partials/users/searchBar.html' %}
-
+      <div class="col-12">
+      <h4>Users</h4>
+      <hr>
       <table class="table align-middle bg-white">
-        <thead class="bg-light">
+          <thead class="bg-light">
           <tr>
-            <th></th>
-            <th>Name</th>
-            <th>Username</th>
+              <th></th>
+              <th>Name</th>
+              <th>Username</th>
           </tr>
-        </thead>
-        <tbody>
+          </thead>
+          <tbody>
           {% for user in users %}
-            <tr>
+              <tr>
               <td>
-                <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
+                  <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
               </td>
               <td>{{ user.fullName }}</td>
               <td><a href="{% url 'showUser' user.id %}">{{ user.username }}</a></td>
-            </tr>
+              </tr>
           {% endfor %}
-        </tbody>
+          </tbody>
       </table>
 
       {% include 'partials/users/pagination.html' %}
 
-    </div>
+      </div>
   </div>
 </div>
 

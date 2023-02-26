@@ -23,7 +23,6 @@ class SignUpForm(forms.ModelForm):
     )
     passwordConfirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
-
     def clean(self):
         super().clean()
         newPassword = self.cleaned_data.get("newPassword") 
@@ -42,7 +41,6 @@ class SignUpForm(forms.ModelForm):
             password=self.cleaned_data.get('newPassword'),
         )
         return newUser
-
 
 
 '''Form to allow a user to login'''
@@ -76,7 +74,6 @@ class CategorySpendingLimitForm(forms.ModelForm):
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
     
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(CategorySpendingLimitForm, self).__init__(*args, **kwargs)
@@ -96,6 +93,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
             self.user.categories.add(category)
         return category
 
+
 class EditProfile(forms.ModelForm):
     class Meta:
         model = User
@@ -113,3 +111,26 @@ class ChangePasswordForm(PasswordChangeForm):
         fields=["old_password","new_password1","new_password2"]
 
 # Had to use snake case as I am referenceing variables that already exist
+
+
+class ShareCategoryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.none())
+
+    class Meta:
+        model = Category
+        fields = []
+
+    def __init__(self, user, category, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = user.followers.all()
+        self.category = category
+
+    def save(self, commit=True):
+        category = self.category
+        user = self.cleaned_data['user']
+        category.users.add(user)
+        user.categories.add(category)
+        if commit:
+            category.save()
+            user.save()
+        return category

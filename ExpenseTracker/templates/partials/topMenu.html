@@ -3,6 +3,7 @@
     {% if user.is_authenticated %}
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
         <ul>
+            {% include 'partials/users/userDropdown.html' %}
             <li>
                 <a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a>
             </li>
