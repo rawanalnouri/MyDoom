@@ -21,17 +21,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.seedSpendingLimits()
         self.seedExpenditures()
-        self.seedBaseUser()
+        user = self.seedBaseUser()
         self.seedUsers()
         self.seedCategories()
         self.seedUserCategories()
+        for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
+            user.followers.add(followee)
 
     def seedBaseUser(self):
         firstName = 'John'
         lastName = 'Doe'
         email = self._email(firstName, lastName)
         username = 'johndoe'
-        User.objects.create_user(
+        user = User.objects.create_user(
             username = username,
             firstName = firstName,
             lastName = lastName,
@@ -39,6 +41,7 @@ class Command(BaseCommand):
             password = Command.PASSWORD,
         )
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
+        return user
 
     def seedUsers(self):
         userCount = 0
@@ -55,7 +58,7 @@ class Command(BaseCommand):
                 password = Command.PASSWORD,
             )
             userCount += 1
-            for followee in random.sample(list(User.objects.all()), random.randint(0, User.objects.count())):
+            for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
                 user.followers.add(followee)
         self.stdout.write(self.style.SUCCESS(f"Number of created users: {userCount}"))
 
