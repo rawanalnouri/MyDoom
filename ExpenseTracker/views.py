@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView, DetailView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView, FormView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate,login,logout
 from .forms import SignUpForm, LogInForm, PostForm
 from django.http import Http404
 from .models import Category, Expenditure, User, Post
-from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
+from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm, ShareCategoryForm
 from .models import Category, Expenditure
 from .models import User
 from django.core.paginator import Paginator
@@ -104,13 +104,36 @@ class CategoryDeleteView(LoginRequiredMixin, View):
             expenditure.delete()
         category.spendingLimit.delete()
         category.delete()
-        messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
+        messages.add_message(request, messages.SUCCESS, "Category successfully deleted")
         return redirect('home')
     
     def handle_no_permission(self):
         return redirect('logIn')
+    
 
+class CategoryShareView(LoginRequiredMixin, View):
+    '''Implements a view for sharing categories'''
 
+    def get(self, request, *args, **kwargs):
+        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
+        form = ShareCategoryForm(user=request.user, category=category)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
+        form = ShareCategoryForm(user=request.user, category=category, data=request.POST)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully Added New User to Category")
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.add_message(request, messages.ERROR, "Failed to Add User to Category")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+    
 class ExpenditureUpdateView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
 

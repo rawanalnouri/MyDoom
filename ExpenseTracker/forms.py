@@ -116,7 +116,8 @@ class ChangePasswordForm(PasswordChangeForm):
 
 
 class PostForm(forms.ModelForm):
-    """Form to ask user for post text.
+    """
+    Form to ask user for post text.
 
     The post author must be by the post creator.
     """
@@ -129,3 +130,26 @@ class PostForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea()
         }
+
+
+class ShareCategoryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.none())
+
+    class Meta:
+        model = Category
+        fields = []
+
+    def __init__(self, user, category, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = user.followers.all()
+        self.category = category
+
+    def save(self, commit=True):
+        category = self.category
+        user = self.cleaned_data['user']
+        category.users.add(user)
+        user.categories.add(category)
+        if commit:
+            category.save()
+            user.save()
+        return category
