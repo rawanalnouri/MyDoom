@@ -4,7 +4,7 @@ import datetime
 from faker import Faker
 from django.core.management.base import BaseCommand
 from dateutil.relativedelta import relativedelta
-from ExpenseTracker.models import SpendingLimit, Expenditure, Category, User
+from ExpenseTracker.models import SpendingLimit, Expenditure, Category, User, Points
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
@@ -31,12 +31,16 @@ class Command(BaseCommand):
         lastName = 'Doe'
         email = self._email(firstName, lastName)
         username = 'johndoe'
-        User.objects.create_user(
+        user = User.objects.create_user(
             username = username,
             firstName = firstName,
             lastName = lastName,
             email = email,
             password = Command.PASSWORD,
+        )
+        Points.objects.create(
+            user = user,
+            pointsNum = 50,
         )
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
 

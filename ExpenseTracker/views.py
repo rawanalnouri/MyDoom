@@ -19,7 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
 import random
-import datetime
+from datetime import datetime
 import time
 
 

@@ -122,16 +122,16 @@ FAVORITE_COLORS_CHOICES = [
 '''Form to allow a user to select a category to generate a report for'''
 class ReportForm(forms.Form):
     timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
-    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=createCategorySelection(), label = "Categories")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
 
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(ReportForm, self).__init__(*args, **kwargs)
+        self.fields['selectedCategory'].choices = self.createCategorySelection()
 
     def createCategorySelection(self):
         categoryArray = []
-        # filter for user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         for x in Category.objects.filter(user=self.user):
             categoryArray.append((x, x))
         return categoryArray
