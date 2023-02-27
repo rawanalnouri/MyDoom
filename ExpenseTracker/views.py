@@ -174,7 +174,10 @@ class LogOutView(LoginRequiredMixin, View):
 
 class IndexView(View):
     def get(self, request):
-        return render(request, 'index.html')
+        if request.user.is_authenticated:
+            return render(request, 'home.html')
+        else:
+            return render(request, 'index.html')
 
 
 class HomeView(LoginRequiredMixin, View):
