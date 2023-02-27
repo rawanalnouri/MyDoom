@@ -58,7 +58,7 @@ class Command(BaseCommand):
                 password = Command.PASSWORD,
             )
             userCount += 1
-            for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
+            for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
         self.stdout.write(self.style.SUCCESS(f"Number of created users: {userCount}"))
 
