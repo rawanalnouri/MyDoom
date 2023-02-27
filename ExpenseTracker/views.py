@@ -31,7 +31,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
         context['category'] = category
         # adding pagination
-        paginator = Paginator(category.expenditures.all(), 15) # Show 15 expenditures per page
+        paginator = Paginator(category.expenditures.all(), 10)
         page = self.request.GET.get('page')
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
