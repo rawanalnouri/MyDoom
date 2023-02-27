@@ -136,8 +136,10 @@ class Notification(models.Model):
     '''model for storing and managing user notifications.'''
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
     message = models.CharField(max_length=255)
     createdAt = models.DateTimeField(auto_now_add=True)
+    isSeen = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['-createdAt']

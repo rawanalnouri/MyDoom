@@ -4,13 +4,15 @@ import datetime
 from faker import Faker
 from django.core.management.base import BaseCommand
 from dateutil.relativedelta import relativedelta
-from ExpenseTracker.models import SpendingLimit, Expenditure, Category, User, Points
+from ExpenseTracker.models import *
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
     SPENDING_LIMIT_COUNT = CATEGORY_COUNT = 50
     EXPENDITURE_COUNT = 50
     USER_COUNT = 10
+    NOTIFICATION_COUNT = 5
+
 
     help = "Seeds the database for testing and development."
 
@@ -23,8 +25,24 @@ class Command(BaseCommand):
         self.seedExpenditures()
         self.seedUsers()
         self.seedBaseUser()
+        self.seedAdminUser()
         self.seedCategories()
         self.seedUserCategories()
+        self.seedNotifications()
+
+    def seedAdminUser(self):
+        firstName = 'admin'
+        lastName = 'admin'
+        email = self._email(firstName, lastName)
+        username = 'admin'
+        User.objects.create_superuser(
+            username = username,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = Command.PASSWORD,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created adminp user: username {username}, password {Command.PASSWORD}"))
 
     def seedBaseUser(self):
         firstName = 'John'
@@ -131,3 +149,27 @@ class Command(BaseCommand):
             mood=mood,
             amount=amount,
         )
+
+    def seedNotifications(self):
+        notificationsCreated = 0
+        for user in User.objects.all():
+            notificationCount = 0
+            while notificationCount < Command.NOTIFICATION_COUNT:
+                   self._createNotifcation(user)
+                   notificationCount += 1
+            notificationsCreated += Command.NOTIFICATION_COUNT
+        self.stdout.write(self.style.SUCCESS(f"Number of created notifications: {notificationsCreated}"))
+        
+            
+        
+    def _createNotifcation(self, user):
+        title = self.faker.word() + " " + self.faker.word()
+        message = self.faker.sentence()
+        isSeen = random.choice([True, False])
+        Notification.objects.create(
+            user=user,
+            title=title,
+            message=message,
+            isSeen = isSeen
+        )
+

@@ -9,18 +9,25 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
+
+from django.http import Http404
 from django.core.paginator import Paginator
 from .helpers.pointsHelper import addPoints
 from django.utils.timezone import datetime
-from django.http import Http404
 from .models import *
 from .forms import *
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from .helpers.pointsHelper import addPoints
+from django.utils.timezone import datetime
+from .helpers.utils import createNotification
+from .contextProcessor import getNotifications
 
 import random
 from datetime import datetime
 import time
+
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -381,6 +388,56 @@ class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
+
+class NotificationsView(LoginRequiredMixin, View):
+    login_url = reverse_lazy('logIn')
+
+    def get(self,request):
+        context = {}
+        allNotifications = getNotifications(request)
+        # adding pagination
+        unreadPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 unread notifications per page
+        unreadPage = self.request.GET.get('page')
+        unreadNotificationPaginated = unreadPaginator.get_page(unreadPage)
+        context['unreadNotificationsPaginated'] = unreadNotificationPaginated
+
+        readPaginator = Paginator(allNotifications['readNotifications'], 5) # Show 5 read notifications per page
+        readPage = self.request.GET.get('page')
+        readNotificationPaginated = readPaginator.get_page(readPage)
+        context['readNotificationsPaginated'] = readNotificationPaginated
+
+        return render(request, "notifications.html", context) 
+
+
+class EditNotificationsView(LoginRequiredMixin, View):
+    '''Implements a view function for marking notifications as read'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        notification = Notification.objects.get(id=kwargs['notificationId'])
+        notification.isSeen = not notification.isSeen
+        notification.save()
+
+        # Making the user stay on whichever page they called this request  
+        return redirect(request.META['HTTP_REFERER'])
+
+class deleteNotificationsView(LoginRequiredMixin, View):
+    '''Implements a view function for deleting a notification'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        notification = Notification.objects.get(id=kwargs['notificationId'])
+        if notification.isSeen:
+            Notification.objects.get(id=kwargs['notificationId']).delete()
+        return redirect("notifications")  
+
+class DeleteAllNotifications(LoginRequiredMixin, View):
+    '''Implements a view function for deleting all read notifications'''
+    login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        Notification.objects.filter(user = request.user, isSeen = True).delete()
+        return redirect("notifications")  
 
 
 class UserListView(LoginRequiredMixin, ListView):

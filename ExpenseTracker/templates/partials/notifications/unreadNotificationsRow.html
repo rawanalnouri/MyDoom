@@ -1,0 +1,15 @@
+<tr>
+    <td> 
+        <div id="notification-item w-auto" >
+            <h6> <strong>{{notification.title}}</strong> </h6>
+            <p> {{notification.message}} </p>
+            <p id="notification-timestamp">Recieved on {{notification.createdAt}}</p>
+        </div>
+        
+    </td>
+    <td class="text-end">
+        <a role="button" style="border-radius: 60px;" class=" btn btn-sm btn-outline-primary"  href="{% url 'editNotifications' notificationId=notification.id %}">
+            <i class="bi bi-check"></i>
+        </a>
+    </td>
+</tr>

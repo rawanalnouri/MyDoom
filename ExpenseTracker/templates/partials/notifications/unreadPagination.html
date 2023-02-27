@@ -1,0 +1,9 @@
+{% if unreadNotificationsPaginated.has_previous %}
+    <a id="pagination-button" style="border-radius: 20%;" href="?page={{ unreadNotificationsPaginated.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
+{% endif %}
+page {{ unreadNotificationsPaginated.number }} of {{ unreadNotificationsPaginated.paginator.num_pages }}
+{% if unreadNotificationsPaginated.has_next %}
+    <a id="pagination-button" href="?page={{ unreadNotificationsPaginated.next_page_number }}">
+        <i class="bi bi-arrow-right"></i>
+    </a>
+{% endif %}
