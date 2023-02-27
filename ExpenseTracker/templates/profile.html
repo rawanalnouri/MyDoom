@@ -1,26 +1,24 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Profile{% endblock %}
 
 {% block content %}
 
-    <div class="container">
-        <div class="row g">
-            <h3>Your Profile</h3>
-            <div class="col-12">
-                <p>First name:</p>
-                <p>{{user.firstName}}</p>
-                <p>Last name:</p>
-                <p>{{user.lastName}}</p>
-                <p>Username</p>
-                <p>{{user.username}}</p>
-                <p>Email:</p>
-                <p> {{user.email}}</p>
-                
-    
-            </div>
+<div class="container">
+    <div class="row g">
+        <h3>Your Profile</h3>
+        <div class="col-12">
+            <p>First name:</p>
+            <p>{{user.firstName}}</p>
+            <p>Last name:</p>
+            <p>{{user.lastName}}</p>
+            <p>Username</p>
+            <p>{{user.username}}</p>
+            <p>Email:</p>
+            <p> {{user.email}}</p>
         </div>
-        <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary btn-sm">Edit Profile </a>
     </div>
+    <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary btn-sm">Edit Profile </a>
+</div>
 
 {% endblock %}

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
+from libgravatar import Gravatar
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
@@ -82,9 +83,53 @@ class User(AbstractUser):
     lastName  = models.CharField(max_length=50)
     email      = models.EmailField(unique=True, blank=False)
     categories = models.ManyToManyField(Category, related_name='categories')
+    followers = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followees'
+    )
 
-    def full_name(self):
+    def gravatar(self, size=120):
+        """Return a URL to the user's gravatar."""
+        gravatar_object = Gravatar(self.email)
+        gravatar_url = gravatar_object.get_image(size=size, default='mp')
+        return gravatar_url
+
+    def miniGravatar(self):
+        """Return a URL to a miniature version of the user's gravatar."""
+        return self.gravatar(size=60)
+
+    def fullName(self):
         return f'{self.firstName} {self.lastName}'
+
+    def toggleFollow(self, followee):
+        """Toggles when self follows a different user."""
+
+        if followee==self:
+            return
+        if self.isFollowing(followee):
+            self._unfollow(followee)
+        else:
+            self._follow(followee)
+
+    def _follow(self, user):
+        user.followers.add(self)
+
+    def _unfollow(self, user):
+        user.followers.remove(self)
+
+    def isFollowing(self, user):
+        """Returns whether self follows the given user."""
+
+        return user in self.followees.all()
+
+    def followerCount(self):
+        """Returns the number of followers of self."""
+
+        return self.followers.count()
+
+    def followeeCount(self):
+        """Returns the number of followees of self."""
+
+        return self.followees.count()
 
 
 class Notification(models.Model):

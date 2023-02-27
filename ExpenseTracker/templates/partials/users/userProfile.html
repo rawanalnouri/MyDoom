@@ -1,0 +1,53 @@
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-body text-center">
+          <img src="{{ user.gravatar }}" alt="{{ user.fullName }}" class="rounded-circle mb-3" width="128" height="128">
+          <h4 class="mb-0">{{ user.fullName }}</h4>
+          <p class="text-muted mb-2">{{ user.username }}</p>
+          <form action="{% url 'followToggle' userId=user.id %}" method="get">
+            {% if followable %}
+                {% if following %}
+                    <button class="btn btn-secondary">Unfollow</button>
+                {% else %}
+                    <button class="btn btn-primary">Follow</button>
+                {% endif %}
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          Followers ({{ user.followerCount }})
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for follower in user.followers.all %}
+            <li class="list-group-item">
+              <a href="{% url 'showUser' follower.id %}">{{ follower.fullName }}</a>
+            </li>
+          {% empty %}
+            <li class="list-group-item">No followers yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-header">
+          Following ({{ user.followeeCount }})
+        </div>
+        <ul class="list-group list-group-flush">
+          {% for followee in user.followees.all %}
+            <li class="list-group-item">
+              <a href="{% url 'showUser' followee.id %}">{{ followee.fullName }}</a>
+            </li>
+          {% empty %}
+            <li class="list-group-item">Not following anyone yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
