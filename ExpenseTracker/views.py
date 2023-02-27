@@ -242,11 +242,10 @@ def reportsView(request):
     totalSpent = []
 
     if request.method == 'POST':
-        form = ReportForm(request.POST)
+        form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategory = form.cleaned_data.get('selectedCategory')
-
             for selected in selectedCategory:
                 category = Category.objects.get(name=selected)
                 # all categories
@@ -262,7 +261,7 @@ def reportsView(request):
 
             return render(request, "reports.html", dict)
 
-    form = ReportForm()
+    form = ReportForm(user=request.user)
     dict = generateGraph(categories, totalSpent, 'bar')
     dict.update({"form": form})
     return render(request, "reports.html", dict)
