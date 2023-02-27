@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+    <h1>Notifications</h1>
+    <hr>
+
+    <div>
+        <table class="table align-middle bg-white notification-table">
+            <thead class="bg-light">
+                <tr>
+                    <th>Unread Notifications</th>
+                    <th></th>
+            </thead>
+            <tbody>
+                {% for notification in unreadNotificationsPaginated %}
+                    {% include "partials/notifications/unreadNotificationsRow.html" with notification=notification %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-center">
+        {% include 'partials/notifications/unreadPagination.html' with expenditures=expenditures %}
+    </div>
+
+    <div>
+        <table class="table align-middle bg-white notification-table">
+            <thead class="bg-light">
+                <tr>
+                    <th class="w-auto">Read Notifications</th>
+                    <th></th>
+            </thead>
+            <tbody>
+                {% for notification in readNotificationsPaginated %}
+                    {% include "partials/notifications/readNotificationsRow.html" with notification=notification %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div style="padding-bottom: 2rem;" class="text-center">
+        {% include 'partials/notifications/readPagination.html' with expenditures=expenditures %}
+    </div>
+{% endblock %}

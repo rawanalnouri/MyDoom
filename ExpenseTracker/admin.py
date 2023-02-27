@@ -14,7 +14,7 @@ class CategoryAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for categories."""
 
     list_display = [
-        'name', 'description', 'spendingLimit', 'user'
+        'name', 'description', 'spendingLimit',
     ]
 
 @admin.register(Expenditure)
@@ -38,5 +38,5 @@ class NotificationAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for notifications."""
 
     list_display = [
-        'user', 'message',
+        'user', 'message', 'isSeen', 'title',
     ]

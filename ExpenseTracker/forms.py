@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
-    
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
@@ -14,7 +14,7 @@ class SignUpForm(forms.ModelForm):
     firstName = forms.CharField(label="First name")
     lastName = forms.CharField(label="Last name")
     newPassword = forms.CharField(
-        label='New password', 
+        label='New password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$', #using postive lookaheads
@@ -23,10 +23,9 @@ class SignUpForm(forms.ModelForm):
     )
     passwordConfirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
-
     def clean(self):
         super().clean()
-        newPassword = self.cleaned_data.get("newPassword") 
+        newPassword = self.cleaned_data.get("newPassword")
         passwordConfirmation = self.cleaned_data.get("passwordConfirmation")
         if newPassword != passwordConfirmation:
             self.add_error("passwordConfirmation", "Confirmation does not match password.")
@@ -44,7 +43,6 @@ class SignUpForm(forms.ModelForm):
         return newUser
 
 
-
 '''Form to allow a user to login'''
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
@@ -58,7 +56,7 @@ class ExpenditureForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
-    
+
     def save(self, category, commit=True):
         expenditure = super().save()
         if commit:
@@ -75,7 +73,6 @@ class CategorySpendingLimitForm(forms.ModelForm):
         widgets = {
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
-    
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
@@ -89,12 +86,13 @@ class CategorySpendingLimitForm(forms.ModelForm):
         spendingLimit = SpendingLimit.objects.create(timePeriod=self.cleaned_data['timePeriod'],
                                                      amount=self.cleaned_data['amount'])
         category.spendingLimit = spendingLimit
-        category.user = self.user
         if commit:
             spendingLimit.save()
             category.save()
+            category.users.add(self.user)
             self.user.categories.add(category)
         return category
+
 
 class EditProfile(forms.ModelForm):
     class Meta:
@@ -103,7 +101,7 @@ class EditProfile(forms.ModelForm):
 
 
 class ChangePasswordForm(PasswordChangeForm):
-    
+
     old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
@@ -112,4 +110,48 @@ class ChangePasswordForm(PasswordChangeForm):
         model = User
         fields=["old_password","new_password1","new_password2"]
 
-# Had to use snake case as I am referenceing variables that already exist
+
+class ShareCategoryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.none())
+
+    class Meta:
+        model = Category
+        fields = []
+
+    def __init__(self, user, category, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = user.followers.all()
+        self.category = category
+
+    def save(self, commit=True):
+        category = self.category
+        user = self.cleaned_data['user']
+        category.users.add(user)
+        user.categories.add(category)
+        if commit:
+            category.save()
+            user.save()
+        return category
+
+FAVORITE_COLORS_CHOICES = [
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+]
+
+'''Form to allow a user to select a category to generate a report for'''
+class ReportForm(forms.Form):
+    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
+
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(ReportForm, self).__init__(*args, **kwargs)
+        self.fields['selectedCategory'].choices = self.createCategorySelection()
+
+    def createCategorySelection(self):
+        categoryArray = []
+        for x in Category.objects.filter(users__in=[self.user]):
+            categoryArray.append((x, x))
+        return categoryArray

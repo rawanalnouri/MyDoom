@@ -2,9 +2,12 @@
     <div class="title">Spending <span>Tracker</span></div>
     {% if user.is_authenticated %}
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
+        <p style="color: black;" >Points: {{points.pointsNum}}</p>  
         <ul>
+            {% include 'partials/users/userDropdown.html' %}
+            {% include 'partials/notifications/notificationDropdown.html' %}
             <li>
-                <a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a>
+                <a href="#" class='logged-in-items'><i class="bi bi-envelope"></i></a>
             </li>
             <li>
                 <a href="{% url 'logOut' %}" class='logged-in-items'><i class="bi bi-box-arrow-left"></i></a>

@@ -14,9 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
 from django.urls import path
-from ExpenseTracker import views
 from ExpenseTracker.views import *
 
 urlpatterns = [
@@ -28,20 +26,26 @@ urlpatterns = [
 
     path('home/', HomeView.as_view(), name='home'),
     path('', IndexView.as_view(), name='index'),
+    path('notifications/', NotificationsView.as_view(), name='notifications'),
+    path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
+    path('deleteNotifcations/<int:notificationId>/', deleteNotificationsView.as_view(), name='deleteNotifications'),
+    path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
 
-    path('reports/', ReportsView.as_view(), name='reports'),
+    path('reports/', reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
+    path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
+    path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
     path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
     path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
     path('category/<int:categoryId>/delete/<int:expenditureId>/', ExpenditureDeleteView.as_view(), name='deleteExpenditure'),
-    path('category/<int:categoryId>/delete/', CategoryDeleteView.as_view(), name='deleteCategory'),
 
     path('profile/', ProfileView.as_view(), name='profile'),
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
     path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html'), name='changePassword'),
 
-    path('user/<int:user_id>', ShowUserView.as_view(), name='showUser'),
+    path('user/<int:user_id>/', ShowUserView.as_view(), name='showUser'),
     path('users/', UserListView.as_view(), name='users'),
-    path('followToggle/<int:userId>', FollowToggleView.as_view(), name='followToggle'),
+    path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
+    path('searchUsers/', searchUsers, name='searchUsers'),
 ]
 

@@ -21,10 +21,12 @@ class SpendingLimit(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return f'£{self.amount}, {self.timePeriod}'
 
+    def getNumber(self):
+        return self.amount
 
 
 class Expenditure(models.Model):
@@ -47,23 +49,24 @@ class Expenditure(models.Model):
 
     class Meta:
         ordering = ['-date']
-    
+
     def __str__(self):
         return self.title
 
 class Category(models.Model):
     '''model for storing and managing user expense categories.'''
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.name
+
 
 class User(AbstractUser):
     '''model for user authentication.'''
@@ -83,6 +86,9 @@ class User(AbstractUser):
     followers = models.ManyToManyField(
         'self', symmetrical=False, related_name='followees'
     )
+
+    class Meta:
+        ordering = ['username']
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""
@@ -133,11 +139,19 @@ class Notification(models.Model):
     '''model for storing and managing user notifications.'''
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
     message = models.CharField(max_length=255)
     createdAt = models.DateTimeField(auto_now_add=True)
+    isSeen = models.BooleanField(default = False)
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return self.message
+
+class Points(models.Model):
+    ''' model for the points that the user earns '''
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pointsNum = models.IntegerField(default=0)
+    
