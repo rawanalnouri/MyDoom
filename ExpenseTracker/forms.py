@@ -112,12 +112,6 @@ class ChangePasswordForm(PasswordChangeForm):
         model = User
         fields=["old_password","new_password1","new_password2"]
 
-def createCategorySelection():
-    categoryArray = []
-    # filter for user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    for x in Category.objects.all():
-        categoryArray.append((x, x))
-    return categoryArray
 
 FAVORITE_COLORS_CHOICES = [
     ('daily', 'Daily'),
