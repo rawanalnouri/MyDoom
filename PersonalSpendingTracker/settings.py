@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -132,10 +133,6 @@ AUTH_USER_MODEL = 'ExpenseTracker.User'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# User model for authentication purposes
-AUTH_USER_MODEL = 'ExpenseTracker.User'
-
 
 # User model for authentication purposes
 AUTH_USER_MODEL = 'ExpenseTracker.User'

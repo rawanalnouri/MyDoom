@@ -29,7 +29,6 @@ class SpendingLimit(models.Model):
         return self.amount
 
 
-
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
 
@@ -57,7 +56,7 @@ class Expenditure(models.Model):
 class Category(models.Model):
     '''model for storing and managing user expense categories.'''
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')
@@ -67,6 +66,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class User(AbstractUser):
     '''model for user authentication.'''
@@ -86,6 +86,9 @@ class User(AbstractUser):
     followers = models.ManyToManyField(
         'self', symmetrical=False, related_name='followees'
     )
+
+    class Meta:
+        ordering = ['username']
 
     def gravatar(self, size=120):
         """Return a URL to the user's gravatar."""

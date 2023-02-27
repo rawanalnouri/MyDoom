@@ -1,24 +1,38 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-
 <div class="container">
-    <div class="row g">
-        <h3>Your Profile</h3>
-        <div class="col-12">
-            <p>First name:</p>
-            <p>{{user.firstName}}</p>
-            <p>Last name:</p>
-            <p>{{user.lastName}}</p>
-            <p>Username</p>
-            <p>{{user.username}}</p>
-            <p>Email:</p>
-            <p> {{user.email}}</p>
+  <div class="row mt-5">
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm">
+        <img class="card-img-top rounded-circle mx-auto mt-4 w-25" src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}">
+        <div class="card-body text-center">
+          <h5 class="card-title">{{ user.fullName }}</h5>
+          <div class="d-flex justify-content-center mb-3">
+            <div class="mr-3">
+              <p class="text-secondary m-0"><small>Followers</small></p>
+              <h6 class="m-0">{{ user.followers.count }}</h6>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-    <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary btn-sm">Edit Profile </a>
+    <div class="col-md-9">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4 class="card-title mb-4">Personal Information</h4>
+          <p class="card-text"><strong>First name:</strong> {{user.firstName}}</p>
+          <p class="card-text"><strong>Last name:</strong> {{user.lastName}}</p>
+          <p class="card-text"><strong>Username:</strong> {{user.username}}</p>
+          <p class="card-text"><strong>Email:</strong> {{user.email}}</p>
+          <hr>
+          <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary float-right">Edit Profile</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
 {% endblock %}
