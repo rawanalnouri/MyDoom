@@ -82,7 +82,6 @@ class User(AbstractUser):
     lastName  = models.CharField(max_length=50)
     email      = models.EmailField(unique=True, blank=False)
     categories = models.ManyToManyField(Category, related_name='categories')
-    id = models.AutoField(primary_key=True)
 
     def full_name(self):
         return f'{self.firstName} {self.lastName}'
