@@ -9,10 +9,12 @@ from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
+from django.core.paginator import Paginator
+from .helpers.pointsHelper import addPoints
+from django.utils.timezone import datetime
 from django.http import Http404
 from .models import *
 from .forms import *
-from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
@@ -113,6 +115,8 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
+        ##add points
+        addPoints(self.request,5)
         return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
@@ -176,6 +180,11 @@ class SignUpView(View):
         signUpForm = SignUpForm(request.POST)
         if signUpForm.is_valid():
             user = signUpForm.save()
+            pointsObject = Points()
+            pointsObject.user=user
+            pointsObject.pointsNum=50
+            pointsObject.save()
+          
             login(request, user)
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -193,7 +202,14 @@ class LogInView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')
+
+                if request.user.last_login.date() != datetime.now().date():
+                    # check if it is the users first time logging in that day, only add points if this is their first login of the day 
+                    addPoints(request,5)
+
+
+                return redirect('home') 
+
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
 
