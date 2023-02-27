@@ -26,9 +26,12 @@ urlpatterns = [
 
     path('home/', HomeView.as_view(), name='home'),
     path('', IndexView.as_view(), name='index'),
+    path('notifications/', NotificationsView.as_view(), name='notifications'),
+    path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
+    path('deleteNotifcations/<int:notificationId>/', deleteNotificationsView.as_view(), name='deleteNotifications'),
+    path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
 
-    path('reports/', ReportsView.as_view(), name='reports'),
-
+    path('reports/', reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),

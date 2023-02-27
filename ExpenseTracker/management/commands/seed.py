@@ -4,13 +4,15 @@ import datetime
 from faker import Faker
 from django.core.management.base import BaseCommand
 from dateutil.relativedelta import relativedelta
-from ExpenseTracker.models import SpendingLimit, Expenditure, Category, User
+from ExpenseTracker.models import *
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
     SPENDING_LIMIT_COUNT = CATEGORY_COUNT = 50
     EXPENDITURE_COUNT = 50
-    USER_COUNT = 20
+    USER_COUNT = 10
+    NOTIFICATION_COUNT = 5
+
 
     help = "Seeds the database for testing and development."
 
@@ -27,6 +29,26 @@ class Command(BaseCommand):
         self.seedUserCategories()
         for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
             user.followers.add(followee)
+        self.seedAdminUser()
+        self.seedNotifications()
+
+    def seedAdminUser(self):
+        firstName = 'admin'
+        lastName = 'admin'
+        email = self._email(firstName, lastName)
+        username = 'admin'
+        user = User.objects.create_superuser(
+            username = username,
+            firstName = firstName,
+            lastName = lastName,
+            email = email,
+            password = Command.PASSWORD,
+        ) 
+        Points.objects.create(
+            user = user,
+            pointsNum = 50,
+        )
+        self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
 
     def seedBaseUser(self):
         firstName = 'John'
@@ -39,6 +61,10 @@ class Command(BaseCommand):
             lastName = lastName,
             email = email,
             password = Command.PASSWORD,
+        )
+        Points.objects.create(
+            user = user,
+            pointsNum = 50,
         )
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
         return user
@@ -132,3 +158,27 @@ class Command(BaseCommand):
             mood=mood,
             amount=amount,
         )
+
+    def seedNotifications(self):
+        notificationsCreated = 0
+        for user in User.objects.all():
+            notificationCount = 0
+            while notificationCount < Command.NOTIFICATION_COUNT:
+                   self._createNotifcation(user)
+                   notificationCount += 1
+            notificationsCreated += Command.NOTIFICATION_COUNT
+        self.stdout.write(self.style.SUCCESS(f"Number of created notifications: {notificationsCreated}"))
+        
+            
+        
+    def _createNotifcation(self, user):
+        title = self.faker.word() + " " + self.faker.word()
+        message = self.faker.sentence()
+        isSeen = random.choice([True, False])
+        Notification.objects.create(
+            user=user,
+            title=title,
+            message=message,
+            isSeen = isSeen
+        )
+
