@@ -34,7 +34,7 @@ urlpatterns = [
 
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
 
-    path('reports/', ReportsView.as_view(), name='reports'),
+    path('reports/', views.reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
     path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),

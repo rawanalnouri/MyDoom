@@ -8,24 +8,35 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import SignUpForm, LogInForm
+from django.http import HttpResponse
+
 from django.http import Http404
-from .models import Category, Expenditure, User
-from .forms import CategorySpendingLimitForm, ExpenditureForm, EditProfile, ChangePasswordForm
-from .models import *
 from django.core.paginator import Paginator
+from .helpers.pointsHelper import addPoints
+from django.utils.timezone import datetime
+from .models import *
+from .forms import *
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from .helpers.pointsHelper import addPoints
+from django.utils.timezone import datetime
 from .helpers.utils import createNotification
 from .contextProcessor import getNotifications
+
+import random
+from datetime import datetime
+import time
+
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
     '''Handles editing categories'''
-    
+
     template_name = 'category.html'
     login_url = reverse_lazy('logIn') #redirects to the "logIn" path if the user is not logged in
-    
+
     def get(self, request, *args, **kwargs):
         context = {}
         category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
@@ -38,7 +49,36 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         page = self.request.GET.get('page')
         expenditures = paginator.get_page(page)
         context['expenditures'] = expenditures
-        return render(request, self.template_name, context)
+
+        categories = []
+        totalSpent = []
+        categorySpend = 0
+        for category in Category.objects.filter(id = kwargs['categoryId'], user=self.request.user):
+            # all categories
+            categories.append(str(category))
+            categories.append("Remaining Budget")
+            # total spend per catagory
+            categorySpend = 0.00
+            for expence in category.expenditures.all():
+                categorySpend += float(expence.amount)
+            totalSpent.append(categorySpend)
+            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+
+        dict = generateGraph(categories, totalSpent, 'doughnut')
+        dict.update(context)
+
+        # analysis stuff
+        namesOfExpenses = []
+        currentCategory = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user)
+        allExpensesInRange = category.expenditures.all().filter(date__year='2023', date__month='01')
+        # filter between months
+        # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
+        for expense in allExpensesInRange:
+            namesOfExpenses.append(expense.title)
+
+        dict.update({'stuff': namesOfExpenses})
+
+        return render(request, self.template_name, dict)
 
     ''' Handles saving a valid form and presenting error messages '''
     def handleForm(self, form, category, errorMessage, successMessage):
@@ -47,11 +87,11 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             form.save(category)
         else:
             messages.add_message(self.request, messages.ERROR, errorMessage)
-    
+
     def post(self, request, *args, **kwargs):
         category = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user).first()
         expendForm = ExpenditureForm(request.POST)
-        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category) 
+        categForm = CategorySpendingLimitForm(request.POST, user=self.request.user, instance=category)
 
         if 'expenditureForm' in request.POST:
             self.handleForm(expendForm, category, "Failed to Create Expenditure", "Successfully Created Expenditure")
@@ -68,7 +108,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
     '''Implements a view for creating a new category using a form'''
-    
+
     model = Category
     form_class = CategorySpendingLimitForm
     template_name = 'categoryForm.html'
@@ -82,8 +122,10 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
+        ##add points
+        addPoints(self.request,5)
         return redirect(reverse('category', args=[category.id]))
-    
+
     def form_invalid(self, form):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
@@ -111,7 +153,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
-    
+
     def post(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
@@ -145,6 +187,11 @@ class SignUpView(View):
         signUpForm = SignUpForm(request.POST)
         if signUpForm.is_valid():
             user = signUpForm.save()
+            pointsObject = Points()
+            pointsObject.user=user
+            pointsObject.pointsNum=50
+            pointsObject.save()
+          
             login(request, user)
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -162,7 +209,14 @@ class LogInView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect('home')
+
+                if request.user.last_login.date() != datetime.now().date():
+                    # check if it is the users first time logging in that day, only add points if this is their first login of the day 
+                    addPoints(request,5)
+
+
+                return redirect('home') 
+
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
 
@@ -174,9 +228,13 @@ class LogOutView(LoginRequiredMixin, View):
         return redirect('index')
 
 class IndexView(View):
+
     def get(self, request):
         return render(request, 'index.html')
 
+def generateGraph(categories, spentInCategories, type):
+    dict = {'labels': categories, 'data': spentInCategories, 'type':type}
+    return dict
 
 class HomeView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the home page'''
@@ -184,16 +242,70 @@ class HomeView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def get(self, request):
-        return render(request, "home.html")
+            categories = []
+            totalSpent = []
+            for category in Category.objects.filter(user=self.request.user):
+                # all categories
+                categories.append(str(category))
+                # total spend per catagory
+                categorySpend = 0.00
+                for expence in category.expenditures.all():
+                    categorySpend += float(expence.amount)
+                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+
+            return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
 
 
-class ReportsView(LoginRequiredMixin, View):
-    '''Implements a view for handling requests to the reports page'''
-    
-    login_url = reverse_lazy('logIn')
 
-    def get(self, request):
-        return render(request, 'reports.html')
+'''Implements a view for handling requests to the reports page'''
+def reportsView(request):
+
+    # login_url = reverse_lazy('logIn')
+    categories = []
+    totalSpent = []
+
+    if request.method == 'POST':
+        form = ReportForm(request.POST, user=request.user)
+        if form.is_valid():
+            timePeriod = form.cleaned_data.get('timePeriod')
+            selectedCategory = form.cleaned_data.get('selectedCategory')
+            for selected in selectedCategory:
+                category = Category.objects.get(name=selected)
+                # all categories
+                categories.append(selected)
+                # total spend per catagory
+                categorySpend = 0.00
+                for expence in category.expenditures.all():
+                    categorySpend += float(expence.amount)
+                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+
+            dict = generateGraph(categories, totalSpent, 'bar')
+            dict.update({"form": form})
+
+            return render(request, "reports.html", dict)
+
+    form = ReportForm(user=request.user)
+    dict = generateGraph(categories, totalSpent, 'bar')
+    dict.update({"form": form})
+    return render(request, "reports.html", dict)
+
+    # def get(self, request):
+    #     categories = []
+    #     totalSpent = []
+    #     for category in Category.objects.filter(user=self.request.user):
+    #         # all categories
+    #         categories.append(str(category))
+    #         # total spend per catagory
+    #         categorySpend = 0.00
+    #         for expence in category.expenditures.all():
+    #             categorySpend += float(expence.amount)
+    #         totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+    #
+    #     return render(request, "reports.html", generateGraph(categories, totalSpent, 'bar'))
+    #
+    #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
+
+
 
 
 class ShowUserView(LoginRequiredMixin, DetailView):
