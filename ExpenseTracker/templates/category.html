@@ -12,6 +12,7 @@
     <p><b>Spending Limit</b> {{ category.spendingLimit }}</p>
     {% include 'partials/chart.html' %}
     <hr>
+    {% include 'analyse.html' %}
     <p><b>Expenditure History</b></p>
     <div class="shadow-4 rounded-3 overflow-hidden">
         {% include 'partials/expenditures/expendituresTable.html' with category=category expenditures=expenditures %}

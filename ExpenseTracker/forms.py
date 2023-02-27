@@ -103,7 +103,7 @@ class EditProfile(forms.ModelForm):
 
 
 class ChangePasswordForm(PasswordChangeForm):
-    
+
     old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
@@ -112,7 +112,7 @@ class ChangePasswordForm(PasswordChangeForm):
         model = User
         fields=["old_password","new_password1","new_password2"]
 
-# Had to use snake case as I am referenceing variables that already exist 
+# Had to use snake case as I am referenceing variables that already exist
 
 
 

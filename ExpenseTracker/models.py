@@ -20,7 +20,7 @@ class SpendingLimit(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return f'£{self.amount}, {self.timePeriod}'
 
@@ -49,7 +49,7 @@ class Expenditure(models.Model):
 
     class Meta:
         ordering = ['-date']
-    
+
     def __str__(self):
         return self.title
 
@@ -63,7 +63,7 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.name
 
@@ -82,6 +82,7 @@ class User(AbstractUser):
     lastName  = models.CharField(max_length=50)
     email      = models.EmailField(unique=True, blank=False)
     categories = models.ManyToManyField(Category, related_name='categories')
+    id = models.AutoField(primary_key=True)
 
     def full_name(self):
         return f'{self.firstName} {self.lastName}'
@@ -96,6 +97,6 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return self.message

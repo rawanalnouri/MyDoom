@@ -23,10 +23,10 @@
       labels: {{ labels|safe }}
     },
     options: {
-     
+
       responsive: true,
       {% if type == 'doughnut' %}
-      
+
       legend: {
       display: false
       }
@@ -40,7 +40,15 @@
                 max: 100
             }
         }]
-    }
+      }
+    {% endif %}
+    {% if type == 'polarArea' %}
+      scale: {
+        ticks: {
+          min: 0,
+          max: 100
+        }
+      }
     {% endif %}
     },
   };
@@ -54,7 +62,7 @@
     var fontSize = (height / 114).toFixed(2);
     ctx.font = fontSize + "em sans-serif";
     ctx.textBaseline = "middle";
-    var text = "hi",
+    var text = "{{category.name}}",
         textX = Math.round((width - ctx.measureText(text).width) / 2),
         textY = height / 2;
     ctx.fillText(text, textX, textY);

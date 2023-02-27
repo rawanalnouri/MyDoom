@@ -5,5 +5,9 @@
 {% block content %}
     <h1>Welcome {{user.firstName}}</h1>
     <h3>Manage your money here!</h3>
+    <h3>Your auto id type is {{user.id}}</h3>
+    {% if user.id|divisibleby:4 == 0 %}
+      <h3> blue house </h3>
+    {% endif %}
     {% include 'partials/chart.html' %}
 {% endblock %}

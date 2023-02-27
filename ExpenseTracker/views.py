@@ -51,11 +51,22 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categorySpend = 0.00
             for expence in category.expenditures.all():
                 categorySpend += float(expence.amount)
-            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+            totalSpent.append(categorySpend)
             totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
 
         dict = generateGraph(categories, totalSpent, 'doughnut')
         dict.update(context)
+
+        # analysis stuff
+        namesOfExpenses = []
+        currentCategory = Category.objects.filter(id = kwargs['categoryId'], user=self.request.user)
+        allExpensesInRange = category.expenditures.all().filter(date__year='2023', date__month='01')
+        # filter between months
+        # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
+        for expense in allExpensesInRange:
+            namesOfExpenses.append(expense.title)
+
+        dict.update({'stuff': namesOfExpenses})
 
         return render(request, self.template_name, dict)
 
