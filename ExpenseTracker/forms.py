@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
-    
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
@@ -14,7 +14,7 @@ class SignUpForm(forms.ModelForm):
     firstName = forms.CharField(label="First name")
     lastName = forms.CharField(label="Last name")
     newPassword = forms.CharField(
-        label='New password', 
+        label='New password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$', #using postive lookaheads
@@ -26,7 +26,7 @@ class SignUpForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        newPassword = self.cleaned_data.get("newPassword") 
+        newPassword = self.cleaned_data.get("newPassword")
         passwordConfirmation = self.cleaned_data.get("passwordConfirmation")
         if newPassword != passwordConfirmation:
             self.add_error("passwordConfirmation", "Confirmation does not match password.")
@@ -58,7 +58,7 @@ class ExpenditureForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
-    
+
     def save(self, category, commit=True):
         expenditure = super().save()
         if commit:
@@ -75,7 +75,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
         widgets = {
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
-    
+
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
@@ -103,7 +103,7 @@ class EditProfile(forms.ModelForm):
 
 
 class ChangePasswordForm(PasswordChangeForm):
-    
+
     old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
     new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
@@ -112,6 +112,32 @@ class ChangePasswordForm(PasswordChangeForm):
         model = User
         fields=["old_password","new_password1","new_password2"]
 
-# Had to use snake case as I am referenceing variables that already exist 
+def createCategorySelection():
+    categoryArray = []
+    # filter for user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    for x in Category.objects.all():
+        categoryArray.append((x, x))
+    return categoryArray
+
+FAVORITE_COLORS_CHOICES = [
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+]
+
+'''Form to allow a user to select a category to generate a report for'''
+class ReportForm(forms.Form):
+    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=createCategorySelection(), label = "Categories")
 
 
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(ReportForm, self).__init__(*args, **kwargs)
+
+    def createCategorySelection(self):
+        categoryArray = []
+        # filter for user!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        for x in Category.objects.filter(user=self.user):
+            categoryArray.append((x, x))
+        return categoryArray

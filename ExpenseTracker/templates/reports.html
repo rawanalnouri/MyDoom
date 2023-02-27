@@ -2,6 +2,18 @@
 
 {% block title %}Reports{% endblock %}
 
+
 {% block content %}
     <p>This is the reports page</p>
+
+    <form action="{% url 'reports' %}" method="post">
+      {% csrf_token %}
+      {{ form }}
+      <input type = "submit">
+    </form>
+
+
+    {% include 'partials/chart.html' %}
+
+
 {% endblock %}

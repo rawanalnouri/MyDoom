@@ -10,11 +10,10 @@
             <li><a href="#" class='logged-in-items'><i class="bi bi-bell"></i></a></li>
             <li><a href="{% url 'logOut' %}" class='logged-in-items'><i class="bi bi-box-arrow-left"></i></a></li>
         </ul>
-
     {% else %}
         <ul>
             <li>
-                <a class="logged-out-items" href="{% url 'signUp' %}">Sign up</a>
+                <a class="logged-out-items-clear" href="{% url 'signUp' %}">Sign up</a>
             </li>
             <li>
                 <a class="logged-out-items" href="{% url 'logIn' %}">Log in</a>
