@@ -1,0 +1,31 @@
+<table class="table align-middle bg-white">
+    <thead class="bg-light">
+        <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Mood</th>
+            <th>Date</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for expenditure in expenditures %}
+            <tr>
+                <td>{{ expenditure.title }}</td>
+                <td class="text-muted">-£{{ expenditure.amount }}</td>
+                <td>{% include 'partials/expenditures/moodColors.html' with mood=expenditure.mood %}</td>
+                <td class="text-muted">{{ expenditure.date }}</td>
+                <td>
+                    <a class="open-update-modal btn btn-sm btn-outline-dark" style="border-radius: 60px;" data-id="{{ expenditure.id }}" data-category="{{ category.id }}">
+                        <i class="bi bi-pencil"></i>
+                    </a>                    
+                    <button style="border-radius: 60px;" class="openDeleteExpenditure btn btn-sm btn-outline-dark"  data-bs-toggle="modal" data-target="#deleteExpenditureModal">
+                        <i class="bi bi-trash3"></i>
+                    </button>
+
+                    {% include 'modals/expenditures/deleteExpenditure.html' %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

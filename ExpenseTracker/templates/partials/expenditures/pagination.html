@@ -1,0 +1,7 @@
+{% if expenditures.has_previous %}
+    <a href="?page={{ expenditures.previous_page_number }}">previous</a>
+{% endif %}
+page {{ expenditures.number }} of {{ expenditures.paginator.num_pages }}
+{% if expenditures.has_next %}
+    <a href="?page={{ expenditures.next_page_number }}">next</a>
+{% endif %}
