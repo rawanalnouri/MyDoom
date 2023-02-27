@@ -21,9 +21,12 @@ class SpendingLimit(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return f'£{self.amount}, {self.timePeriod}'
+
+    def getNumber(self):
+        return self.amount
 
 
 
@@ -47,7 +50,7 @@ class Expenditure(models.Model):
 
     class Meta:
         ordering = ['-date']
-    
+
     def __str__(self):
         return self.title
 
@@ -61,7 +64,7 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.name
 
@@ -138,6 +141,6 @@ class Notification(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return self.message
