@@ -176,9 +176,10 @@ class Command(BaseCommand):
         message = self.faker.sentence()
         isSeen = random.choice([True, False])
         Notification.objects.create(
-            user=user,
+            toUser=user,
             title=title,
             message=message,
-            isSeen = isSeen
+            isSeen = isSeen,
+            type='basic'
         )
 
