@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 class CategoryCreateViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
