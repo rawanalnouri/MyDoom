@@ -3,7 +3,7 @@ from django.test import TestCase
 from ExpenseTracker.forms import LogInForm
 
 class LoginFormTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.input = {
