@@ -6,7 +6,7 @@ from django.core.paginator import Page
 import datetime
 
 class CategoryViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)

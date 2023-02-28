@@ -3,7 +3,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 
 class CategoryDeleteViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -12,6 +12,7 @@ class CategoryDeleteViewTest(TestCase):
         self.expenditure = Expenditure.objects.get(id=1)
         self.category = Category.objects.get(id=1)
         self.user.categories.add(self.category)
+        self.category.users.add(self.user)
         self.category.expenditures.add(self.expenditure)
 
     def testCategoryDeleteViewRemovesCategoryAndExpendituresAndSpendingLimit(self):

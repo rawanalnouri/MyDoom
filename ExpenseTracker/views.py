@@ -139,8 +139,8 @@ class CategoryDeleteView(LoginRequiredMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
-        categoryExpenditures = category.expenditures.all()
-        for expenditure in categoryExpenditures:
+        expenditures = category.expenditures.all()
+        for expenditure in expenditures:
             expenditure.delete()
         category.spendingLimit.delete()
         category.delete()
@@ -298,7 +298,6 @@ class HomeView(LoginRequiredMixin, View):
 '''Implements a view for handling requests to the reports page'''
 def reportsView(request):
 
-    # login_url = reverse_lazy('logIn')
     categories = []
     totalSpent = []
 
@@ -342,8 +341,6 @@ def reportsView(request):
     #     return render(request, "reports.html", generateGraph(categories, totalSpent, 'bar'))
     #
     #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
-
-
 
 
 class ShowUserView(LoginRequiredMixin, DetailView):
@@ -428,6 +425,7 @@ class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
     form_class = ChangePasswordForm
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
+
 
 class NotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
