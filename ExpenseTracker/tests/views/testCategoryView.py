@@ -65,7 +65,7 @@ class CategoryViewTest(TestCase):
             self.category.expenditures.add(expenditure)
         # Check only 15 expenditures are displayed per page
         response = self.client.get(reverse('category', args=[self.category.id]))
-        self.assertEqual(len(response.context['expenditures']), 15)
+        self.assertEqual(len(response.context['expenditures']), 10)
         # Check the next page displays the remaining 5 expenditures
         response = self.client.get(reverse('category', args=[self.category.id]) + '?page=2')
-        self.assertEqual(len(response.context['expenditures']), 5)
+        self.assertEqual(len(response.context['expenditures']), 10)

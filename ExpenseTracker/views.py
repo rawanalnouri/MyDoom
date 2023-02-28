@@ -34,7 +34,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = {}
-        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
+        category = Category.objects.get(id = kwargs['categoryId'])
         #Forms used for modal pop-ups
         context['expenditureForm'] = ExpenditureForm()
         context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
@@ -64,7 +64,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         # analysis stuff
         namesOfExpenses = []
-        currentCategory = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user])
+        currentCategory = Category.objects.get(id = kwargs['categoryId'])
         allExpensesInRange = category.expenditures.all().filter(date__year='2023', date__month='01')
         # filter between months
         # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
@@ -84,7 +84,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             messages.add_message(self.request, messages.ERROR, errorMessage)
 
     def post(self, request, *args, **kwargs):
-        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
+        category = Category.objects.get(id = kwargs['categoryId'])
         expendForm = ExpenditureForm(request.POST)
         categForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
 
@@ -138,7 +138,7 @@ class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
     def dispatch(self, request, *args, **kwargs):
-        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
+        category = Category.objects.get(id = kwargs['categoryId'])
         expenditures = category.expenditures.all()
         for expenditure in expenditures:
             expenditure.delete()
@@ -155,12 +155,12 @@ class CategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for sharing categories'''
 
     def get(self, request, *args, **kwargs):
-        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
+        category = Category.objects.get(id=kwargs['categoryId'])
         form = ShareCategoryForm(user=request.user, category=category)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
-        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
+        category = Category.objects.get(id=kwargs['categoryId'])
         form = ShareCategoryForm(user=request.user, category=category, data=request.POST)
         if form.is_valid():
             form.save()
@@ -186,7 +186,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
         if form.is_valid():
-            category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
+            category = Category.objects.get(id=kwargs['categoryId'])
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -484,7 +484,7 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
-    paginate_by = 15
+    paginate_by = 10
 
     def get_context_data(self, *args, **kwargs):
         """Generate content to be displayed in the template."""
