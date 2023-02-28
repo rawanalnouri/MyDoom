@@ -34,6 +34,15 @@ https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNT
                                         <i class="bi bi-check"></i>
                                     </a>
                                 </td>
+                                {% if notification.type == "category" %}
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-sm btn-success">Accept</button>
+                                            <button class="btn btn-sm btn-danger">Decline</button>
+
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </tr>
                         </tbody>
                     </table>
