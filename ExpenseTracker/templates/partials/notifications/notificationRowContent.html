@@ -1,0 +1,9 @@
+<div id="notification-item w-auto" >
+    <h6> <strong>{{notification.title}}</strong> </h6>
+    <p> {{notification.message}} </p>
+    <p id="notification-timestamp">Recieved on {{notification.createdAt}}</p>
+    {% if notification.type == "category" %}
+        <button class="btn btn-sm btn-success">Accept</button>
+        <button class="btn btn-sm btn-danger">Decline</button>
+    {% endif %}
+</div>
