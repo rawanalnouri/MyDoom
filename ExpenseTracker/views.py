@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
-from .forms import SignUpForm, LogInForm
 from django.http import HttpResponse
 from django.http import Http404
 from django.core.paginator import Paginator
@@ -17,9 +16,8 @@ from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from .helpers.pointsHelper import addPoints
-from django.utils.timezone import datetime
-from .helpers.utils import createNotification
-from .contextProcessor import getNotifications
+from .helpers.utils import *
+from .notificationContextProcessor import getNotifications
 import random
 from datetime import datetime
 import time

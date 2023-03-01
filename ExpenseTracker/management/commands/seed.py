@@ -29,8 +29,20 @@ class Command(BaseCommand):
         self.seedUserCategories()
         for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
             user.followers.add(followee)
-        self.seedAdminUser()
+        adminStuff = self.seedAdminUser()
+
         self.seedNotifications()
+
+        # Create dummy share notifcation for base user
+        print("Creating share notification!")
+        ShareCategoryNotification.objects.create(
+            toUser=user,
+            fromUser = adminStuff[0],
+            title="New Category Shared",
+            message="Admin has shared a new category",
+            sharedCategory = adminStuff[1],
+            type='category'
+            )
 
     def seedAdminUser(self):
         firstName = 'admin'
@@ -44,11 +56,20 @@ class Command(BaseCommand):
             email = email,
             password = Command.PASSWORD,
         ) 
+
+        category = Category.objects.create (
+            name = "test",
+            description = "test",
+            spendingLimit = random.choice(list(SpendingLimit.objects.all())),
+        )
+        category.users.add(user)
+
         Points.objects.create(
             user = user,
             pointsNum = 50,
         )
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
+        return [user, category]
 
     def seedBaseUser(self):
         firstName = 'John'
