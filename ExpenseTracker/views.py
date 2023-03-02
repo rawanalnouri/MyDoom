@@ -257,9 +257,11 @@ class IndexView(View):
     def get(self, request):
         return render(request, 'index.html')
 
+
 def generateGraph(categories, spentInCategories, type):
     dict = {'labels': categories, 'data': spentInCategories, 'type':type}
     return dict
+
 
 class HomeView(LoginRequiredMixin, View):
     '''Implements a view for handling requests to the home page'''
@@ -282,8 +284,8 @@ class HomeView(LoginRequiredMixin, View):
         return redirect('logIn')
     
 
-'''Implements a view for handling requests to the reports page'''
 def reportsView(request):
+    '''Implements a view for handling requests to the reports page'''
 
     categories = []
     totalSpent = []
@@ -363,8 +365,6 @@ class ShowUserView(LoginRequiredMixin, DetailView):
 class FollowToggleView(LoginRequiredMixin, View):
     '''View that handles follow/unfollow user functionality'''
 
-    login_url = reverse_lazy('logIn')
-
     def get(self, request, userId, *args, **kwargs):
         currentUser = request.user
         try:
@@ -374,6 +374,9 @@ class FollowToggleView(LoginRequiredMixin, View):
             return redirect('users')
         else:
             return redirect('showUser', user_id=userId)
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class ProfileView(LoginRequiredMixin, View):
