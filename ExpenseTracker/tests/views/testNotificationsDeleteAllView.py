@@ -15,9 +15,9 @@ class DeleteAllNotificationViewTest(TestCase):
 
     def testAllReadNotificationAreDeleted(self):
         for i in range(2):
-            Notification.objects.create(user=self.user, title='test'+str(i), message='test message', isSeen=True)
+            Notification.objects.create(toUser=self.user, title='test'+str(i), message='test message', isSeen=True)
 
-        userNotificationsCountBefore = Notification.objects.filter(user=self.user)
+        userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
         self.client.delete(reverse('deleteAllNotifications'))
         self.assertFalse(Notification.objects.filter(id=self.readNotification.id).exists())
         self.assertFalse(Notification.objects.filter(id=3).exists())

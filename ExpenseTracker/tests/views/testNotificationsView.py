@@ -22,13 +22,13 @@ class DeleteAllNotificationViewTest(TestCase):
         self.assertIsInstance(response.context['unreadNotificationsPaginated'], Page)
         self.assertIsInstance(response.context['readNotificationsPaginated'], Page)
         #Check contextProcessor context is available
-        self.assertEqual(len(response.context['unreadNotifications']), len(Notification.objects.filter(user=self.user, isSeen=False)))
-        self.assertEqual(len(response.context['readNotifications']), len(Notification.objects.filter(user=self.user, isSeen=True)))
+        self.assertEqual(len(response.context['unreadNotifications']), len(Notification.objects.filter(toUser=self.user, isSeen=False)))
+        self.assertEqual(len(response.context['readNotifications']), len(Notification.objects.filter(toUser=self.user, isSeen=True)))
 
     def testUnreadNotificationsPagination(self):
         # Create additional unread notifications
         for i in range(5):
-            Notification.objects.create(user=self.user, title='test'+str(i), message='test message', isSeen=False)
+            Notification.objects.create(toUser=self.user, title='test'+str(i), message='test message', isSeen=False, type="basic")
         # Check only 5 expenditures are displayed per page
         response = self.client.get(reverse('notifications'))
         self.assertEqual(len(response.context['unreadNotificationsPaginated']), 5)
@@ -39,7 +39,7 @@ class DeleteAllNotificationViewTest(TestCase):
     def testReadNotificationsPagination(self):
         # Create additional unread notifications
         for i in range(9):
-            Notification.objects.create(user=self.user, title='test'+str(i), message='test message', isSeen=True)
+            Notification.objects.create(toUser=self.user, title='test'+str(i), message='test message', isSeen=True, type="basic")
         # Check only 5 expenditures are displayed per page
         response = self.client.get(reverse('notifications'))
         self.assertEqual(len(response.context['readNotificationsPaginated']), 5)
