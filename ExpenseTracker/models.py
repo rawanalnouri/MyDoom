@@ -4,7 +4,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
 from libgravatar import Gravatar
-from ExpenseTracker.helpers import *
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
