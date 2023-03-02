@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, TemplateView, ListView, DetailView, FormView
+from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from .forms import SignUpForm, LogInForm
-from django.http import HttpResponse
 from django.http import Http404
 from django.core.paginator import Paginator
 from .helpers.pointsHelper import addPoints
@@ -18,91 +17,79 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from .helpers.pointsHelper import addPoints
 from django.utils.timezone import datetime
-from .helpers.utils import createNotification
 from .contextProcessor import getNotifications
-import random
 from datetime import datetime
-import time
-
-
 
 class CategoryView(LoginRequiredMixin, TemplateView):
-    '''Implements a template view for displaying a specific category and handling create expenditure form submissions'''
-    '''Handles editing categories'''
+    '''Displays a specific category and handles create expenditure and edit category form submissions.'''
 
-    template_name = 'category.html'
-    
-    def get(self, request, *args, **kwargs):
-        context = {}
-        category = Category.objects.get(id = kwargs['categoryId'])
-        #Forms used for modal pop-ups
-        context['expenditureForm'] = ExpenditureForm()
-        context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
-        context['category'] = category
-        # adding pagination
+    template_name = "category.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        category = Category.objects.get(id=kwargs["categoryId"])
         paginator = Paginator(category.expenditures.all(), 10)
-        page = self.request.GET.get('page')
+        page = self.request.GET.get("page")
         expenditures = paginator.get_page(page)
-        context['expenditures'] = expenditures
+
+        context = {
+            'category': category,
+            'expenditureForm': ExpenditureForm(),
+            'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
+            'expenditures': expenditures,
+        }
 
         categories = []
         totalSpent = []
         categorySpend = 0
-        for category in Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]):
-            # all categories
+        for category in Category.objects.filter(id=kwargs["categoryId"], users__in=[self.request.user]):
             categories.append(str(category))
             categories.append("Remaining Budget")
-            # total spend per catagory
-            categorySpend = 0.00
-            for expence in category.expenditures.all():
-                categorySpend += float(expence.amount)
+            # total spend per category
+            categorySpend = 0.0
+            for expense in category.expenditures.all():
+                categorySpend += float(expense.amount)
             totalSpent.append(categorySpend)
             totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
 
-        dict = generateGraph(categories, totalSpent, 'doughnut')
-        dict.update(context)
+        graphData = generateGraph(categories, totalSpent, "doughnut")
+        context.update(graphData)
 
-        # analysis stuff
+        # analysis
         namesOfExpenses = []
-        currentCategory = Category.objects.get(id = kwargs['categoryId'])
-        allExpensesInRange = category.expenditures.all().filter(date__year='2023', date__month='01')
+        allExpensesInRange = category.expenditures.all().filter(date__year="2023", date__month="01")
         # filter between months
         # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
         for expense in allExpensesInRange:
             namesOfExpenses.append(expense.title)
 
-        dict.update({'stuff': namesOfExpenses})
+        context.update({'stuff': namesOfExpenses})
+        return context
 
-        return render(request, self.template_name, dict)
-
-    ''' Handles saving a valid form and presenting error messages '''
-    def handleForm(self, form, category, errorMessage, successMessage):
+    def handleForm(self, form, category, error_message, success_message):
         if category and form.is_valid():
-            messages.add_message(self.request, messages.SUCCESS, successMessage)
+            messages.success(self.request, success_message)
             form.save(category)
         else:
-            messages.add_message(self.request, messages.ERROR, errorMessage)
+            messages.error(self.request, error_message)
 
     def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id = kwargs['categoryId'])
-        expendForm = ExpenditureForm(request.POST)
-        categForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
+        category = Category.objects.get(id=kwargs["categoryId"])
+        expForm = ExpenditureForm(request.POST)
+        catForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
 
-        if 'expenditureForm' in request.POST:
-            self.handleForm(expendForm, category, "Failed to Create Expenditure", "Successfully Created Expenditure")
+        if "expenditureForm" in request.POST:
+            self.handleForm(expForm, category, "Failed to create expenditure.","Expenditure created successfully.")
 
-        elif 'categoryForm' in request.POST:
-            self.handleForm(categForm, category, "Failed to Updated Category", "Successfully Updated Category")
+        elif "categoryForm" in request.POST:
+            self.handleForm(catForm, category, "Failed to update category.", "Category updated successfully.")
 
-        #Using hidden id to determine which form is being used and adding to context
-        context = {
-            'expenditureForm': expendForm,
-            'categoryForm': categForm
-        }
-        return redirect(reverse('category', args=[category.id]), context=context)
-    
+        # using hidden id to modal templates to determine which form is being used
+        context = {"expenditureForm": expForm, "categoryForm": catForm}
+        return redirect(reverse("category", args=[category.id]), context=context)
+
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect("login")
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
@@ -121,7 +108,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
-        ##add points
+        # add points
         addPoints(self.request,5)
         return redirect(reverse('category', args=[category.id]))
 
