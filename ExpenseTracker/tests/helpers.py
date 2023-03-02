@@ -1,4 +1,4 @@
-''' File of helpr functions used within tests'''
+''' File of helper functions used within tests'''
 
 class LogInTester:
     def isUserLoggedIn(self):

@@ -1,8 +1,6 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
-from django.core.paginator import Paginator
-from ExpenseTracker.models import User, Category, Expenditure
-from datetime import datetime
+from ExpenseTracker.models import User
 from django.contrib.auth.hashers import make_password
 
 class usersViewTest(TestCase):

@@ -98,7 +98,6 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     model = Category
     form_class = CategorySpendingLimitForm
     template_name = 'categoryForm.html'
-    login_url = reverse_lazy('logIn')
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -243,7 +242,6 @@ class LogInView(View):
 
 
 class LogOutView(LoginRequiredMixin, View):
-
     def get(self, request, *args, **kwargs):
         logout(request)
         return redirect('index')
@@ -253,7 +251,6 @@ class LogOutView(LoginRequiredMixin, View):
 
 
 class IndexView(View):
-
     def get(self, request):
         return render(request, 'index.html')
 
@@ -339,7 +336,6 @@ class ShowUserView(LoginRequiredMixin, DetailView):
     template_name = 'showUser.html'
     context_object_name = "user"
     pk_url_kwarg = 'user_id'
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -360,6 +356,9 @@ class ShowUserView(LoginRequiredMixin, DetailView):
             return super().get(request, *args, **kwargs)
         except Http404:
             return redirect(reverse('users'))
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class FollowToggleView(LoginRequiredMixin, View):
@@ -413,12 +412,13 @@ class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
     '''View that changes the user's password'''
 
     form_class = ChangePasswordForm
-    login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
+
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class NotificationsView(LoginRequiredMixin, View):
-    login_url = reverse_lazy('logIn')
 
     def get(self,request):
         context = {}
@@ -435,11 +435,13 @@ class NotificationsView(LoginRequiredMixin, View):
         context['readNotificationsPaginated'] = readNotificationPaginated
 
         return render(request, "notifications.html", context) 
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class EditNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for marking notifications as read'''
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
@@ -448,24 +450,31 @@ class EditNotificationsView(LoginRequiredMixin, View):
 
         # Making the user stay on whichever page they called this request  
         return redirect(request.META['HTTP_REFERER'])
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 class deleteNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for deleting a notification'''
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
         if notification.isSeen:
             Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect("notifications")  
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 class DeleteAllNotifications(LoginRequiredMixin, View):
     '''Implements a view function for deleting all read notifications'''
-    login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
         Notification.objects.filter(user = request.user, isSeen = True).delete()
         return redirect("notifications")  
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class UserListView(LoginRequiredMixin, ListView):
