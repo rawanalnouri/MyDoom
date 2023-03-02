@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
+from ExpenseTracker.helpers.utils import *
 
 
 class SignUpForm(forms.ModelForm):
@@ -118,20 +119,19 @@ class ShareCategoryForm(forms.ModelForm):
         model = Category
         fields = []
 
-    def __init__(self, user, category, *args, **kwargs):
+    def __init__(self, fromUser, category, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['user'].queryset = user.followers.all()
+        self.fields['user'].queryset = fromUser.followers.all()
         self.category = category
+        self.fromUser = fromUser
 
+    # Sends a share request to the user selected
     def save(self, commit=True):
-        category = self.category
-        user = self.cleaned_data['user']
-        category.users.add(user)
-        user.categories.add(category)
-        if commit:
-            category.save()
-            user.save()
-        return category
+        toUser = self.cleaned_data['user'] 
+        title = "New Category Shared!"
+        message = self.fromUser.username + " wants to share a category '"+ self.category.name +"' with you"
+        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)      
+        return toUser
 
 FAVORITE_COLORS_CHOICES = [
     ('daily', 'Daily'),
