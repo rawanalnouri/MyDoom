@@ -154,22 +154,62 @@ class CategoryShareView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ShareCategoryForm(user=request.user, category=category)
+        form = ShareCategoryForm(fromUser=request.user, category=category)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ShareCategoryForm(user=request.user, category=category, data=request.POST)
+        form = ShareCategoryForm(fromUser=request.user, category=category, data=request.POST)
         if form.is_valid():
-            form.save()
-            messages.add_message(request, messages.SUCCESS, "Successfully Added New User to Category")
+            toUser = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully sent request to share '"+ category.name +"' with "+ toUser.username)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.add_message(request, messages.ERROR, "Failed to Add User to Category")
+            messages.add_message(request, messages.ERROR, "Failed to send share category request ")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def handle_no_permission(self):
         return redirect('logIn')
+    
+class acceptCatergoryShareView(LoginRequiredMixin, View):
+    '''Implements a view for accepting a share category requests'''
+    # login_url = reverse_lazy('logIn')
+
+    def dispatch(self, request, *args, **kwargs):
+        print("Handling accept!")
+
+        notification = ShareCategoryNotification.objects.get(id=kwargs['notificationId'])
+        toUser = notification.toUser
+        category = notification.sharedCategory
+
+        # Sharing the category
+        category.users.add(toUser)
+        category.save()
+        toUser.categories.add(category)
+        toUser.save()
+        messages.add_message(request, messages.SUCCESS, "Successfully accepted share request ")
+
+        # Sending accept notification
+        fromUser = notification.fromUser
+        title = 'Category share request accepted'
+        message = toUser.username + " has accpted your request to share '"+ category.name +"'"
+        createBasicNotification(fromUser, title, message)
+
+        # Deleting the notification after it has been accepted
+        return redirect('declineRequest', notificationId = notification.id)
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+class declineRequestView(LoginRequiredMixin, View):
+    def dispatch(self, request, *args, **kwargs):
+        Notification.objects.get(id=kwargs['notificationId']).delete()
+        return redirect(request.META['HTTP_REFERER'])
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+    
     
     
 class ExpenditureUpdateView(LoginRequiredMixin, View):
@@ -472,7 +512,7 @@ class DeleteAllNotifications(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
-        Notification.objects.filter(user = request.user, isSeen = True).delete()
+        Notification.objects.filter(toUser = request.user, isSeen = True).delete()
         return redirect("notifications")  
 
 
@@ -528,7 +568,6 @@ class ShowUserView(LoginRequiredMixin, DetailView):
 
     def handle_no_permission(self):
         return redirect('logIn')
-
 
 class FollowToggleView(LoginRequiredMixin, View):
     '''View that handles follow/unfollow user functionality'''

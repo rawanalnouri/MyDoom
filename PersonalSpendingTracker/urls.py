@@ -30,6 +30,8 @@ urlpatterns = [
     path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
     path('deleteNotifcations/<int:notificationId>/', deleteNotificationsView.as_view(), name='deleteNotifications'),
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
+    path('declineRequest/<int:notificationId>', declineRequestView.as_view(), name='declineRequest'),
+    path('acceptCatergoryShareView/<int:notificationId>', acceptCatergoryShareView.as_view(), name='acceptCatergoryShare'),
 
     path('reports/', reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
