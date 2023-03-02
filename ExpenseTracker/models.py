@@ -118,6 +118,10 @@ class User(AbstractUser):
 
         return self.followees.count()
 
+    def get_house(self):
+        houses = ['RED', 'BLUE', 'YELLOW', 'GREEN']
+
+        return houses[self.id % len(houses)]
 
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''

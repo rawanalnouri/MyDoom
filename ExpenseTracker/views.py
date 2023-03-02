@@ -248,8 +248,11 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 
 class SignUpView(View):
     def get(self, request, *args, **kwargs):
-        signUpForm = SignUpForm()
-        return render(request, 'signUp.html', {'form': signUpForm})
+        if request.user.is_authenticated:
+            return render(request, 'home.html')
+        else:
+            signUpForm = SignUpForm()
+            return render(request, 'signUp.html', {'form': signUpForm})
 
     def post(self, request, *args, **kwargs):
         signUpForm = SignUpForm(request.POST)
@@ -267,8 +270,11 @@ class SignUpView(View):
 
 class LogInView(View):
     def get(self, request, *args, **kwargs):
-        form = LogInForm()
-        return render(request, 'logIn.html', {"form": form})
+        if request.user.is_authenticated:
+            return render(request, 'home.html')
+        else:
+            form = LogInForm()
+            return render(request, 'logIn.html', {"form": form})
 
     def post(self, request, *args, **kwargs):
         form = LogInForm(request.POST)
@@ -303,7 +309,10 @@ class LogOutView(LoginRequiredMixin, View):
 class IndexView(View):
 
     def get(self, request):
-        return render(request, 'index.html')
+        if request.user.is_authenticated:
+            return render(request, 'home.html')
+        else:
+            return render(request, 'index.html')
 
 def generateGraph(categories, spentInCategories, type):
     dict = {'labels': categories, 'data': spentInCategories, 'type':type}
