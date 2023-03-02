@@ -34,7 +34,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         context = {}
-        category = Category.objects.get(id = kwargs['categoryId'])
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
         #Forms used for modal pop-ups
         context['expenditureForm'] = ExpenditureForm()
         context['categoryForm'] = CategorySpendingLimitForm(user=self.request.user, instance = category)
@@ -64,7 +64,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         # analysis stuff
         namesOfExpenses = []
-        currentCategory = Category.objects.get(id = kwargs['categoryId'])
+        currentCategory = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user])
         allExpensesInRange = category.expenditures.all().filter(date__year='2023', date__month='01')
         # filter between months
         # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
@@ -84,7 +84,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             messages.add_message(self.request, messages.ERROR, errorMessage)
 
     def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id = kwargs['categoryId'])
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
         expendForm = ExpenditureForm(request.POST)
         categForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
 
@@ -138,9 +138,9 @@ class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
     def dispatch(self, request, *args, **kwargs):
-        category = Category.objects.get(id = kwargs['categoryId'])
-        expenditures = category.expenditures.all()
-        for expenditure in expenditures:
+        category = Category.objects.filter(id = kwargs['categoryId'], users__in=[request.user]).first()
+        categoryExpenditures = category.expenditures.all()
+        for expenditure in categoryExpenditures:
             expenditure.delete()
         category.spendingLimit.delete()
         category.delete()
@@ -155,12 +155,12 @@ class CategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for sharing categories'''
 
     def get(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs['categoryId'])
+        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
         form = ShareCategoryForm(user=request.user, category=category)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs['categoryId'])
+        category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
         form = ShareCategoryForm(user=request.user, category=category, data=request.POST)
         if form.is_valid():
             form.save()
@@ -186,7 +186,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
         if form.is_valid():
-            category = Category.objects.get(id=kwargs['categoryId'])
+            category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -301,6 +301,7 @@ class HomeView(LoginRequiredMixin, View):
 '''Implements a view for handling requests to the reports page'''
 def reportsView(request):
 
+    # login_url = reverse_lazy('logIn')
     categories = []
     totalSpent = []
 
@@ -344,6 +345,8 @@ def reportsView(request):
     #     return render(request, "reports.html", generateGraph(categories, totalSpent, 'bar'))
     #
     #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
+
+
 
 
 class ShowUserView(LoginRequiredMixin, DetailView):
@@ -429,7 +432,6 @@ class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
     login_url = reverse_lazy('login')
     success_url = reverse_lazy('home')
 
-
 class NotificationsView(LoginRequiredMixin, View):
     login_url = reverse_lazy('logIn')
 
@@ -487,7 +489,7 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
-    paginate_by = 10
+    paginate_by = 15
 
     def get_context_data(self, *args, **kwargs):
         """Generate content to be displayed in the template."""

@@ -6,7 +6,7 @@ from django.contrib import messages
 from ExpenseTracker.tests.helpers import LogInTester
 
 class TestLogOut(TestCase, LogInTester):
-    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
 
     def setUp(self):
         self.url = reverse('logOut')

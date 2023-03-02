@@ -6,7 +6,7 @@ from django.core.paginator import Page
 
 
 class DeleteAllNotificationViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)

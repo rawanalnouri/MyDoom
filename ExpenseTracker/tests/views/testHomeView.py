@@ -3,7 +3,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User
 
 class HomeViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -17,4 +17,4 @@ class HomeViewTest(TestCase):
     def testHomeViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
         response = self.client.get(reverse('home'))
-        self.assertRedirects(response, '/logIn/')
+        self.assertRedirects(response, '/logIn/?next=' + reverse('home'))

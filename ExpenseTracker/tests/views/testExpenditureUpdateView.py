@@ -5,7 +5,7 @@ from ExpenseTracker.forms import ExpenditureForm
 import datetime
 
 class ExpenditureUpdateViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
     
     def setUp(self):
         self.user = User.objects.get(id=1)

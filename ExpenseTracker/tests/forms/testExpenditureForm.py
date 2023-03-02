@@ -8,8 +8,7 @@ class ExpenditureFormTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
         self.spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
-        self.category = Category.objects.create(name='Food', spendingLimit=self.spendingLimit)
-        self.category.users.add(self.user)
+        self.category = Category.objects.create(name='Food', spendingLimit=self.spendingLimit, user=self.user)
         self.expenditure = Expenditure.objects.create(
             title='Grocery Shopping',
             description='Weekly grocery shopping',
