@@ -39,7 +39,7 @@ class Command(BaseCommand):
             toUser=user,
             fromUser = adminStuff[0],
             title="New Category Shared",
-            message="Admin has shared a new category",
+            message = adminStuff[0].username + " wants to share a category '"+ adminStuff[1].name +"' with you",
             sharedCategory = adminStuff[1],
             type='category'
             )
