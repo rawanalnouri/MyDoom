@@ -171,13 +171,10 @@ class CategoryShareView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
     
-class acceptCatergoryShareView(LoginRequiredMixin, View):
+class AcceptCatergoryShareView(LoginRequiredMixin, View):
     '''Implements a view for accepting a share category requests'''
-    # login_url = reverse_lazy('logIn')
 
     def dispatch(self, request, *args, **kwargs):
-        print("Handling accept!")
-
         notification = ShareCategoryNotification.objects.get(id=kwargs['notificationId'])
         toUser = notification.toUser
         category = notification.sharedCategory
@@ -201,7 +198,7 @@ class acceptCatergoryShareView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
     
-class declineRequestView(LoginRequiredMixin, View):
+class DeclineRequestView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
         Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect(request.META['HTTP_REFERER'])
@@ -381,50 +378,50 @@ def reportsView(request):
     #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
 
 
-class ShowUserView(LoginRequiredMixin, DetailView):
-    """View that shows individual user details."""
+# class ShowUserView(LoginRequiredMixin, DetailView):
+#     """View that shows individual user details."""
 
-    model = User
-    template_name = 'showUser.html'
-    context_object_name = "user"
-    pk_url_kwarg = 'user_id'
-    login_url = reverse_lazy('logIn')
+#     model = User
+#     template_name = 'showUser.html'
+#     context_object_name = "user"
+#     pk_url_kwarg = 'user_id'
+#     login_url = reverse_lazy('logIn')
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+#     def dispatch(self, request, *args, **kwargs):
+#         return super().dispatch(request, *args, **kwargs)
 
-    def get_context_data(self, *args, **kwargs):
-        """Generate content to be displayed in the template."""
+#     def get_context_data(self, *args, **kwargs):
+#         """Generate content to be displayed in the template."""
 
-        context = super().get_context_data(*args, **kwargs)
-        user = self.get_object()
-        context['following'] = self.request.user.isFollowing(user)
-        context['followable'] = (self.request.user != user)
-        return context
+#         context = super().get_context_data(*args, **kwargs)
+#         user = self.get_object()
+#         context['following'] = self.request.user.isFollowing(user)
+#         context['followable'] = (self.request.user != user)
+#         return context
 
-    def get(self, request, *args, **kwargs):
-        """Handle get request, and redirect to users if user_id invalid."""
+#     def get(self, request, *args, **kwargs):
+#         """Handle get request, and redirect to users if user_id invalid."""
 
-        try:
-            return super().get(request, *args, **kwargs)
-        except Http404:
-            return redirect(reverse('users'))
+#         try:
+#             return super().get(request, *args, **kwargs)
+#         except Http404:
+#             return redirect(reverse('users'))
 
 
-class FollowToggleView(LoginRequiredMixin, View):
-    '''View that handles follow/unfollow user functionality'''
+# class FollowToggleView(LoginRequiredMixin, View):
+#     '''View that handles follow/unfollow user functionality'''
 
-    login_url = reverse_lazy('logIn')
+#     login_url = reverse_lazy('logIn')
 
-    def get(self, request, userId, *args, **kwargs):
-        currentUser = request.user
-        try:
-            followee = User.objects.get(id=userId)
-            currentUser.toggleFollow(followee)
-        except ObjectDoesNotExist:
-            return redirect('users')
-        else:
-            return redirect('showUser', user_id=userId)
+#     def get(self, request, userId, *args, **kwargs):
+#         currentUser = request.user
+#         try:
+#             followee = User.objects.get(id=userId)
+#             currentUser.toggleFollow(followee)
+#         except ObjectDoesNotExist:
+#             return redirect('users')
+#         else:
+#             return redirect('showUser', user_id=userId)
 
 
 class ProfileView(LoginRequiredMixin, View):
@@ -575,12 +572,36 @@ class FollowToggleView(LoginRequiredMixin, View):
     def get(self, request, userId, *args, **kwargs):
         try:
             followee = User.objects.get(id=userId)
-            request.user.toggleFollow(followee)
+            sentFollowRequest = toggleFollow(request.user,followee)
+            if sentFollowRequest:
+                messages.add_message(request, messages.SUCCESS, "Successfully sent follow request to "+ followee.username)
+
         except ObjectDoesNotExist:
             return redirect('users')
         else:
             # Redirect to the previous page or URL
             return redirect(request.META.get('HTTP_REFERER', 'users'))
+    
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+class AcceptFollowRequestView(LoginRequiredMixin, View):
+    '''Implements a view for accepting a follow request category requests'''
+
+    def dispatch(self, request, *args, **kwargs):
+        notification = FollowRequestNotification.objects.get(id=kwargs['notificationId'])
+        toUser = notification.toUser
+        fromUser = notification.fromUser
+        follow(fromUser, toUser)
+        messages.add_message(request, messages.SUCCESS, "Successfully accepted follow request ")
+
+        # Sending accept notification
+        title = 'Follow request accepted'
+        message = toUser.username + " has accpted your follow request"
+        createBasicNotification(fromUser, title, message)
+
+        # Deleting notification after being accepted
+        return redirect('declineRequest', notificationId = notification.id)
     
     def handle_no_permission(self):
         return redirect('logIn')
