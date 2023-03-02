@@ -20,12 +20,39 @@ def createShareCategoryNotification(toUser, title, message, sharedCategory, from
     type='category'
     )
 
-# Function to create a share category notifcation for a user 
-def createFriendRequestNotification(toUser, title, message, fromUser):
-    ShareCategoryNotification.objects.create(
+# Function to create a follow requesty notifcation for a user 
+def createFollowRequestNotification(toUser, title, message, fromUser):
+    FollowRequestNotification.objects.create(
     toUser=toUser,
     fromUser = fromUser,
     title=title,
     message=message,
-    type='friend'
+    type='follow'
     )
+
+''' Function ot handle following functionality'''
+def toggleFollow(user, followee):
+    """Toggles when self follows a different user."""
+    sentFollowRequest = False
+
+    if followee==user:
+        return
+    if user.isFollowing(followee):
+        unfollow(user, followee)
+        return sentFollowRequest
+    else:
+        toUser = followee
+        fromUser = user
+        title = "New follow request!"
+        message = fromUser.username + " wants to follow you"
+        createFollowRequestNotification(toUser, title, message, fromUser)
+        sentFollowRequest = True
+        return sentFollowRequest
+
+        # follow(user, followee)
+
+def follow(currentUser, userToFollow):
+    userToFollow.followers.add(currentUser)
+
+def unfollow(currentUser, userToUnfollow):
+    userToUnfollow.followers.remove(currentUser)
