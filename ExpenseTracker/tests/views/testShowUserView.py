@@ -9,9 +9,9 @@ class ShowUserViewTest(TestCase):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
 
-    def test_show_user_view_logged_in_user(self):
+    def testShowUserViewLoggedInUser(self):
         """Test show user view with a logged in user."""
-        response = self.client.get(reverse('showUser', kwargs={'user_id': self.user.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
         self.assertEqual(response.context['otherUser'], self.user)
@@ -21,12 +21,12 @@ class ShowUserViewTest(TestCase):
     def testShowUserViewRedirectsIfUserNotLoggedIn(self):
         """Test show user view with an anonymous user."""
         self.client.logout()
-        response = self.client.get(reverse('showUser', kwargs={'user_id': self.user.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
         self.assertRedirects(response, reverse('logIn'))
 
     def testShowUserViewLoggedInUser(self):
         """Test show user view with a logged in user."""
-        response = self.client.get(reverse('showUser', kwargs={'user_id': self.user.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
         self.assertEqual(response.context['otherUser'], self.user)
@@ -35,7 +35,7 @@ class ShowUserViewTest(TestCase):
 
     def testShowUserViewWithInvalidIdUser(self):
         """Test show user view with an invalpk user pk."""
-        response = self.client.get(reverse('showUser', kwargs={'user_id': 999}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': 999}))
         self.assertRedirects(response, reverse('users'))
 
     def testShowUserViewFollowable(self):
@@ -45,7 +45,7 @@ class ShowUserViewTest(TestCase):
             email='testuser2@test.com',
             password='password'
         )
-        response = self.client.get(reverse('showUser', kwargs={'user_id': user2.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': user2.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
         self.assertEqual(response.context['otherUser'], user2)
@@ -60,7 +60,7 @@ class ShowUserViewTest(TestCase):
             password='password'
         )
         user2.followers.add(self.user)
-        response = self.client.get(reverse('showUser', kwargs={'user_id': user2.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': user2.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
         self.assertEqual(response.context['otherUser'], user2)
@@ -69,7 +69,7 @@ class ShowUserViewTest(TestCase):
 
     def testShowUserViewSameUser(self):
         """Test show user view when user is the same user as logged in user."""
-        response = self.client.get(reverse('showUser', kwargs={'user_id': self.user.id}))
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
         self.assertEqual(response.context['otherUser'], self.user)

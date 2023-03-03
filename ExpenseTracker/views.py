@@ -334,8 +334,8 @@ class ShowUserView(LoginRequiredMixin, DetailView):
 
     model = User
     template_name = 'showUser.html'
-    context_object_name = "user"
-    pk_url_kwarg = 'user_id'
+    context_object_name = "otherUser"
+    pk_url_kwarg = 'userId'
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -350,7 +350,7 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         return context
 
     def get(self, request, *args, **kwargs):
-        """Handle get request, and redirect to users if user_id invalid."""
+        """Handle get request, and redirect to users if userId invalid."""
 
         try:
             return super().get(request, *args, **kwargs)
@@ -359,24 +359,7 @@ class ShowUserView(LoginRequiredMixin, DetailView):
     
     def handle_no_permission(self):
         return redirect('logIn')
-
-
-class FollowToggleView(LoginRequiredMixin, View):
-    '''View that handles follow/unfollow user functionality'''
-
-    def get(self, request, userId, *args, **kwargs):
-        currentUser = request.user
-        try:
-            followee = User.objects.get(id=userId)
-            currentUser.toggleFollow(followee)
-        except ObjectDoesNotExist:
-            return redirect('users')
-        else:
-            return redirect('showUser', user_id=userId)
     
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 
 class ProfileView(LoginRequiredMixin, View):
     '''View that handles requests to the profile page'''
@@ -454,6 +437,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
 
+
 class deleteNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for deleting a notification'''
 
@@ -465,6 +449,7 @@ class deleteNotificationsView(LoginRequiredMixin, View):
     
     def handle_no_permission(self):
         return redirect('logIn')
+
 
 class DeleteAllNotifications(LoginRequiredMixin, View):
     '''Implements a view function for deleting all read notifications'''
@@ -497,52 +482,20 @@ class UserListView(LoginRequiredMixin, ListView):
     
     def handle_no_permission(self):
         return redirect('logIn')
-
-
-class ShowUserView(LoginRequiredMixin, DetailView):
-    """View that shows individual user details."""
-
-    model = User
-    template_name = 'showUser.html'
-    context_object_name = "otherUser"
-    pk_url_kwarg = 'user_id'
-
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-    def get_context_data(self, *args, **kwargs):
-        """Generate content to be displayed in the template."""
-
-        context = super().get_context_data(*args, **kwargs)
-        otherUser = self.get_object()
-        context['following'] = self.request.user.isFollowing(otherUser)
-        context['followable'] = (self.request.user != otherUser)
-        return context
-
-    def get(self, request, *args, **kwargs):
-        """Handle get request, and redirect to users if user_id invalid."""
-
-        try:
-            return super().get(request, *args, **kwargs)
-        except Http404:
-            return redirect(reverse('users'))
-
-    def handle_no_permission(self):
-        return redirect('logIn')
-
+    
 
 class FollowToggleView(LoginRequiredMixin, View):
     '''View that handles follow/unfollow user functionality'''
 
     def get(self, request, userId, *args, **kwargs):
+        currentUser = request.user
         try:
             followee = User.objects.get(id=userId)
-            request.user.toggleFollow(followee)
+            currentUser.toggleFollow(followee)
         except ObjectDoesNotExist:
             return redirect('users')
         else:
-            # Redirect to the previous page or URL
-            return redirect(request.META.get('HTTP_REFERER', 'users'))
+            return redirect('showUser', userId=userId)
     
     def handle_no_permission(self):
         return redirect('logIn')
