@@ -89,7 +89,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         return redirect(reverse("category", args=[category.id]), context=context)
 
     def handle_no_permission(self):
-        return redirect("login")
+        return redirect("logIn")
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
