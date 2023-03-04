@@ -83,6 +83,10 @@ class Command(BaseCommand):
                 email = email,
                 password = Command.PASSWORD,
             )
+            Points.objects.create(
+                user = user,
+                pointsNum = 50,
+            )
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
@@ -149,13 +153,11 @@ class Command(BaseCommand):
         title = self.faker.word()
         description = self.faker.sentence()
         date = datetime.date.today() + relativedelta(days=dayDifference)
-        mood = random.choice(Expenditure.MOOD_CHOICES)[0]
         amount = float(decimal.Decimal(random.randrange(1, 10000))/100)
         Expenditure.objects.create(
             title=title,
             description=description,
             date=date,
-            mood=mood,
             amount=amount,
         )
 
