@@ -4,21 +4,13 @@
 
 {% block content %}
 
-<h1>Edit profile information</h1>
-
+<h3>Edit profile information</h3>
+<hr>
 <form action ="{% url 'editProfile'%}" method="post">
     {% csrf_token %}
     {% include 'partials/bootstrapForm.html' with form=form %}
-    <!-- <button type="submit" typclass = "btn btn-secondary" > Update Profile </button> -->
-    <input type="submit" class="btn btn-outline-secondary btn-sm" value = Update>
+    <input type="submit" class="btn btn-outline-secondary btn-sm" value="Update">
     <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
-</form>  
+</form>
 
 {% endblock %}
-
-
-<!-- <form action="{% url 'signUp' %}" method="post">
-    {% csrf_token %}
-    {% include 'partials/bootstrapForm.html' with form=form %}
-    <input type="submit" value="Sign Up">
-</form> -->

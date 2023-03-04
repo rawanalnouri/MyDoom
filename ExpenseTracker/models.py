@@ -37,13 +37,6 @@ class Expenditure(models.Model):
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
     receipt = models.ImageField(upload_to='receipts/', blank=True)
-    MOOD_CHOICES = [
-        ('happy', 'Happy'),
-        ('content', 'Content'),
-        ('indifferent', 'Indifferent'),
-        ('anxious', 'Anxious')
-    ]
-    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
