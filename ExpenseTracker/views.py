@@ -1,6 +1,5 @@
 from django.shortcuts import render, redirect, reverse
 from django.views import View
-from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
@@ -236,10 +235,9 @@ class LogInView(View):
             if user is not None:
                 login(request, user)
 
-                if request.user.last_login.date() != datetime.now().date():
-                    # check if it is the users first time logging in that day, only add points if this is their first login of the day 
-                    addPoints(request,5)
-
+                if user.last_login.date() != datetime.now().date():
+                    # if this is the first login of the day, add 5 points
+                    addPoints(request, 5)
 
                 return redirect('home') 
 
@@ -398,14 +396,23 @@ class EditProfileView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
+    
+    
+class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
+    template_name = 'changePassword.html'
+    form_class = PasswordChangeForm
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Your password has been changed successfully.')
+        return super().form_valid(form)
 
-class ChangePassword(LoginRequiredMixin, PasswordChangeView, View):
-    '''View that changes the user's password'''
+    def form_invalid(self, form):
+        messages.error(self.request, 'Please correct the errors below.')
+        return super().form_invalid(form)
 
-    form_class = ChangePasswordForm
-    success_url = reverse_lazy('home')
-
+    def get_success_url(self):
+        return reverse('home')
+    
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -447,7 +454,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
         return redirect('logIn')
 
 
-class deleteNotificationsView(LoginRequiredMixin, View):
+class DeleteNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for deleting a notification'''
 
     def dispatch(self, request, *args, **kwargs):
