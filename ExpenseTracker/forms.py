@@ -52,7 +52,7 @@ class LogInForm(forms.Form):
 class ExpenditureForm(forms.ModelForm):
     class Meta:
         model = Expenditure
-        fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
+        fields = ['title', 'description', 'amount', 'date', 'receipt']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
@@ -133,7 +133,8 @@ class ShareCategoryForm(forms.ModelForm):
             user.save()
         return category
 
-FAVORITE_COLORS_CHOICES = [
+
+TIME_PERIOD_CHOICES = [
     ('daily', 'Daily'),
     ('weekly', 'Weekly'),
     ('monthly', 'Monthly'),
@@ -141,7 +142,7 @@ FAVORITE_COLORS_CHOICES = [
 
 '''Form to allow a user to select a category to generate a report for'''
 class ReportForm(forms.Form):
-    timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
+    timePeriod = forms.ChoiceField(choices = TIME_PERIOD_CHOICES, label = "Time Frame")
     selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
 
 
