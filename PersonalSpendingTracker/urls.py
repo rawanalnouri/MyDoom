@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ExpenseTracker.views import *
+from ExpenseTracker.views.authViews import *
+from ExpenseTracker.views.userViews import *
+from ExpenseTracker.views.expenditureViews import *
+from ExpenseTracker.views.categoryViews import *
+from ExpenseTracker.views.reportsViews import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,12 +36,12 @@ urlpatterns = [
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
 
     path('reports/', reportsView, name='reports'),
-    path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
-    path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
-    path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
+    path('createCategory/', CreateCategoryView.as_view(), name='createCategory'),
+    path('deleteCategory/<int:categoryId>/', DeleteCategoryView.as_view(), name='deleteCategory'),
+    path('shareCategory/<int:categoryId>/', ShareCategoryView.as_view(), name='shareCategory'),
     path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
-    path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
-    path('category/<int:categoryId>/delete/<int:expenditureId>/', ExpenditureDeleteView.as_view(), name='deleteExpenditure'),
+    path('category/<int:categoryId>/update/<int:expenditureId>/', UpdateExpenditureView.as_view(), name='updateExpenditure'),
+    path('category/<int:categoryId>/delete/<int:expenditureId>/', DeleteExpenditureView.as_view(), name='deleteExpenditure'),
 
     path('profile/', ProfileView.as_view(), name='profile'),
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
