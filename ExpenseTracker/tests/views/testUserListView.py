@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User
-from django.contrib.auth.hashers import make_password
+from ExpenseTracker.tests.helpers import createUsers
 
 class usersViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -9,19 +9,6 @@ class usersViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-
-    def createUsers(self, num):
-        users = []
-        for i in range(num):
-            user = User.objects.create(
-                username=f"user{i+1}",
-                first_name=f"first_name{i+1}",
-                last_name=f"last_name{i+1}",
-                email=f"user{i+1}@example.com",
-                password=make_password("password")
-            )
-            users.append(user)
-        return users
 
     def testUserListView(self):
         response = self.client.get(reverse('users'))
@@ -32,7 +19,7 @@ class usersViewTest(TestCase):
         self.assertEqual(users[0].username, 'bob123')
     
     def testUserListViewPagination(self):
-        self.createUsers(15) # 16 users total
+        createUsers(15) # 16 users total
         url = reverse('users')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -41,7 +28,7 @@ class usersViewTest(TestCase):
         self.assertEqual(response.context['users'].paginator.num_pages, 2)
 
     def testUserListViewPaginationSecondPage(self):
-        self.createUsers(15) # 16 users total
+        createUsers(15) # 16 users total
         url = reverse('users') + '?page=2'
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
