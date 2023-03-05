@@ -30,7 +30,9 @@
             <thead class="bg-light">
                 <tr>
                     <th class="w-auto">Read Notifications</th>
-                    <th></th>
+                    <th class="text-end">
+                        <a role="button" class="btn btn-outline-secondary btn-sm" href="{% url 'deleteAllNotifications' %}"  style="text-align: center;">Clear All</a>
+                    </th>
             </thead>
             <tbody>
                 {% for notification in readNotificationsPaginated %}
