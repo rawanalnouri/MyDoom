@@ -79,5 +79,27 @@
             "isSeen": true,
             "type": "basic"
         }
+    }, 
+
+    {
+        "model": "ExpenseTracker.notification",
+        "pk": 3,
+        "fields": {
+            "toUser": 1,
+            "title": "Share Category Test Notification",
+            "message": "This is a share category notification",
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "isSeen": true,
+            "type": "category"
+        }
+    },
+
+    {
+        "model": "ExpenseTracker.ShareCategoryNotification",
+        "pk": 3,
+        "fields": {
+            "fromUser": 1,
+            "sharedCategory": 1
+        }
     }
 ]
