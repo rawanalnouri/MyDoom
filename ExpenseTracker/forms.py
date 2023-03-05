@@ -96,21 +96,31 @@ class CategorySpendingLimitForm(forms.ModelForm):
 
 
 class EditProfile(forms.ModelForm):
+    firstName = forms.CharField(label='First name')
+    lastName = forms.CharField(label='Last name')
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
 
 
 class ChangePasswordForm(PasswordChangeForm):
-
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
-    new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
-
-    class Meta:
-        model = User
-        fields=["old_password","new_password1","new_password2"]
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['old_password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Old Password'
+        })
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'New Password'
+        })
+        self.fields['new_password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Confirm New Password'
+        })
+    
 
 class ShareCategoryForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.none())
