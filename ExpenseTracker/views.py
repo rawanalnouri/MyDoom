@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
-from django.http import HttpResponse
 from django.http import Http404
 from django.core.paginator import Paginator
 from .helpers.pointsHelper import addPoints
@@ -19,7 +18,6 @@ from .helpers.pointsHelper import addPoints
 from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
-import random
 from datetime import datetime
 
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -162,7 +160,7 @@ class CategoryShareView(LoginRequiredMixin, View):
         return redirect('logIn')
     
 
-class AcceptCatergoryShareView(LoginRequiredMixin, View):
+class AcceptCategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for accepting a share category requests'''
 
     def dispatch(self, request, *args, **kwargs):
@@ -180,7 +178,7 @@ class AcceptCatergoryShareView(LoginRequiredMixin, View):
         # Sending accept notification
         fromUser = notification.fromUser
         title = 'Category share request accepted'
-        message = toUser.username + " has accpted your request to share '"+ category.name +"'"
+        message = toUser.username + " has accepted your request to share '"+ category.name +"'"
         createBasicNotification(fromUser, title, message)
 
         # Deleting the notification after it has been accepted

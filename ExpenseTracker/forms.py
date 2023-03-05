@@ -145,7 +145,6 @@ class ReportForm(forms.Form):
     timePeriod = forms.ChoiceField(choices = TIME_PERIOD_CHOICES, label = "Time Frame")
     selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
 
-
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
         super(ReportForm, self).__init__(*args, **kwargs)
