@@ -53,7 +53,7 @@ class LogInForm(forms.Form):
 class ExpenditureForm(forms.ModelForm):
     class Meta:
         model = Expenditure
-        fields = ['title', 'description', 'amount', 'date', 'receipt']
+        fields = ['title', 'description', 'amount', 'date', 'receipt','mood']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
