@@ -99,6 +99,11 @@ class NotificationModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.notification.full_clean()
 
+    def testValidType(self):
+        self.notification.type = 'testChoice'
+        with self.assertRaises(ValidationError):
+            self.notification.full_clean()
+
     def testUserExists(self):
         self.user.save()
         user = User.objects.get(email = self.notification.toUser.email)
