@@ -1,4 +1,4 @@
-from ExpenseTracker.models import Notification, User
+from ExpenseTracker.models import Notification, User, ShareCategoryNotification, FollowRequestNotification, Category
 from django.test import TestCase
 from datetime import date
 from django.core.exceptions import ValidationError
@@ -42,11 +42,20 @@ class NotificationModelTestCase(TestCase):
             password = password2
         )
 
-        self.notification2 = Notification.objects.create(
+        # self.shareCategoryNotification = ShareCategoryNotification.objects.create(
+        #     toUser = self.user,
+        #     title = "Test Title",
+        #     message = "This is a 'share category' notification message text for test purposes.",
+        #     type = 'category'
+        #     sharedCategory = #insert category here
+        # )
+
+        self.followRequestNotification = FollowRequestNotification.objects.create(
             toUser = self.user,
             title = "Test Title",
-            message = "This is a notification message text for test purposes.",
-            type = 'basic'
+            message = "This is a 'follow request' notification message text for test purposes.",
+            type = 'follow',
+            fromUser = self.user2
         )
 
     def testNotificationIsValid(self):
@@ -94,5 +103,17 @@ class NotificationModelTestCase(TestCase):
         self.user.save()
         user = User.objects.get(email = self.notification.toUser.email)
         self.assertEqual(user, self.notification.toUser)
+
+    # follow request notification tests
+
+    def testNoBlankFromUser(self):
+        self.followRequestNotification.fromUser = None
+        with self.assertRaises(ValidationError):
+            self.followRequestNotification.full_clean()
+
+    def testFromUserExists(self):
+        self.user2.save()
+        user2 = User.objects.get(email = self.followRequestNotification.fromUser.email)
+        self.assertEqual(user2, self.followRequestNotification.fromUser)
 
     #def testCreatedDateIsNow
