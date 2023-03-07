@@ -18,6 +18,7 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
+from datetime import timedelta
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -36,6 +37,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'expenditureForm': ExpenditureForm(),
             'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
+            'progress': getProgress(category),
         }
 
         categories = []
@@ -65,30 +67,72 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         context.update({'stuff': namesOfExpenses})
         return context
 
-    def handleForm(self, form, category, error_message, success_message):
-        if category and form.is_valid():
-            messages.success(self.request, success_message)
-            form.save(category)
-        else:
-            messages.error(self.request, error_message)
-
-    def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs["categoryId"])
-        expForm = ExpenditureForm(request.POST)
-        catForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
-
-        if "expenditureForm" in request.POST:
-            self.handleForm(expForm, category, "Failed to create expenditure.","Expenditure created successfully.")
-
-        elif "categoryForm" in request.POST:
-            self.handleForm(catForm, category, "Failed to update category.", "Category updated successfully.")
-
-        # using hidden id to modal templates to determine which form is being used
-        context = {"expenditureForm": expForm, "categoryForm": catForm}
-        return redirect(reverse("category", args=[category.id]), context=context)
-
     def handle_no_permission(self):
         return redirect("logIn")
+    
+
+class CreateExpenditureView(LoginRequiredMixin, View):
+    '''Implements a view for creating expenditures'''
+
+    def get(self, request, *args, **kwargs):
+        form = ExpenditureForm()
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = ExpenditureForm(request.POST)
+        if category and form.is_valid():
+            messages.success(self.request, "Expenditure created successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error("Failed to create expenditure.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
+class EditCategoryView(LoginRequiredMixin, View):
+    '''Implements a view for editing categories'''
+
+    def get(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(user=request.user, instance=category)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
+        if category and form.is_valid():
+            messages.success(self.request, "Category updated successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error("Failed to update category.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
+def getProgress(category):
+    total = 0
+    today = datetime.now()
+    if(category.spendingLimit.timePeriod == 'daily'):
+        for expense in category.expenditures.filter(date__day=today.day):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'weekly'):
+        startOfWeek = today - timedelta(days=today.weekday())
+        for expense in category.expenditures.filter(date__gte=startOfWeek):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'monthly'):
+        for expense in category.expenditures.filter(date__month=today.month):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'yearly'):
+        for expense in category.expenditures.filter(date__year=today.year):
+            total += expense.amount
+    return 100*round(total/category.spendingLimit.amount, 2)
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):

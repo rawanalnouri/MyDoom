@@ -166,7 +166,7 @@ class Command(BaseCommand):
         while expenditureCount < Command.EXPENDITURE_COUNT:
             self._createExpenditure(dayDifference)
             expenditureCount += 1
-            dayDifference += 2
+            dayDifference -= 2
         self.stdout.write(self.style.SUCCESS(f"Number of created expenditures: {expenditureCount}"))
 
     def _createExpenditure(self, dayDifference):
