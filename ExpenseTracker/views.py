@@ -324,7 +324,7 @@ class HomeView(LoginRequiredMixin, View):
             totalSpent.append(round(categorySpend,2))
             overallSpendForMonth += round(categorySpend,2)
         context = generateGraph(categories, totalSpent,'pie')
-        context['overallSpendForMonth'] =  overallSpendForMonth
+        context['overallSpendForMonth'] =  round(overallSpendForMonth,2)
         context['month']= datetime.now().strftime('%B')
 
         return render(request, "home.html", context)
