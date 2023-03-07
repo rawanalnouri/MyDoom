@@ -18,6 +18,7 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
+from datetime import timedelta
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -36,6 +37,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'expenditureForm': ExpenditureForm(),
             'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
+            'progress': getProgress(category),
         }
 
         categories = []
@@ -89,6 +91,25 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
     def handle_no_permission(self):
         return redirect("logIn")
+
+
+def getProgress(category):
+    total = 0
+    today = datetime.now()
+    if(category.spendingLimit.timePeriod == 'daily'):
+        for expense in category.expenditures.filter(date__day=today.day):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'weekly'):
+        startOfWeek = today - timedelta(days=today.weekday())
+        for expense in category.expenditures.filter(date__gte=startOfWeek):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'monthly'):
+        for expense in category.expenditures.filter(date__month=today.month):
+            total += expense.amount
+    elif(category.spendingLimit.timePeriod == 'yearly'):
+        for expense in category.expenditures.filter(date__year=today.year):
+            total += expense.amount
+    return 100*round(total/category.spendingLimit.amount, 2)
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
