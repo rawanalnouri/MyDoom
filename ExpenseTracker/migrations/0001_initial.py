@@ -36,7 +36,6 @@ class Migration(migrations.Migration):
                 ('amount', models.DecimalField(decimal_places=2, max_digits=10, validators=[django.core.validators.MinValueValidator(0.01)])),
                 ('date', models.DateField()),
                 ('receipt', models.ImageField(blank=True, upload_to='receipts/')),
-                ('mood', models.CharField(blank=True, choices=[('happy', 'Happy'), ('content', 'Content'), ('indifferent', 'Indifferent'), ('anxious', 'Anxious')], max_length=20)),
                 ('createdAt', models.DateTimeField(auto_now_add=True)),
                 ('updatedAt', models.DateTimeField(auto_now=True)),
             ],
