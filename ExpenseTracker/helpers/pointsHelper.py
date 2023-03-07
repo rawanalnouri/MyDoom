@@ -11,10 +11,41 @@ def addPoints(request,n):
     pointsObject.pointsNum = points+n
     pointsObject.save()
 
+
+
+
+
+def loosePoints(request,limit,spent):
+    # call add points with a -ve
+    # pass in spent and limit find percentage 
+    #this function only called if we are over the limit 
+    user = request.user
+    spentProportion = (spent-limit)/limit 
+    percentage = spentProportion*100
+    if percentage<=10:
+        addPoints(request,-3)
+    elif percentage>10 and percentage<=30:
+        addPoints(request,-5)
+    elif percentage>30 and percentage<=50:
+        addPoints(request,-10)
+    elif percentage>50 and percentage<=70:
+        addPoints(request,-15)
+    elif percentage>70 and percentage<=100:
+        addPoints(request,-20)
+    else:
+        addPoints(request,-25)
+
+    
+    
+
+
+
+
+
 def getTimePeriod(request,category):
     user = request.user
     # need a list of all categories and then do a for loop through them all 
-    # categories = Category.objects.all()
+   
     currentSpendingLimit = Category.objects.get(id=category.id).spendingLimit
     period = currentSpendingLimit.timePeriod
     return period
@@ -32,7 +63,9 @@ def dailyTracking(request,category):
     currentCategory = Category.objects.get(id=category.id)
     spent = getTodaySpending(request,category)
     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,5)
+        addPoints(request,2)
+    else:
+        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
 
 def weeklyTracking(request,category):
     currentCategory = Category.objects.get(id=category.id)
@@ -40,9 +73,10 @@ def weeklyTracking(request,category):
     for expence in currentCategory.expenditures.filter(createdAt__gte=datetime.now()-timedelta(days=7)):
         spent+=float(expence.amount)
     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,5)
+        addPoints(request,10)
     else:
-        addPoints(request,-5)
+        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
+      
 
 def monthlyTracking(request,category):
     currentCategory = Category.objects.get(id=category.id)
@@ -50,13 +84,13 @@ def monthlyTracking(request,category):
     for expence in currentCategory.expenditures.filter(createdAt__gte=datetime.now()-timedelta(months=1)):
         spent+=float(expence.amount)
     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,5)
-    
-    
+        addPoints(request,15)
+    else:
+        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
 
-# def checkExpenditure(request,category,expenditure):
-#     currentCategory = Category.objects.get(id=category.id)
-#     spent = Expenditure.objects.get(id=expenditure.id).amount
+    
+    
+# even though we check after each expenditure this allows us to add or deduct points at the correct time 
 
 def trackPoints(request):
     date = datetime.now()
