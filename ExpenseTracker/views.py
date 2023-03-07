@@ -247,6 +247,7 @@ class LogInView(View):
                 if request.user.last_login.date() != datetime.now().date():
                     # check if it is the users first time logging in that day, only add points if this is their first login of the day 
                     addPoints(request,5)
+               
 
 
                 return redirect('home') 

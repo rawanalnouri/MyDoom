@@ -1,8 +1,8 @@
 
 from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
 from django.utils.timezone import datetime, timedelta
-#from datetime.datetime import now
 
+#from
 def addPoints(request,n):
     user = request.user
     pointsObject = Points.objects.get(user=request.user)
@@ -103,6 +103,7 @@ def trackPoints(request):
         elif category.spendingLimit.timePeriod=='monthly' and date.date() == date.replace(day=1).date():
             #check if its the first day of the month
             monthlyTracking(request,category)
+ 
 
     
 
