@@ -310,16 +310,24 @@ class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         categories = []
         totalSpent = []
+        overallSpendForMonth = 0
         for category in Category.objects.filter(users__in=[request.user]):
             # all categories
             categories.append(str(category))
             # total spend per catagory
             categorySpend = 0.00
             for expence in category.expenditures.all():
-                categorySpend += float(expence.amount)
-            totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
+                if(expence.createdAt.month == datetime.now().month):
+                        categorySpend += float(expence.amount)
+                
+            # totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
+            totalSpent.append(round(categorySpend,2))
+            overallSpendForMonth += round(categorySpend,2)
+        context = generateGraph(categories, totalSpent,'pie')
+        context['overallSpendForMonth'] =  overallSpendForMonth
+        context['month']= datetime.now().strftime('%B')
 
-        return render(request, "home.html", generateGraph(categories, totalSpent, 'pie'))
+        return render(request, "home.html", context)
     
     def handle_no_permission(self):
         return redirect('logIn')
