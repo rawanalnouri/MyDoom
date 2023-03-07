@@ -22,15 +22,15 @@ class DeleteNotificationViewTest(TestCase):
         self.assertTemplateUsed(response, 'home.html')
 
     def testReadNotificationChangesToUnread(self):
-        userReadNotificationsCountBefore = Notification.objects.filter(user=self.user, isSeen=True)
-        userUnreadNotificationsCountBefore = Notification.objects.filter(user=self.user, isSeen=False)
+        userReadNotificationsCountBefore = Notification.objects.filter(toUser=self.user, isSeen=True)
+        userUnreadNotificationsCountBefore = Notification.objects.filter(toUser=self.user, isSeen=False)
         reverse('editNotifications', args=[self.readNotification.id])
         self.assertTrue(len(userReadNotificationsCountBefore), len(userReadNotificationsCountBefore)-1)
         self.assertTrue(len(userUnreadNotificationsCountBefore), len(userUnreadNotificationsCountBefore)+1)
 
     def testUneadNotificationChangesToRead(self):
-        userReadNotificationsCountBefore = Notification.objects.filter(user=self.user, isSeen=True)
-        userUnreadNotificationsCountBefore = Notification.objects.filter(user=self.user, isSeen=False)
+        userReadNotificationsCountBefore = Notification.objects.filter(toUser=self.user, isSeen=True)
+        userUnreadNotificationsCountBefore = Notification.objects.filter(toUser=self.user, isSeen=False)
         reverse('editNotifications', args=[self.unreadNotification.id])
         self.assertTrue(len(userReadNotificationsCountBefore), len(userReadNotificationsCountBefore)+1)
         self.assertTrue(len(userUnreadNotificationsCountBefore), len(userUnreadNotificationsCountBefore)-1)

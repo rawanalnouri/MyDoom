@@ -31,19 +31,11 @@ class SpendingLimit(models.Model):
 
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
-
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
     receipt = models.ImageField(upload_to='receipts/', blank=True)
-    MOOD_CHOICES = [
-        ('happy', 'Happy'),
-        ('content', 'Content'),
-        ('indifferent', 'Indifferent'),
-        ('anxious', 'Anxious')
-    ]
-    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -103,22 +95,6 @@ class User(AbstractUser):
     def fullName(self):
         return f'{self.firstName} {self.lastName}'
 
-    def toggleFollow(self, followee):
-        """Toggles when self follows a different user."""
-
-        if followee==self:
-            return
-        if self.isFollowing(followee):
-            self._unfollow(followee)
-        else:
-            self._follow(followee)
-
-    def _follow(self, user):
-        user.followers.add(self)
-
-    def _unfollow(self, user):
-        user.followers.remove(self)
-
     def isFollowing(self, user):
         """Returns whether self follows the given user."""
 
@@ -134,21 +110,39 @@ class User(AbstractUser):
 
         return self.followees.count()
 
+    def get_house(self):
+        houses = ['RED', 'BLUE', 'YELLOW', 'GREEN']
+
+        return houses[self.id % len(houses)]
 
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    toUser = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     message = models.CharField(max_length=255)
     createdAt = models.DateTimeField(auto_now_add=True)
     isSeen = models.BooleanField(default = False)
+    TYPE_CHOICES = [
+        ('basic', 'Basic'),
+        ('category', 'Category'),
+        ('follow', 'Follow')
+    ]
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=False)
 
     class Meta:
         ordering = ['-createdAt']
 
     def __str__(self):
         return self.message
+    
+class ShareCategoryNotification(Notification):
+    sharedCategory = models.ForeignKey(Category, on_delete=models.CASCADE)
+    fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class FollowRequestNotification(Notification):
+    fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
+
 
 class Points(models.Model):
     ''' model for the points that the user earns '''

@@ -28,8 +28,11 @@ urlpatterns = [
     path('', IndexView.as_view(), name='index'),
     path('notifications/', NotificationsView.as_view(), name='notifications'),
     path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
-    path('deleteNotifcations/<int:notificationId>/', deleteNotificationsView.as_view(), name='deleteNotifications'),
+    path('deleteNotifcations/<int:notificationId>/', DeleteNotificationsView.as_view(), name='deleteNotifications'),
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
+    path('declineRequest/<int:notificationId>', DeclineRequestView.as_view(), name='declineRequest'),
+    path('acceptCategoryShareView/<int:notificationId>', AcceptCategoryShareView.as_view(), name='acceptCategoryShare'),
+    path('acceptFollowRequest/<int:notificationId>/', AcceptFollowRequestView.as_view(), name='acceptFollowRequest'),
 
     path('reports/', reportsView, name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
@@ -41,9 +44,9 @@ urlpatterns = [
 
     path('profile/', ProfileView.as_view(), name='profile'),
     path('editProfile/', EditProfileView.as_view(), name='editProfile'),
-    path('changePassword/', ChangePassword.as_view(template_name = 'changePassword.html'), name='changePassword'),
+    path('changePassword/', ChangePasswordView.as_view(template_name = 'changePassword.html'), name='changePassword'),
 
-    path('user/<int:user_id>/', ShowUserView.as_view(), name='showUser'),
+    path('user/<int:userId>/', ShowUserView.as_view(), name='showUser'),
     path('users/', UserListView.as_view(), name='users'),
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
