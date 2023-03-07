@@ -308,7 +308,6 @@ def reportsView(request):
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
 
-            if timePeriod == 'daily':
             for selected in selectedCategories:
                 category = Category.objects.get(id=selected)
                 # all categories
