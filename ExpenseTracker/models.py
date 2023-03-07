@@ -14,7 +14,7 @@ class SpendingLimit(models.Model):
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly')
     ]
-    timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=True)
+    timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=False)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
