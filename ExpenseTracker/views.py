@@ -317,9 +317,9 @@ class HomeView(LoginRequiredMixin, View):
             categorySpend = 0.00
             for expence in category.expenditures.all():
                 categorySpend += float(expence.amount)
-            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+            totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
 
-        return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
+        return render(request, "home.html", generateGraph(categories, totalSpent, 'pie'))
     
     def handle_no_permission(self):
         return redirect('logIn')
