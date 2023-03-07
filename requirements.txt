@@ -5,3 +5,5 @@ Pillow==9.0.1
 django-widget-tweaks==1.4.8
 libgravatar==1.0.0
 humanize
+django-crontab
+
