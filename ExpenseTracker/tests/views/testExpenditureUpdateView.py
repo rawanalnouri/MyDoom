@@ -5,7 +5,7 @@ from ExpenseTracker.forms import ExpenditureForm
 import datetime
 
 class ExpenditureUpdateViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
     
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -29,7 +29,6 @@ class ExpenditureUpdateViewTest(TestCase):
             'description': 'Updated Description',
             'amount': 200.00,
             'date': datetime.date.today(),
-            'mood': 'happy'
         })
         updated_expenditure = Expenditure.objects.get(id=self.expenditure.id)
         self.assertEqual(response.status_code, 302)
@@ -37,7 +36,6 @@ class ExpenditureUpdateViewTest(TestCase):
         self.assertEqual(updated_expenditure.title, 'Updated Title')
         self.assertEqual(updated_expenditure.description, 'Updated Description')
         self.assertEqual(updated_expenditure.amount, 200.00)
-        self.assertEqual(updated_expenditure.mood, 'happy')
         
     def testPostMethodWithInvalidData(self):
         response = self.client.post(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
@@ -45,7 +43,6 @@ class ExpenditureUpdateViewTest(TestCase):
             'description': '',
             'amount': '',
             'date': '',
-            'mood': ''
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')

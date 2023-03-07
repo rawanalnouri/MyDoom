@@ -1,0 +1,18 @@
+<div class="modal fade" id="share-category-modal" tabindex="-1" role="dialog" aria-labelledby="shareCategoryModal" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+                <h5 class="modal-title" id="shareCategoryModal">Share Category</h5>
+                <button onclick="$('#share-category-modal').modal('hide');" class="btn btn-outline">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Select a user to share this category with.</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="update-form"></div>
+                    <button type="submit" class="btn btn-secondary">Confirm</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

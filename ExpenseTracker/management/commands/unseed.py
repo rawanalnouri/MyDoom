@@ -1,11 +1,12 @@
 from django.core.management.base import BaseCommand
-from ExpenseTracker.models import SpendingLimit, Expenditure, Category, User
+from ExpenseTracker.models import *
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         self._deleteExpenditures()
         self._deleteCategories()
         self._deleteUsers()
+        self._deleteNotifications()
     
     def _deleteExpenditures(self, *args, **options):
         deletedExpenditures = 0
@@ -27,3 +28,10 @@ class Command(BaseCommand):
                 user.delete()
                 deletedUsers += 1
         self.stdout.write(self.style.SUCCESS(f"Number of deleted users: {deletedUsers}"))
+
+    def _deleteNotifications(self, *args, **options):
+        deletedNotifications = 0
+        for notification in Notification.objects.all():
+                notification.delete()
+                deletedNotifications += 1
+        self.stdout.write(self.style.SUCCESS(f"Number of deleted notifications: {deletedNotifications}"))

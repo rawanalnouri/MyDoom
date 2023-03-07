@@ -1,7 +1,7 @@
 {% if expenditures.has_previous %}
-    <a href="?page={{ expenditures.previous_page_number }}">previous</a>
+    <a id="pagination-button" href="?page={{ expenditures.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
 {% endif %}
 page {{ expenditures.number }} of {{ expenditures.paginator.num_pages }}
 {% if expenditures.has_next %}
-    <a href="?page={{ expenditures.next_page_number }}">next</a>
+    <a id="pagination-button" href="?page={{ expenditures.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
 {% endif %}

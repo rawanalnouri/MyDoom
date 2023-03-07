@@ -1,0 +1,10 @@
+<tr>
+    <td> 
+        {% include "partials/notifications/notificationRowContent.html" with notification=notification %}
+    </td>
+    <td class="text-end">
+        <a role="button" style="border-radius: 60px;" class=" btn btn-sm btn-outline-primary"  href="{% url 'editNotifications' notificationId=notification.id %}">
+            <i class="bi bi-check"></i>
+        </a>
+    </td>
+</tr>

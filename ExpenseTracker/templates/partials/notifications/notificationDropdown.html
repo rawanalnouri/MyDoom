@@ -1,0 +1,64 @@
+<!-- A Notification dropdown derived from https://medium.com/star-gazers/how-to-add-notifications-to-django-app-74df1dac984e
+https://github.com/gauthamdasu/Mini-project-blog-codes/tree/master/Simple_Chat_App 
+https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNTG8q&index=9&ab_channel=CodeWithStein-->
+
+<!-- Notification Badge From: https://www.w3schools.com/howto/howto_css_notification_button.asp -->
+
+<li class="nav-item dropdown" >
+    <a href="#" class="nav-link logged-in-items notification" data-bs-toggle="dropdown">
+        <i class="bi bi-bell"></i>
+        {% if unreadNotifications %}
+            <span class="badge">{{unreadNotifications.count}}</span> 
+        {% endif %}
+    </a>
+    <div class="dropdown-menu" id="scrollable-menu">        
+        {% if not unreadNotifications %}
+            <p style="text-align: center;"> No new notifications! </p> 
+            <div class="dropdown-divider"></div>
+        {% else %}
+            <p style="text-align: center;"> Unread Notifications ({{unreadNotifications.count}})  </p> 
+            <div class="dropdown-divider"></div>
+
+            {% for notification in latestNotifications %} 
+                <div id="notification-item" >
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <h6> <strong>{{notification.title}}</strong> </h6>
+                                    <p> {{notification.message}} </p>
+                                    <p id="notification-timestamp"> {{notification.createdAt|timesince}} ago </p>
+                                </td>
+                                <td>
+                                    <a role="button" href="{% url 'editNotifications' notificationId=notification.id %}">
+                                        <i class="bi bi-check"></i>
+                                    </a>
+                                </td>
+                                {% if notification.type == "category" %}
+                                    <tr>
+                                        <td>
+                                            <a role="button" class="btn btn-sm btn-success" href="{% url 'acceptCategoryShare' notificationId=notification.id %}">Accept</a>
+                                            <a role="button" class="btn btn-sm btn-danger" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+                                        </td>
+                                    </tr>
+                                {% elif notification.type == "follow" %}
+                                <tr>
+                                    <td>
+                                        <a role="button" class="btn btn-sm btn-success" href="{% url 'acceptFollowRequest' notificationId=notification.id %}">Accept</a>
+                                        <a role="button" class="btn btn-sm btn-danger" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                
+
+                </div>
+            <div class="dropdown-divider"></div>
+            {% endfor %}
+        {% endif %}
+
+        <a class="dropdown-item" href="{% url 'notifications' %}" style="text-align: center;">View All</a>
+    </div>
+</li>

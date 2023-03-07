@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
+from libgravatar import Gravatar
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
@@ -20,49 +21,44 @@ class SpendingLimit(models.Model):
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return f'£{self.amount}, {self.timePeriod}'
 
+    def getNumber(self):
+        return self.amount
 
 
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
-
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
     receipt = models.ImageField(upload_to='receipts/', blank=True)
-    MOOD_CHOICES = [
-        ('happy', 'Happy'),
-        ('content', 'Content'),
-        ('indifferent', 'Indifferent'),
-        ('anxious', 'Anxious')
-    ]
-    mood = models.CharField(max_length=20, choices=MOOD_CHOICES, blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-date']
-    
+
     def __str__(self):
         return self.title
 
 class Category(models.Model):
     '''model for storing and managing user expense categories.'''
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return self.name
+
 
 class User(AbstractUser):
     '''model for user authentication.'''
@@ -79,20 +75,77 @@ class User(AbstractUser):
     lastName  = models.CharField(max_length=50)
     email      = models.EmailField(unique=True, blank=False)
     categories = models.ManyToManyField(Category, related_name='categories')
+    followers = models.ManyToManyField(
+        'self', symmetrical=False, related_name='followees'
+    )
 
-    def full_name(self):
+    class Meta:
+        ordering = ['username']
+
+    def gravatar(self, size=120):
+        """Return a URL to the user's gravatar."""
+        gravatar_object = Gravatar(self.email)
+        gravatar_url = gravatar_object.get_image(size=size, default='mp')
+        return gravatar_url
+
+    def miniGravatar(self):
+        """Return a URL to a miniature version of the user's gravatar."""
+        return self.gravatar(size=60)
+
+    def fullName(self):
         return f'{self.firstName} {self.lastName}'
 
+    def isFollowing(self, user):
+        """Returns whether self follows the given user."""
+
+        return user in self.followees.all()
+
+    def followerCount(self):
+        """Returns the number of followers of self."""
+
+        return self.followers.count()
+
+    def followeeCount(self):
+        """Returns the number of followees of self."""
+
+        return self.followees.count()
+
+    def get_house(self):
+        houses = ['RED', 'BLUE', 'YELLOW', 'GREEN']
+
+        return houses[self.id % len(houses)]
 
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    toUser = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
     message = models.CharField(max_length=255)
     createdAt = models.DateTimeField(auto_now_add=True)
+    isSeen = models.BooleanField(default = False)
+    TYPE_CHOICES = [
+        ('basic', 'Basic'),
+        ('category', 'Category'),
+        ('follow', 'Follow')
+    ]
+    type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=False)
 
     class Meta:
         ordering = ['-createdAt']
-    
+
     def __str__(self):
         return self.message
+    
+class ShareCategoryNotification(Notification):
+    sharedCategory = models.ForeignKey(Category, on_delete=models.CASCADE)
+    fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class FollowRequestNotification(Notification):
+    fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+class Points(models.Model):
+    ''' model for the points that the user earns '''
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pointsNum = models.IntegerField(default=0)
+    

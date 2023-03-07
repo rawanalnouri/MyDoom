@@ -2,11 +2,12 @@ from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
+from ExpenseTracker.helpers.utils import *
 
 
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
-    
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
@@ -14,7 +15,7 @@ class SignUpForm(forms.ModelForm):
     firstName = forms.CharField(label="First name")
     lastName = forms.CharField(label="Last name")
     newPassword = forms.CharField(
-        label='New password', 
+        label='New password',
         widget=forms.PasswordInput(),
         validators=[RegexValidator(
             regex=r'^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$', #using postive lookaheads
@@ -23,10 +24,9 @@ class SignUpForm(forms.ModelForm):
     )
     passwordConfirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
-
     def clean(self):
         super().clean()
-        newPassword = self.cleaned_data.get("newPassword") 
+        newPassword = self.cleaned_data.get("newPassword")
         passwordConfirmation = self.cleaned_data.get("passwordConfirmation")
         if newPassword != passwordConfirmation:
             self.add_error("passwordConfirmation", "Confirmation does not match password.")
@@ -44,7 +44,6 @@ class SignUpForm(forms.ModelForm):
         return newUser
 
 
-
 '''Form to allow a user to login'''
 class LogInForm(forms.Form):
     username = forms.CharField(label="Username")
@@ -54,11 +53,11 @@ class LogInForm(forms.Form):
 class ExpenditureForm(forms.ModelForm):
     class Meta:
         model = Expenditure
-        fields = ['title', 'description', 'amount', 'date', 'receipt', 'mood']
+        fields = ['title', 'description', 'amount', 'date', 'receipt']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
-    
+
     def save(self, category, commit=True):
         expenditure = super().save()
         if commit:
@@ -75,7 +74,6 @@ class CategorySpendingLimitForm(forms.ModelForm):
         widgets = {
             'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
         }
-    
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user')
@@ -89,29 +87,81 @@ class CategorySpendingLimitForm(forms.ModelForm):
         spendingLimit = SpendingLimit.objects.create(timePeriod=self.cleaned_data['timePeriod'],
                                                      amount=self.cleaned_data['amount'])
         category.spendingLimit = spendingLimit
-        category.user = self.user
         if commit:
             spendingLimit.save()
             category.save()
+            category.users.add(self.user)
             self.user.categories.add(category)
         return category
 
+
 class EditProfile(forms.ModelForm):
+    firstName = forms.CharField(label='First name')
+    lastName = forms.CharField(label='Last name')
+
     class Meta:
         model = User
         fields = ["firstName", "lastName", "username", "email"]
 
 
 class ChangePasswordForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        
+        self.fields['old_password'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Old Password'
+        })
+        self.fields['new_password1'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'New Password'
+        })
+        self.fields['new_password2'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Confirm New Password'
+        })
     
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
-    new_password1 = forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
-    new_password2= forms.CharField(widget=forms.PasswordInput(attrs={'class':'form-control','type':'password'}))
+
+class ShareCategoryForm(forms.ModelForm):
+    user = forms.ModelChoiceField(queryset=User.objects.none())
 
     class Meta:
-        model = User
-        fields=["old_password","new_password1","new_password2"]
+        model = Category
+        fields = []
 
-# Had to use snake case as I am referenceing variables that already exist 
+    def __init__(self, fromUser, category, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['user'].queryset = fromUser.followers.all()
+        self.category = category
+        self.fromUser = fromUser
+
+    # Sends a share request to the user selected
+    def save(self, commit=True):
+        toUser = self.cleaned_data['user'] 
+        title = "New Category Shared!"
+        message = self.fromUser.username + " wants to share a category '"+ self.category.name +"' with you"
+        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)      
+        return toUser
 
 
+TIME_PERIOD_CHOICES = [
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+]
+
+'''Form to allow a user to select a category to generate a report for'''
+class ReportForm(forms.Form):
+    timePeriod = forms.ChoiceField(choices = TIME_PERIOD_CHOICES, label = "Time Frame")
+    selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(ReportForm, self).__init__(*args, **kwargs)
+        self.fields['selectedCategory'].choices = self.createCategorySelection()
+
+    def createCategorySelection(self):
+        categoryArray = []
+        for x in Category.objects.filter(users__in=[self.user]):
+            categoryArray.append((x, x))
+        return categoryArray

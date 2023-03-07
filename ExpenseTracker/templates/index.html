@@ -1,9 +1,212 @@
-{% extends 'base.html' %}
+{% extends 'initialBase.html' %}
 
 {% block title %}Main Page{% endblock %}
 
 {% block content %}
-    <p>Welcome to spending tracker!</p>
+
+<section class="top-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+      <h1 class="page-title">The <span>fun</span> way<br>to manage<br>expenses</h1>
+      <div class="subtitle">
+        <p>Make day-to-day spending a breeze with all things money in<br>one place!</p>
+      </div>
+      <div class="padding">
+        <a class="home-button" href="{% url 'signUp' %}">
+          Sign up now
+        </a>
+      </div>
+      </div>
+      <div class="col-md-6">
+        <img src="https://www.linkpicture.com/q/IMG_1783.png" width="700" height="380" alt="">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-split">
+    <div class="container">
+      <div class="row">
+        <div class="section-header col-12">
+          <div class="section-intro">
+            <h2 style="text-align: center;"><small>Spend and save <b>smarter</b> - open your account in a flash!</small></h2>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section class="image-section">
+  <div class="container">
+    <div class="row">
+      <div class="section-header col-12">
+    </div>
+    <div class="section-content col-12">
+      <div class="alternating_content">
+        <div class="row align-items-center justify-content-center">
+          <div class="col-12 col-md-6 centered order-md-2 offset-xs-1">
+          <img src="https://www.linkpicture.com/q/IMG_1750.png"  width="768" height="714" alt="">
+        </div>
+        <div class="col-12 col-md-5 order-md-1">
+          <h2>Blah Blah</h2>
+          <p>Blah blah blah.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="results-section rounded-corner">
+  <div class="container">
+    <div class="row">
+      <div class="section-header col-12">
+        <div class="section-intro">
+          <h2 class="section-title">Our users outstanding results</h2>
+        </div>
+      </div>
+      <div class="section-content col-12">
+        <div class="flexible_cards">
+          <div class="row">
+            <div class="flexible_card col-12 col-md-6 col-lg-3">
+              <div class="flexible_card-container">
+                <div class="column-icon-list">
+                  <div class="column-4">
+                    <img src="https://www.linkpicture.com/q/card-30_2.png" width="210" height="140" alt="">
+                  </div>
+                </div>
+              </div>
+            </div> 
+            <div class="flexible_card col-12 col-md-6 col-lg-3">
+              <div class="flexible_card-container">
+                <div class="column-icon-list">
+                  <div class="column-4">
+                    <img src="https://www.linkpicture.com/q/card-98_1.png" width="210" height="140" alt=""">
+                  </div>
+                </div>
+              </div>
+            </div> 
+            <div class="flexible_card col-12 col-md-6 col-lg-3">
+              <div class="flexible_card-container">
+                <div class="column-icon-list">
+                  <div class="column-4">
+                    <img src="https://www.linkpicture.com/q/card-20_1.png" width="210" height="140" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flexible_card col-12 col-md-6 col-lg-3">
+              <div class="flexible_card-container">
+                <div class="column-icon-list">
+                  <div class="column-4">
+                    <img src="https://www.linkpicture.com/q/card-95_1.png" width="210" height="140" alt="">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="home-testimonial">
+  <div class="container-fluid">
+      <div class="row d-flex justify-content-center testimonial-pos">
+          <div class="col-md-12 pt-4 d-flex justify-content-center">
+              <h3>Testimonials</h3>
+          </div>
+          <div class="col-md-12 d-flex justify-content-center">
+              <h2>What our users are saying</h2>
+          </div>
+      </div>
+      <section class="home-testimonial-bottom">
+          <div class="container testimonial-inner">
+              <div class="row d-flex justify-content-center">
+                  <div class="col-md-4 style-3">
+                      <div class="tour-item ">
+                          <div class="tour-desc bg-beige">
+                              <div class="tour-text color-blue text-center">&ldquo;Blah blah&rdquo;</div>
+                              <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-4_51.png" alt=""></div>
+                              <div class="link-name d-flex justify-content-center">MoneySaver123</div>
+                              <div class="link-position d-flex justify-content-center">User</div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4 style-3">
+                      <div class="tour-item ">
+                          <div class="tour-desc bg-beige">
+                              <div class="tour-text color-blue text-center">&ldquo;Blah blah&rdquo;</div>
+                              <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-3_67.png" alt=""></div>
+                              <div class="link-name d-flex justify-content-center">Anonymous</div>
+                              <div class="link-position d-flex justify-content-center">User</div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-md-4 style-3">
+                      <div class="tour-item ">
+                          <div class="tour-desc bg-beige">
+                              <div class="tour-text color-blue text-center">&ldquo;Blah blah&rdquo;</div>
+                              <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-5_33.png" alt=""></div>
+                              <div class="link-name d-flex justify-content-center">BellaSaves</div>
+                              <div class="link-position d-flex justify-content-center">User</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+      </section>
+</section>
+
+<section class="final-section">
+  <div class="container">
+    <div class="row">
+      <div class="section-header col-12"> </div>
+        <div class="section-content col-12">
+          <div class="cta-block colourful">
+            <div class="container colourful-block rounded-corner">
+              <div class="row">
+                <div class="col-12 text-center">
+                  <div class="card mx-auto">
+                    <img class="card-img-top" src="https://www.linkpicture.com/q/circle_2.png" width="150" height="120">
+                    <div class="card-img-overlay">
+                      <h2 class="cta-block-title">Ready to try out <b>MyDoom</b>?</h2>
+                    </div>
+                     
+                </div>
+                  <!--<img src="https://www.linkpicture.com/q/circle_2.png" width="150" height="100">
+                  <h2 class="cta-block-title">Ready to try out <b>MyDoom</b>?</h2>
+                  <div class="subtitle"></div> -->
+                </div>
+              </div>
+            <div class="row">
+              <div class="col-12 text-center">
+                <div class="btn-container">
+                  <a id="" class="button" href="{% url 'signUp' %}">
+                  Create an account
+                  </a>
+                  <a id="" class="button-clear" href="{% url 'logIn' %}">
+                  Login
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  $(window).scroll(function(){
+    if ($(window).scrollTop() >= 30) {
+       $('header').addClass('shadow-header');
+    }
+    else {
+       $('header').removeClass('shadow-header');
+    }
+});
+</script>
+
 {% endblock %}
-
-

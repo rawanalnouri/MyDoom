@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ otherUser.fullName }}{% endblock %}
+
+{% block content %}
+
+{% include 'partials/users/userProfile.html' with followable=followable following=following user=otherUser %}
+
+{% endblock %}

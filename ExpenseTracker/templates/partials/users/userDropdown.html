@@ -1,0 +1,26 @@
+<li class="nav-item dropdown" >
+    <a href="#" class="nav-link logged-in-items" data-bs-toggle="dropdown">
+        <i class="bi bi-search"></i>
+    </a>
+    <div style="width: 300px;" class="dropdown-menu" id="scrollable-menu"> 
+        <input class="form-control mr-sm-2" name="q" type="search" placeholder="Search users..." aria-label="Search" id="user-search-input">
+        <div class="dropdown-divider"></div>
+        <div id="user-list"></div>
+        <a class="dropdown-item" href="{% url 'users' %}" style="text-align: center;">View All</a>
+    </div>
+</li>
+
+<script>
+$(document).ready(function() {
+    $("#user-search-input").on("input", function() {
+        var query = $(this).val();
+        $.ajax({
+            url: "/searchUsers/",
+            data: { "q": query },
+            success: function(response) {
+                $("#user-list").html(response);
+            }
+        });
+    });
+});
+</script>

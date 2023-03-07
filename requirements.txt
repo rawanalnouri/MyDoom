@@ -1,5 +1,7 @@
-coverage
-Django
-Faker
-Pillow
+coverage==7.2.0
+Django==3.2.5
+Faker==8.10.3
+Pillow==9.0.1
 django-widget-tweaks==1.4.8
+libgravatar==1.0.0
+humanize
