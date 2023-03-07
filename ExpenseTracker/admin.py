@@ -1,6 +1,6 @@
 """Configuration of the administrative interface for ExpenseTracker."""
 from django.contrib import admin
-from .models import User, Category, Expenditure, SpendingLimit, Notification
+from .models import User, Category, Expenditure, SpendingLimit, Notification, Points
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -40,3 +40,5 @@ class NotificationAdmin(admin.ModelAdmin):
     list_display = [
         'user', 'message', 'isSeen', 'title',
     ]
+
+admin.register(Points)
