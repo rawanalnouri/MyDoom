@@ -9,5 +9,6 @@
     {% if user.id|divisibleby:4 == 0 %}
       <h3> blue house </h3>
     {% endif %}
+    <h4>Total spent in {{month}}: £{{overallSpendForMonth}}</h4>
     {% include 'partials/chart.html' %}
 {% endblock %}

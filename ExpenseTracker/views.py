@@ -152,6 +152,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         # add points
         addPoints(self.request,5)
+        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
         return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
@@ -295,6 +296,9 @@ class SignUpView(View):
             pointsObject.save()
     
             login(request, user)
+            createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
+            createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
 
@@ -319,6 +323,8 @@ class LogInView(View):
                 if user.last_login.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
                     addPoints(request, 5)
+                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
+
 
                 return redirect('home') 
 
@@ -354,16 +360,24 @@ class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         categories = []
         totalSpent = []
+        overallSpendForMonth = 0
         for category in Category.objects.filter(users__in=[request.user]):
             # all categories
             categories.append(str(category))
             # total spend per catagory
             categorySpend = 0.00
             for expence in category.expenditures.all():
-                categorySpend += float(expence.amount)
-            totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+                if(expence.createdAt.month == datetime.now().month):
+                        categorySpend += float(expence.amount)
+                
+            # totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
+            totalSpent.append(round(categorySpend,2))
+            overallSpendForMonth += round(categorySpend,2)
+        context = generateGraph(categories, totalSpent,'pie')
+        context['overallSpendForMonth'] =  round(overallSpendForMonth,2)
+        context['month']= datetime.now().strftime('%B')
 
-        return render(request, "home.html", generateGraph(categories, totalSpent, 'polarArea'))
+        return render(request, "home.html", context)
     
     def handle_no_permission(self):
         return redirect('logIn')
