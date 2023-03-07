@@ -31,7 +31,6 @@ class SpendingLimit(models.Model):
 
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
-
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
