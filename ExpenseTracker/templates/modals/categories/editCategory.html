@@ -8,7 +8,7 @@
             <div class="modal-body">
                 <form method="post">
                     {% csrf_token %}
-                    {% include 'partials/bootstrapForm.html' with form=form %}
+                    <div class="update-form"></div>
                     <button type="submit" class="btn btn-secondary" name="categoryForm">Save</button>
                 </form>
             </div>
