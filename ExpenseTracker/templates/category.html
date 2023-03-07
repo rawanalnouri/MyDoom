@@ -12,10 +12,7 @@
             <i class="bi bi-trash3"></i>
         </button>
         <button id="open-share-category-modal" data-category="{{ category.id }}" class="btn btn-sm btn-outline-dark ms-2">
-            <i class="bi bi-person-plus"></i>
-        </button>
-        <button id="open-create-expenditure-modal" class="btn btn-sm btn-outline-dark ms-2">
-            <i class="bi bi-plus-lg"></i>
+          <i class="bi bi-person-plus"></i>
         </button>
     </div>
 </h3>
@@ -26,14 +23,23 @@
         <div class="col-md-6">
           <div class="card">
             <div class="card-body">
-              <h5 class="card-title">Expenditure History</h5>
+              <div class="row align-items-center">
+                <div class="col">
+                  <h5 class="card-title">Expenditure History</h5>
+                </div>
+                <div class="col-auto">
+                  <button id="open-create-expenditure-modal" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#create-expenditure-modal">
+                    <i class="bi bi-plus-lg"></i> Add Expenditure
+                  </button>
+                </div>
+              </div>
               <p class="card-text">
-                  {% include 'partials/expenditures/expendituresTable.html' with category=category expenditures=expenditures %}
-                  <div class="text-center">
-                      {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
-                  </div>
+                {% include 'partials/expenditures/expendituresTable.html' with category=category expenditures=expenditures %}
+                <div class="text-center">
+                  {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
+                </div>
               </p>
-            </div>
+            </div>            
           </div>
         </div>
       <div class="col-md-6">
@@ -42,7 +48,7 @@
             <h5 class="card-title">Category Information</h5>
             <div class="d-flex justify-content-between align-items-center">
               <p class="card-text">Shared with {{ category.users.count|add:"-1" }} users</p>
-              <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#shared-users-modal">
+              <button type="button" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#shared-users-modal">
                 <i class="bi bi-people"></i> View users
               </button>
             </div>
@@ -61,34 +67,13 @@
         </div>
       </div>
     </div>
-    <div class="modal fade" id="shared-users-modal" tabindex="-1" aria-labelledby="shared-users-modal-label" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="shared-users-modal-label">Users with access to "{{ category.name }}"</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <ul class="list-group">
-              {% for otherUser in category.users.all %}
-                {% if user != otherUser %}
-                    <li class="list-group-item">{{ otherUser.username }}</li>
-                {% endif %}
-              {% endfor %}
-            </ul>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 {% include 'modals/expenditures/createExpenditure.html' with form=expenditureForm %} 
 {% include 'modals/expenditures/editExpenditure.html' with form=expenditureForm %} 
 {% include 'modals/categories/editCategory.html' with form=categoryForm %}
 {% include 'modals/categories/shareCategory.html' %} 
 {% include 'modals/categories/deleteCategory.html' %}
+{% include 'modals/categories/viewUsersSharingCategory.html' %}
 
 <script>
 

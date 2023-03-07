@@ -6,8 +6,8 @@ def getNotifications(request):
     context['readNotifications'] = []
     
     if request.user.is_authenticated:
-        unreadNotifications = Notification.objects.filter(user = request.user, isSeen = False)
-        readNotifications = Notification.objects.filter(user = request.user, isSeen = True)
+        unreadNotifications = Notification.objects.filter(toUser = request.user, isSeen = False)
+        readNotifications = Notification.objects.filter(toUser = request.user, isSeen = True)
         context['unreadNotifications'] = unreadNotifications
         context['latestNotifications'] = unreadNotifications[:3]
         context['readNotifications'] = readNotifications

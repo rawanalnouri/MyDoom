@@ -15,13 +15,13 @@ class DeleteNotificationViewTest(TestCase):
         self.readNotification = Notification.objects.get(id=2)
 
     def testReadNotificationIsSuccessfullyDeleted(self):
-        userNotificationsCountBefore = Notification.objects.filter(user=self.user)
+        userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
         self.client.delete(reverse('deleteNotifications', args=[self.readNotification.id]))
         self.assertFalse(Notification.objects.filter(id=self.readNotification.id).exists())
         self.assertTrue(len(userNotificationsCountBefore), len(userNotificationsCountBefore)-1)
 
     def testUnreadNotificationsCannotBeDeleted(self):
-        userNotificationsCountBefore = Notification.objects.filter(user=self.user)
+        userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
         self.client.delete(reverse('deleteNotifications', args=[self.unreadNotification.id]))
         self.assertTrue(Notification.objects.filter(id=self.unreadNotification.id).exists())
         self.assertTrue(len(userNotificationsCountBefore), len(userNotificationsCountBefore))
