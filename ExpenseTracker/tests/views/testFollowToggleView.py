@@ -55,3 +55,4 @@ class FollowToggleViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
+        self.assertTemplateUsed('logIn.html')
