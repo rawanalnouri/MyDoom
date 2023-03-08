@@ -40,20 +40,17 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'progress': category.progress,
         }
 
-        categories = []
-        totalSpent = []
-        categorySpend = 0
-        for category in Category.objects.filter(id=kwargs["categoryId"], users__in=[self.request.user]):
-            categories.append(str(category))
-            categories.append("Remaining Budget")
-            # total spend per category
-            categorySpend = 0.0
-            for expense in category.expenditures.all():
-                categorySpend += float(expense.amount)
-            totalSpent.append(categorySpend)
-            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+        categoryLabels = []
+        spending = []
+        for category in Category.objects.filter(id=kwargs["categoryId"]):
+            categoryLabels.append(str(category))
+            categoryLabels.append("Remaining Budget")
+            # append total spent in category to date
+            cur = category.totalSpent() 
+            spending.append(cur)
+            spending.append(float(category.spendingLimit.amount) - cur)
 
-        graphData = generateGraph(categories, totalSpent, "doughnut")
+        graphData = generateGraph(categoryLabels, spending, "doughnut")
         context.update(graphData)
 
         # analysis
@@ -325,7 +322,7 @@ class LogOutView(LoginRequiredMixin, View):
 class IndexView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             return render(request, 'index.html')
 
