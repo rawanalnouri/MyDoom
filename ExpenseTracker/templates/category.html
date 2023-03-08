@@ -56,7 +56,7 @@
             <p class="card-text">Spending limit: {{ category.spendingLimit }}</p>
             <p class="card-text"><small class="text-muted">Last updated: {{ category.updatedAt|date }}</small></p>
             <div class="progress">
-              <div id="my-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">{{progress}}%</div>
+              <div id="spending-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">{{progress}}%</div>
             </div>
             <div class="mt-4">
               <p>Current Progress:</p>
@@ -81,7 +81,7 @@ $(document).ready(function() {
 
     // Progress bar width
 
-    var progressBar = document.getElementById("my-progress-bar");
+    var progressBar = document.getElementById("spending-progress-bar");
     progressBar.style.width = "{{progress}}%";
 
     // Expenditure modals
