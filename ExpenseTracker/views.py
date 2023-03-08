@@ -37,7 +37,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'expenditureForm': ExpenditureForm(),
             'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
-            'progress': getProgress(category),
+            'progress': category.progress,
         }
 
         categories = []
@@ -114,25 +114,6 @@ class EditCategoryView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
-
-
-def getProgress(category):
-    total = 0
-    today = datetime.now()
-    if(category.spendingLimit.timePeriod == 'daily'):
-        for expense in category.expenditures.filter(date__day=today.day):
-            total += expense.amount
-    elif(category.spendingLimit.timePeriod == 'weekly'):
-        startOfWeek = today - timedelta(days=today.weekday())
-        for expense in category.expenditures.filter(date__gte=startOfWeek):
-            total += expense.amount
-    elif(category.spendingLimit.timePeriod == 'monthly'):
-        for expense in category.expenditures.filter(date__month=today.month):
-            total += expense.amount
-    elif(category.spendingLimit.timePeriod == 'yearly'):
-        for expense in category.expenditures.filter(date__year=today.year):
-            total += expense.amount
-    return 100*round(total/category.spendingLimit.amount, 2)
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
@@ -360,22 +341,22 @@ class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         categories = []
         totalSpent = []
-        overallSpendForMonth = 0
+
         for category in Category.objects.filter(users__in=[request.user]):
             # all categories
             categories.append(str(category))
-            # total spend per catagory
-            categorySpend = 0.00
-            for expence in category.expenditures.all():
-                if(expence.createdAt.month == datetime.now().month):
-                        categorySpend += float(expence.amount)
-                
-            # totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
-            totalSpent.append(round(categorySpend,2))
-            overallSpendForMonth += round(categorySpend,2)
-        context = generateGraph(categories, totalSpent,'pie')
-        context['overallSpendForMonth'] =  round(overallSpendForMonth,2)
-        context['month']= datetime.now().strftime('%B')
+            # total spend per category
+            categoryExpenseThisMonth = 0.0
+            today = datetime.now()
+            for expense in category.expenditures.filter(date__month=today.month):
+                    categoryExpenseThisMonth += float(expense.amount)
+            totalSpent.append(round(categoryExpenseThisMonth, 2))
+
+        context = {**generateGraph(categories, totalSpent,'pie'), **{
+            'month': datetime.now().strftime('%B'),
+            'year': datetime.now().strftime('%Y'),
+            'points': Points.objects.get(user=request.user).pointsNum,
+        }}
 
         return render(request, "home.html", context)
     
