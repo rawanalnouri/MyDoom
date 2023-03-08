@@ -40,20 +40,17 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'progress': category.progress,
         }
 
-        categories = []
-        totalSpent = []
-        categorySpend = 0
-        for category in Category.objects.filter(id=kwargs["categoryId"], users__in=[self.request.user]):
-            categories.append(str(category))
-            categories.append("Remaining Budget")
-            # total spend per category
-            categorySpend = 0.0
-            for expense in category.expenditures.all():
-                categorySpend += float(expense.amount)
-            totalSpent.append(categorySpend)
-            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+        categoryLabels = []
+        spendingData = []
+        for category in Category.objects.filter(id=kwargs["categoryId"]):
+            categoryLabels.append(str(category))
+            categoryLabels.append("Remaining Budget")
+            # append total spent in category to date
+            cur = category.totalSpent() 
+            spendingData.append(cur)
+            spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
-        graphData = generateGraph(categories, totalSpent, "doughnut")
+        graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
 
         # analysis
@@ -262,7 +259,7 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 class SignUpView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             signUpForm = SignUpForm()
             return render(request, 'signUp.html', {'form': signUpForm})
@@ -325,7 +322,7 @@ class LogOutView(LoginRequiredMixin, View):
 class IndexView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             return render(request, 'index.html')
 
