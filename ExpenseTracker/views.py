@@ -41,16 +41,16 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         }
 
         categoryLabels = []
-        spending = []
+        spendingData = []
         for category in Category.objects.filter(id=kwargs["categoryId"]):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
             cur = category.totalSpent() 
-            spending.append(cur)
-            spending.append(float(category.spendingLimit.amount) - cur)
+            spendingData.append(cur)
+            spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
-        graphData = generateGraph(categoryLabels, spending, "doughnut")
+        graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
 
         # analysis
@@ -259,7 +259,7 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 class SignUpView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             signUpForm = SignUpForm()
             return render(request, 'signUp.html', {'form': signUpForm})

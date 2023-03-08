@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
 from libgravatar import Gravatar
-from .helpers.utils import computeTotalSpent
+from .helpers.modelUtils import computeTotalSpent
 from datetime import datetime
 
 class SpendingLimit(models.Model):
@@ -60,7 +60,10 @@ class Category(models.Model):
 
     def progress(self):
         total = computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures)
-        return round(100*total/float(self.spendingLimit.amount), 2)
+        if self.spendingLimit.amount==0:
+            return 0.00
+        else:
+            return round(100*total/float(self.spendingLimit.amount), 2)
     
     def totalSpent(self):
         return round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2)
@@ -130,7 +133,10 @@ class User(AbstractUser):
         for category in self.categories.all():
             limit += float(category.spendingLimit.amount)
             total += computeTotalSpent(category.spendingLimit.timePeriod, category.expenditures)
-        return round(100*total/limit, 2)
+        if limit==0:
+            return 0.00
+        else:
+            return round(100*total/limit, 2)
     
     def totalSpentThisMonth(self):
         total = 0.0
