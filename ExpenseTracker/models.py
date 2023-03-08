@@ -61,6 +61,9 @@ class Category(models.Model):
     def progress(self):
         total = computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures)
         return round(100*total/float(self.spendingLimit.amount), 2)
+    
+    def totalSpent(self):
+        return round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2)
 
     def __str__(self):
         return self.name
