@@ -22,6 +22,7 @@ from .helpers.utils import createNotification
 from .contextProcessor import getNotifications
 import random
 from datetime import datetime
+from datetime import timedelta
 import time
 
 
@@ -295,9 +296,43 @@ class HomeView(LoginRequiredMixin, View):
         return redirect('logIn')
 
 
+def convertBudgetToDaily(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'weekly':
+        return category.spendingLimit.getNumber()/7
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/30
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/365
+    else:
+        return category.spendingLimit.getNumber()
+
+def convertBudgetToWeekly(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'daily':
+        return category.spendingLimit.getNumber()*7
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/4
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/54
+    else:
+        return category.spendingLimit.getNumber()
+
+def convertBudgetToMonthly(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'daily':
+        return category.spendingLimit.getNumber()*30
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/4
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/54
+    else:
+        return category.spendingLimit.getNumber()
+
+
 '''Implements a view for handling requests to the reports page'''
 def reportsView(request):
-    '''Implements a view for handling requests to the reports page'''
+    today = datetime.now()
 
     categories = []
     totalSpent = []
@@ -306,18 +341,34 @@ def reportsView(request):
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
-            selectedCategories = form.cleaned_data.get('selectedCategory')
 
             if timePeriod == 'daily':
+                Category.objects.filter(users__in=[request.user])
+                #filters = date__year='2023', date__month='01'
+
+
+            selectedCategories = form.cleaned_data.get('selectedCategory')
+
             for selected in selectedCategories:
                 category = Category.objects.get(id=selected)
+                budgetCalculated = category.spendingLimit.getNumber()
                 # all categories
                 categories.append(category.name)
                 # total spend per catagory
                 categorySpend = 0.00
-                for expence in category.expenditures.all():
+                filteredExpenses = category.expenditures.all()
+                if timePeriod == 'daily':
+                    filteredExpenses = category.expenditures.filter(date__day=today.day)
+                    budgetCalculated = convertBudgetToDaily(category)
+                if timePeriod == 'weekly':
+                    budgetCalculated = convertBudgetToWeekly(category)
+                    startOfWeek = today - timedelta(days=today.weekday())
+                    filteredExpenses = category.expenditures.filter(date__gte=startOfWeek)
+                if timePeriod == 'monthly':
+                    filteredExpenses = category.expenditures.filter(date__month=today.month)
+                for expence in filteredExpenses:
                     categorySpend += float(expence.amount)
-                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+                totalSpent.append(categorySpend/float(budgetCalculated)*100)
 
             dict = generateGraph(categories, totalSpent, 'bar')
             dict.update({"form": form})
