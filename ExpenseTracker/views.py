@@ -34,10 +34,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         context = {
             'category': category,
-            'expenditureForm': ExpenditureForm(),
-            'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
-            'progress': category.progress,
         }
 
         categoryLabels = []
@@ -53,15 +50,6 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
 
-        # analysis
-        namesOfExpenses = []
-        allExpensesInRange = category.expenditures.all().filter(date__year="2023", date__month="01")
-        # filter between months
-        # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
-        for expense in allExpensesInRange:
-            namesOfExpenses.append(expense.title)
-
-        context.update({'stuff': namesOfExpenses})
         return context
 
     def handle_no_permission(self):
@@ -83,7 +71,7 @@ class CreateExpenditureView(LoginRequiredMixin, View):
             form.save(category)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.error("Failed to create expenditure.")
+            messages.error(self.request, "Failed to create expenditure.")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def handle_no_permission(self):
@@ -106,7 +94,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             form.save(category)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.error("Failed to update category.")
+            messages.error(self.request, "Failed to update category.")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def handle_no_permission(self):
