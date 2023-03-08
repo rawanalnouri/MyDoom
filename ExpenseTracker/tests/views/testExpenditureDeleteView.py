@@ -18,3 +18,8 @@ class ExpenditureDeleteViewTest(TestCase):
         response = self.client.delete(reverse('deleteExpenditure', args=[self.category.id, self.expenditure.id]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
+
+    def testRedirectsToLoginIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        self.assertRedirects(response, reverse('logIn'))

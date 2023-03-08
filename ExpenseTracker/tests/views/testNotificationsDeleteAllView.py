@@ -31,3 +31,9 @@ class DeleteAllNotificationViewTest(TestCase):
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'notifications.html')
 
+    def testRedirectsIfUserNotLoggedIn(self):
+        """Test delete all notifications view with an anonymous user."""
+        self.client.logout()
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        self.assertRedirects(response, reverse('logIn'))
+

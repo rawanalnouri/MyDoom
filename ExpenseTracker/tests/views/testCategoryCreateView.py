@@ -29,3 +29,8 @@ class CategoryCreateViewTest(TestCase):
         response = self.client.post(reverse('createCategory'), data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This field is required.')
+
+    def testRedirectsToLoginIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        self.assertRedirects(response, reverse('logIn'))

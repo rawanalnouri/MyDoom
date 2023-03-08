@@ -35,4 +35,9 @@ class DeleteNotificationViewTest(TestCase):
         self.assertTrue(len(userReadNotificationsCountBefore), len(userReadNotificationsCountBefore)+1)
         self.assertTrue(len(userUnreadNotificationsCountBefore), len(userUnreadNotificationsCountBefore)-1)
 
+    def testRedirectsIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        self.assertRedirects(response, reverse('logIn'))
+
 
