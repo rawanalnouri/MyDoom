@@ -52,5 +52,5 @@ class ExpenditureUpdateViewTest(TestCase):
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        response = self.client.get(reverse('updateExpenditure', args=[self.category.id, self.expenditure.id]))
         self.assertRedirects(response, reverse('logIn'))

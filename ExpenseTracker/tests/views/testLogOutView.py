@@ -37,5 +37,5 @@ class TestLogOut(TestCase, LogInTester):
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        response = self.client.get(reverse('logOut'))
         self.assertRedirects(response, reverse('logIn'))

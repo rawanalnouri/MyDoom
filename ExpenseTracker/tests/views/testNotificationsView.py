@@ -49,5 +49,5 @@ class DeleteAllNotificationViewTest(TestCase):
 
     def testRedirectsIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        response = self.client.get(reverse('notifications'))
         self.assertRedirects(response, reverse('logIn'))

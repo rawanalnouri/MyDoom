@@ -16,19 +16,18 @@ class CategoryDeleteViewTest(TestCase):
         self.category.expenditures.add(self.expenditure)
 
     def testCategoryDeleteViewRemovesCategoryAndExpendituresAndSpendingLimit(self):
-        self.client.delete(reverse('deleteCategory', args=[self.category.id]))
+        self.client.get(reverse('deleteCategory', args=[self.category.id]))
         self.assertFalse(SpendingLimit.objects.filter(id=self.spendingLimit.id).exists())
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
         self.assertFalse(Category.objects.filter(id=self.category.id).exists())
 
     def testRedirectToHomeAfterDelete(self):
-        response = self.client.delete(reverse('deleteCategory', args=[self.category.id]), follow=True)
+        response = self.client.get(reverse('deleteCategory', args=[self.category.id]), follow=True)
         userRedirect = reverse('home')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
+        response = self.client.delete(reverse('deleteCategory', args=[self.category.id]))
         self.assertRedirects(response, reverse('logIn'))
-
