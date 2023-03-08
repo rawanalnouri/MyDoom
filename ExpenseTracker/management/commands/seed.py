@@ -172,7 +172,7 @@ class Command(BaseCommand):
     def _createExpenditure(self, dayDifference):
         title = self.faker.word()
         description = self.faker.sentence()
-        date = datetime.date.today() + relativedelta(days=dayDifference)
+        date = datetime.now() + relativedelta(days=dayDifference)
         amount = float(decimal.Decimal(random.randrange(1, 10000))/100)
         Expenditure.objects.create(
             title=title,
