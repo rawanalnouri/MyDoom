@@ -30,12 +30,21 @@
           
             <hr style="width: 75%;">
 
-            <p class="card-text">Total progress:</p>
-            <div class="card p-2 shadow-sm" style="width: 350px;">
-                <div class="progress">
-                  <div id="total-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" data-progress="{{ user.totalProgress }}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+            <p class="card-text">House Progress:</p>
+            <div class="d-flex justify-content-between align-items-center" style="width: 75%;">
+              <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                  <div class="card-text">
+                    <p>Blue House</p>
+                    <h4>"general data on users house"</h4>
+                    <br>
+                    <p>{{user.firstName}}'s Points:</p>
+                    <h4>{{points}}</h4>
+                  </div>
                 </div>
+              </div>
             </div>
+
         </div>
       </div>
     </div>
@@ -45,11 +54,16 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">General Information</h5>
-          <p>user id: {{user.id}}</p>
-          {% if user.id|divisibleby:4 == 0 %}
-            <p> blue house </p>
-          {% endif %}
+
+          <p class="card-text">Total progress:</p>
+          <div class="card p-2 shadow-sm" style="width: 350px;">
+              <div class="progress">
+                <div id="total-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" data-progress="{{ user.totalProgress }}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+          </div>
+
           <hr style="width: 75%;">
+
           <p class="card-text">Category Spending this Month:</p>
         </div>  
       </div>
