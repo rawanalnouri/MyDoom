@@ -145,7 +145,4 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'danger',
 }
 
-#Daily task to run at 1am every day
-CRONJOBS = [
-    ('0 1 * * *', 'ExpenseTracker.pointsHelper.trackPoints')
-]
+
