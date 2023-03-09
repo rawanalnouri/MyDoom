@@ -1,7 +1,7 @@
 ''''Tests for utility functions'''
 from ExpenseTracker.models import User, Notification
 from django.test import TestCase
-from ExpenseTracker.helpers.utils import createNotification
+from ExpenseTracker.helpers.utils import *
 
 class Test(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
@@ -15,10 +15,10 @@ class Test(TestCase):
         user = self.user
         title = 'Test Title'
         message = 'Test Message'
-        createNotification(user, title, message)
+        createBasicNotification(user, title, message)
         self.assertEqual(userNotificationBefore, userNotificationBefore+1)
         newNotification = Notification.objects.get(id=3)
-        self.assertEqual(newNotification.user, user)
+        self.assertEqual(newNotification.toUser, user)
         self.assertEqual(newNotification.title, title)
         self.assertEqual(newNotification.message, message)
         self.assertEqual(newNotification.isSeen, False)

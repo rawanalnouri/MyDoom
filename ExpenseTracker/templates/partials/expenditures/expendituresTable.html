@@ -3,7 +3,6 @@
         <tr>
             <th>Title</th>
             <th>Amount</th>
-            <th>Mood</th>
             <th>Date</th>
             <th>Action</th>
         </tr>
@@ -13,7 +12,6 @@
             <tr>
                 <td>{{ expenditure.title }}</td>
                 <td class="text-muted">-£{{ expenditure.amount }}</td>
-                <td>{% include 'partials/expenditures/moodColors.html' with mood=expenditure.mood %}</td>
                 <td class="text-muted">{{ expenditure.date }}</td>
                 <td>
                     <a class="open-edit-expenditure-modal btn btn-sm btn-outline-dark" style="border-radius: 60px;" data-expenditure="{{ expenditure.id }}" data-category="{{ category.id }}">

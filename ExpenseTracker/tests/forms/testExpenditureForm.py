@@ -15,7 +15,6 @@ class ExpenditureFormTest(TestCase):
             description='Weekly grocery shopping',
             amount=100.00,
             date=datetime.date.today(),
-            mood='happy'
         )
         self.category.expenditures.add(self.expenditure)
     
@@ -26,10 +25,8 @@ class ExpenditureFormTest(TestCase):
         self.assertIn('amount', form.fields)
         self.assertIn('date', form.fields)
         self.assertIn('receipt', form.fields)
-        self.assertIn('mood', form.fields)
         self.assertIsInstance(form.fields['amount'].widget, forms.NumberInput)
         self.assertIsInstance(form.fields['receipt'].widget, forms.FileInput)
-        self.assertIsInstance(form.fields['mood'].widget, forms.Select)
         self.assertIsInstance(form.fields['date'].widget, forms.DateInput)
 
     def testFormValidation(self):
@@ -38,7 +35,6 @@ class ExpenditureFormTest(TestCase):
             'description': 'Weekly grocery shopping',
             'amount': 100.00,
             'date': datetime.date.today(),
-            'mood': 'happy'
         })
         self.assertTrue(form.is_valid())
 
@@ -48,7 +44,6 @@ class ExpenditureFormTest(TestCase):
             'description': '',
             'amount': '',
             'date': '',
-            'mood': ''
         })
         self.assertFalse(form.is_valid())
 
@@ -58,7 +53,6 @@ class ExpenditureFormTest(TestCase):
             'description': 'Weekly grocery shopping',
             'amount': 100.00,
             'date': datetime.date.today(),
-            'mood': 'happy'
         })
         expenditure = form.save(self.category)
         self.assertEqual(expenditure.title, 'Grocery Shopping')
@@ -71,7 +65,6 @@ class ExpenditureFormTest(TestCase):
             'description': 'Updated Description',
             'amount': 200.00,
             'date': datetime.date.today(),
-            'mood': 'anxious'
         })
         self.assertTrue(form.is_valid())
         updated_expenditure = form.save(self.category)
@@ -80,4 +73,3 @@ class ExpenditureFormTest(TestCase):
         self.assertEqual(updated_expenditure.description, 'Updated Description')
         self.assertEqual(updated_expenditure.amount, 200)
         self.assertEqual(updated_expenditure.date, datetime.date.today())
-        self.assertEqual(updated_expenditure.mood, 'anxious')
