@@ -38,7 +38,10 @@ urlpatterns = [
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
+    path('editCategory/<int:categoryId>/', EditCategoryView.as_view(), name='editCategory'),
     path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
+
+    path('createExpenditure/<int:categoryId>/', CreateExpenditureView.as_view(), name='createExpenditure'),
     path('category/<int:categoryId>/update/<int:expenditureId>/', ExpenditureUpdateView.as_view(), name='updateExpenditure'),
     path('category/<int:categoryId>/delete/<int:expenditureId>/', ExpenditureDeleteView.as_view(), name='deleteExpenditure'),
 
