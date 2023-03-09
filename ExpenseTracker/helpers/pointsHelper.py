@@ -2,6 +2,7 @@
 from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
 from django.utils.timezone import datetime, timedelta
 from .utils import createBasicNotification
+from decimal import Decimal
 #from
 def addPoints(request,n):
     user = request.user
@@ -17,7 +18,7 @@ def addPoints(request,n):
 
 
 
-def loosePoints(request,limit,spent):
+def losePoints(request,limit,spent):
     # call add points with a -ve
     # pass in spent and limit find percentage 
     #this function only called if we are over the limit 
@@ -27,6 +28,7 @@ def loosePoints(request,limit,spent):
     if percentage<=10:
         addPoints(request,-3)
         createBasicNotification(request.user,"Points Lost!","3 points lost for going over target")
+        print(spent)
     elif percentage>10 and percentage<=30:
         addPoints(request,-5)
         createBasicNotification(request.user,"Points Lost!","5 points lost for going over target")
@@ -91,7 +93,7 @@ def getTimePeriod(request,category):
 #         addPoints(request,15)
 #         createBasicNotification(request.user,"Points Earned!","5 points for being on target this month")
 #     else:
-#         loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
+#         losePoints(request, currentCategory.spendingLimit.amount, abs(spent))
         
 
     
@@ -121,44 +123,48 @@ def checkIfOver(request,category):
         for expence in currentCategory.expenditures.filter(date=datetime.now().date()):
             spent+=float(expence.amount)
         if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-            return (True, spent)
+            return (False, spent)
         else:
-            return(False, spent)
+            return(True, spent)
         
     elif time=='weekly':
         startOfWeek = date - timedelta(days=date.weekday())
         for expence in currentCategory.expenditures.filter(date__gte=startOfWeek):
             spent+=float(expence.amount)
         if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-           return (True, spent)
+           return (False, spent)
         else:
-            return(False, spent)
+            return(True, spent)
           
     elif time=='monthly':
          for expence in currentCategory.expenditures.filter(month__gte=date.month):
             spent+=float(expence.amount)
          if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-           return (True, spent)
+           return (False, spent)
          else:
-            return(False, spent)
+            return(True, spent)
     
 
 
 def trackPoints(request,category,isOver,totalSpent):
     
     currentCategory = Category.objects.get(id=category.id)
-    newExpenditure=currentCategory.expenditures.objects.filter.latest('createdAt')
+    newExpenditure=currentCategory.expenditures.latest('createdAt')
     newExpenditureAmount = newExpenditure.amount
+    newAmount = newExpenditureAmount+Decimal(totalSpent)
     if isOver==False:
-        if newExpenditureAmount+totalSpent>currentCategory.spendingLimit:
-            loosePoints(request,currentCategory.spendingLimit,newExpenditureAmount+totalSpent)
+       
+        if newAmount>currentCategory.spendingLimit.amount:
+            losePoints(request,currentCategory.spendingLimit.amount,newAmount)
+            
         else:
+            
             addPoints(request,5)
             createBasicNotification(request.user,"Points Won!","5 points for staying within target :)")
         
     else:
-        loosePoints(request,currentCategory.spendingLimit,newExpenditureAmount+totalSpent)
-
+        #if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft 
+        losePoints(request,Decimal(currentCategory.spendingLimit.amount),currentCategory.spendingLimit.amount+newExpenditureAmount)
 
         
 
