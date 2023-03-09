@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User
-class IndexViewTest(TestCase):
 
+class IndexViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
