@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.http import Http404
 from django.core.paginator import Paginator
-from .helpers.pointsHelper import addPoints
+from .helpers.pointsHelper import addPoints, trackPoints
 from django.utils.timezone import datetime
 from .models import *
 from .forms import *
@@ -275,11 +275,15 @@ class LogInView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
+                print((datetime.now().date()-user.last_login.date()).days)
 
-                if user.last_login.date() != datetime.now().date():
+                if (datetime.now().date()-user.last_login.date()).days > 0 :
                     # if this is the first login of the day, add 5 points
+                   
                     addPoints(request, 5)
                     createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
+                    trackPoints(request)
+
 
 
                 return redirect('home') 
