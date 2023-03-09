@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'ExpenseTracker',
     'widget_tweaks',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [
