@@ -291,10 +291,9 @@ class LogInView(View):
 
                 if (datetime.now().date()-user.last_login.date()).days > 0 :
                     # if this is the first login of the day, add 5 points
-                   
                     addPoints(request, 5)
                     createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
-                    trackPoints(request)
+                    
 
 
 
