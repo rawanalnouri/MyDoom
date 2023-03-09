@@ -144,8 +144,11 @@ def checkIfOver(request,category):
     
 
 
-def trackPoints(request,category,isOver,totalSpent,newExpenditureAmount):
+def trackPoints(request,category,isOver,totalSpent):
+    
     currentCategory = Category.objects.get(id=category.id)
+    newExpenditure=currentCategory.expenditures.objects.filter.latest('createdAt')
+    newExpenditureAmount = newExpenditure.amount
     if isOver==False:
         if newExpenditureAmount+totalSpent>currentCategory.spendingLimit:
             loosePoints(request,currentCategory.spendingLimit,newExpenditureAmount+totalSpent)
