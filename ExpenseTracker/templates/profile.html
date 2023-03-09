@@ -3,38 +3,6 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<!-- <div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-12">
-      <div class="card shadow-sm" style="width: 70%;">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img class="rounded-circle mx-3 my-2" src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" width="90">
-              <div>
-                <h3 class="card-title m-1">{{ user.fullName }}</h3>
-                <p class="card-text m-1">{{ user.followers.count }} followers</p>
-              </div>
-            </div>
-          </div>
-          <hr>
-          <h5 class="card-title mb-4">Personal Information</h5>
-          <div class="row">
-            <div class="col-md-6">
-              <p class="card-text"><strong>Full name:</strong> {{ user.fullName }}</p>
-              <p class="card-text"><strong>Username:</strong> {{ user.username }}</p>
-              <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end">
-            <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary">Edit Profile</a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 <div class="page-content page-container">
   <div class="padding-profile">
     <div class="row container d-flex justify-content-center">
@@ -46,7 +14,7 @@
                       <div class="m-b-25">
                           <img src="{{ user.gravatar }}" class="rounded-circle mx-1 my-2">
                       </div>
-                      <h6 class="f-w-600">{{ user.username }}r</h6>
+                      <h6 class="f-w-600">{{ user.username }}</h6>
                       {% if user.followers.count == 1 %}
                         <p>{{ user.followers.count }} Friend </p>
                       {% else %}
@@ -78,10 +46,10 @@
                   </div>
               </div>
           </div>
+        </div>
+      </div>
     </div>
-</div>
   </div>
-    </div>
 </div>
 
 {% endblock %}
