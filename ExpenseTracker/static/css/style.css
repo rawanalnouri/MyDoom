@@ -808,12 +808,40 @@ p {
     border-style: solid;
     border-width: 2px;
     border-color: var(--primary-color);
-	margin-left: 30px;
+	margin-left: 20px;
 	border-radius: 7px;
 	font-weight: 400;
-    min-width: 100px;
-    min-height: 50px;
+    height: 40px;
+    width: 110px;
 	text-decoration: none;
-	padding: .5rem 1rem;
+	padding: 0rem 1rem;
 	line-height: 2.3;
 }
+
+.button-sm-clear:hover{
+    background: transparent;
+    color: var(--primary-color-light);
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--primary-color-light);
+	margin-left: 20px;
+	border-radius: 7px;
+	font-weight: 400;
+    height: 40px;
+    width: 110px;
+	text-decoration: none;
+	padding: 0rem 1rem;
+	line-height: 2.3;
+}
+
+.img-padding{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.round-container{
+    display:inline-block;
+    margin-left:70px;
+    margin-top: 10px;
+  }
