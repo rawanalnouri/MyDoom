@@ -338,14 +338,19 @@ class HomeView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
     
+class ReportsView(LoginRequiredMixin, View):
 
-def reportsView(request):
-    '''Implements a view for handling requests to the reports page'''
-
-    categories = []
-    totalSpent = []
-
-    if request.method == 'POST':
+    def get(self, request):
+        categories = []
+        totalSpent = []
+        form = ReportForm(user=request.user)
+        dict = generateGraph(categories, totalSpent, 'bar')
+        dict.update({"form": form})
+        return render(request, "reports.html", dict)
+        
+    def post(self, request):
+        categories = []
+        totalSpent = []
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
@@ -364,11 +369,41 @@ def reportsView(request):
             dict.update({"form": form})
 
             return render(request, "reports.html", dict)
+        
+    def handle_no_permission(self):
+        return redirect('logIn')
 
-    form = ReportForm(user=request.user)
-    dict = generateGraph(categories, totalSpent, 'bar')
-    dict.update({"form": form})
-    return render(request, "reports.html", dict)
+
+# def reportsView(request):
+#     '''Implements a view for handling requests to the reports page'''
+
+#     categories = []
+#     totalSpent = []
+
+#     if request.method == 'POST':
+#         form = ReportForm(request.POST, user=request.user)
+#         if form.is_valid():
+#             timePeriod = form.cleaned_data.get('timePeriod')
+#             selectedCategory = form.cleaned_data.get('selectedCategory')
+#             for selected in selectedCategory:
+#                 category = Category.objects.get(name=selected)
+#                 # all categories
+#                 categories.append(selected)
+#                 # total spend per catagory
+#                 categorySpend = 0.00
+#                 for expence in category.expenditures.all():
+#                     categorySpend += float(expence.amount)
+#                 totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+
+#             dict = generateGraph(categories, totalSpent, 'bar')
+#             dict.update({"form": form})
+
+#             return render(request, "reports.html", dict)
+
+#     form = ReportForm(user=request.user)
+#     dict = generateGraph(categories, totalSpent, 'bar')
+#     dict.update({"form": form})
+#     return render(request, "reports.html", dict)
 
     # def get(self, request):
     #     categories = []

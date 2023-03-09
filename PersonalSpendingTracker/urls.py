@@ -34,7 +34,7 @@ urlpatterns = [
     path('acceptCategoryShareView/<int:notificationId>', AcceptCategoryShareView.as_view(), name='acceptCategoryShare'),
     path('acceptFollowRequest/<int:notificationId>/', AcceptFollowRequestView.as_view(), name='acceptFollowRequest'),
 
-    path('reports/', reportsView, name='reports'),
+    path('reports/', ReportsView.as_view(), name='reports'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
