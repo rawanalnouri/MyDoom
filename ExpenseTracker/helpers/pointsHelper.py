@@ -9,7 +9,10 @@ def addPoints(request,n):
     pointsObject = Points.objects.get(user=request.user)
     # currentPoints = pointsObject.pointsNum
     points = Points.objects.get(user=request.user).pointsNum
-    pointsObject.pointsNum = points+n
+    if points+n<0:
+        pointsObject.pointsNum=0
+    else:
+        pointsObject.pointsNum = points+n
     pointsObject.save()
 
 
@@ -98,7 +101,9 @@ def trackPoints(request,category,isOver,totalSpent):
             losePoints(request,currentCategory.spendingLimit.amount,newAmount)
             
         else:
-            
+            closeAmount = currentCategory.spendingLimit.amount * Decimal(0.85)
+            if newAmount>=closeAmount:
+                createBasicNotification(request.user,"Watch out","you are nearing your spending limit")
             addPoints(request,5)
             createBasicNotification(request.user,"Points Won!","5 points for staying within target :)")
         
