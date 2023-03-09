@@ -10,6 +10,8 @@ def addPoints(request,n):
     points = Points.objects.get(user=request.user).pointsNum
     pointsObject.pointsNum = points+n
     pointsObject.save()
+ 
+
 
 
 
@@ -51,65 +53,66 @@ def getTimePeriod(request,category):
     period = currentSpendingLimit.timePeriod
     return period
 
-def getYesterdaySpending(request,category):
-    currentCategory = Category.objects.get(id=category.id)
-    spent=0.00
-    for expence in currentCategory.expenditures.filter(date=datetime.now().date()-1):
-        spent+=float(expence.amount)
-    return spent
+# def getToddaySpending(request,category):
+#     currentCategory = Category.objects.get(id=category.id)
+#     spent=0.00
+#     for expence in currentCategory.expenditures.filter(date=datetime.now().date()):
+#         spent+=float(expence.amount)
+#     return spent
        
 
-def dailyTracking(request,category):
-    currentCategory = Category.objects.get(id=category.id)
-    spent = getYesterdaySpending(request,category)
-    if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,3)
-        createBasicNotification(request.user,"Points Earned!","3 points for being on target yesterday")
-    else:
-        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
+# def dailyTracking(request,category):
+#     currentCategory = Category.objects.get(id=category.id)
+#     spent = getTodaydaySpending(request,category)
+#     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
+#         addPoints(request,3)
+#         createBasicNotification(request.user,"Points Earned!","5 points for being on target yesterday")
+#     else:
+#         loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
 
-def weeklyTracking(request,category):
-    currentCategory = Category.objects.get(id=category.id)
-    spent=0.0
-    for expence in currentCategory.expenditures.filter(createdAt__gte=datetime.now()-timedelta(days=7)):
-        spent+=float(expence.amount)
-    if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,10)
-        createBasicNotification(request.user,"Points Earned!","10 points for being on target this week")
-    else:
-        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
+# def weeklyTracking(request,category):
+#     currentCategory = Category.objects.get(id=category.id)
+#     startOfWeek = datetime.now() - timedelta(days=datetime.now().weekday())
+#     spent=0.0
+#     for expence in currentCategory.expenditures.filter(date__gte=startOfWeek):
+#         spent+=float(expence.amount)
+#     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
+#         addPoints(request,10)
+#         createBasicNotification(request.user,"Points Earned!","5 points for being on target this week")
+
       
 
-def monthlyTracking(request,category):
-    currentCategory = Category.objects.get(id=category.id)
-    spent=0.0
-    for expence in currentCategory.expenditures.filter(date__month=datetime.now().month-1):
-        spent+=float(expence.amount)
-    if abs(currentCategory.spendingLimit.amount) >= abs(spent):
-        addPoints(request,15)
-        createBasicNotification(request.user,"Points Earned!","15 points for being on target this month")
-    else:
-        loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
+# def monthlyTracking(request,category):
+#     currentCategory = Category.objects.get(id=category.id)
+#     spent=0.0
+#     for expence in currentCategory.expenditures.filter(date__month=datetime.now().month-1):
+#         spent+=float(expence.amount)
+#     if abs(currentCategory.spendingLimit.amount) >= abs(spent):
+#         addPoints(request,15)
+#         createBasicNotification(request.user,"Points Earned!","5 points for being on target this month")
+#     else:
+#         loosePoints(request, currentCategory.spendingLimit.amount, abs(spent))
         
 
     
     
-# even though we check after each expenditure this allows us to add or deduct points at the correct time 
+# # even though we check after each expenditure this allows us to add or deduct points at the correct time 
 
-def trackPoints(request):
-    date = datetime.now()
-    for category in Category.objects.filter(users=request.user):
+# def trackPoints(request):
+#     date = datetime.now()
+#     for category in Category.objects.filter(users=request.user):
         
-        if category.spendingLimit.timePeriod=='daily':
-            dailyTracking(request,category)
-        elif category.spendingLimit.timePeriod=='weekly' and date.weekday()==0:
-            weeklyTracking(request,category)
-        elif category.spendingLimit.timePeriod=='monthly' and date.date() == date.replace(day=1).date():
-            #check if its the first day of the month
-            monthlyTracking(request,category)
+#         if category.spendingLimit.timePeriod=='daily':
+#             dailyTracking(request,category)
+#         elif category.spendingLimit.timePeriod=='weekly' and date.weekday()==0:
+#             weeklyTracking(request,category)
+#         elif category.spendingLimit.timePeriod=='monthly' and date.date() == date.replace(day=1).date():
+#             #check if its the first day of the month
+#             monthlyTracking(request,category)
 
 
-def checkExpenditure(request,category):
+def checkIfOver(request,category):
+    #get latest expenditure check how over they were before
     time=getTimePeriod(request,category)
     currentCategory = Category.objects.get(id=category.id)
     date = datetime.now()
@@ -118,18 +121,45 @@ def checkExpenditure(request,category):
         for expence in currentCategory.expenditures.filter(date=datetime.now().date()):
             spent+=float(expence.amount)
         if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-            createBasicNotification(request.user,"You have gone over your spending limit","")
-    if time=='weekly':
+            return (True, spent)
+        else:
+            return(False, spent)
+        
+    elif time=='weekly':
         startOfWeek = date - timedelta(days=date.weekday())
         for expence in currentCategory.expenditures.filter(date__gte=startOfWeek):
             spent+=float(expence.amount)
         if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-            createBasicNotification(request.user,"You have gone over your spending limit","")
-    else:
+           return (True, spent)
+        else:
+            return(False, spent)
+          
+    elif time=='monthly':
          for expence in currentCategory.expenditures.filter(month__gte=date.month):
             spent+=float(expence.amount)
          if abs(currentCategory.spendingLimit.amount) >= abs(spent): 
-            createBasicNotification(request.user,"You have gone over your spending limit","")
+           return (True, spent)
+         else:
+            return(False, spent)
+    
+
+
+def trackPoints(request,category,isOver,totalSpent,newExpenditureAmount):
+    currentCategory = Category.objects.get(id=category.id)
+    if isOver==False:
+        if newExpenditureAmount+totalSpent>currentCategory.spendingLimit:
+            loosePoints(request,currentCategory.spendingLimit,newExpenditureAmount+totalSpent)
+        else:
+            addPoints(request,5)
+            createBasicNotification(request.user,"Points Won!","5 points for staying within target :)")
+        
+    else:
+        loosePoints(request,currentCategory.spendingLimit,newExpenditureAmount+totalSpent)
+
+
+        
+
+
 
 
 
