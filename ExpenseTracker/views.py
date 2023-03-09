@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.http import Http404
 from django.core.paginator import Paginator
-from .helpers.pointsHelper import addPoints, trackPoints
+from .helpers.pointsHelper import *
 from django.utils.timezone import datetime
 from .models import *
 from .forms import *
@@ -67,8 +67,10 @@ class CreateExpenditureView(LoginRequiredMixin, View):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = ExpenditureForm(request.POST)
         if category and form.is_valid():
+            cureentCategoryInfo = checkIfOver(request,category)
             messages.success(self.request, "Expenditure created successfully.")
             form.save(category)
+            trackPoints(request,category,cureentCategoryInfo[0],cureentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
