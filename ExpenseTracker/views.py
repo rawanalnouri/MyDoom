@@ -18,6 +18,7 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
+from datetime import timedelta
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -33,62 +34,71 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         context = {
             'category': category,
-            'expenditureForm': ExpenditureForm(),
-            'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
         }
 
-        categories = []
-        totalSpent = []
-        categorySpend = 0
-        for category in Category.objects.filter(id=kwargs["categoryId"], users__in=[self.request.user]):
-            categories.append(str(category))
-            categories.append("Remaining Budget")
-            # total spend per category
-            categorySpend = 0.0
-            for expense in category.expenditures.all():
-                categorySpend += float(expense.amount)
-            totalSpent.append(categorySpend)
-            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+        categoryLabels = []
+        spendingData = []
+        for category in Category.objects.filter(id=kwargs["categoryId"]):
+            categoryLabels.append(str(category))
+            categoryLabels.append("Remaining Budget")
+            # append total spent in category to date
+            cur = category.totalSpent() 
+            spendingData.append(cur)
+            spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
-        graphData = generateGraph(categories, totalSpent, "doughnut")
+        graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
 
-        # analysis
-        namesOfExpenses = []
-        allExpensesInRange = category.expenditures.all().filter(date__year="2023", date__month="01")
-        # filter between months
-        # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
-        for expense in allExpensesInRange:
-            namesOfExpenses.append(expense.title)
-
-        context.update({'stuff': namesOfExpenses})
         return context
-
-    def handleForm(self, form, category, error_message, success_message):
-        if category and form.is_valid():
-            messages.success(self.request, success_message)
-            form.save(category)
-        else:
-            messages.error(self.request, error_message)
-
-    def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs["categoryId"])
-        expForm = ExpenditureForm(request.POST)
-        catForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
-
-        if "expenditureForm" in request.POST:
-            self.handleForm(expForm, category, "Failed to create expenditure.","Expenditure created successfully.")
-
-        elif "categoryForm" in request.POST:
-            self.handleForm(catForm, category, "Failed to update category.", "Category updated successfully.")
-
-        # using hidden id to modal templates to determine which form is being used
-        context = {"expenditureForm": expForm, "categoryForm": catForm}
-        return redirect(reverse("category", args=[category.id]), context=context)
 
     def handle_no_permission(self):
         return redirect("logIn")
+    
+
+class CreateExpenditureView(LoginRequiredMixin, View):
+    '''Implements a view for creating expenditures'''
+
+    def get(self, request, *args, **kwargs):
+        form = ExpenditureForm()
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = ExpenditureForm(request.POST)
+        if category and form.is_valid():
+            messages.success(self.request, "Expenditure created successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error(self.request, "Failed to create expenditure.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
+class EditCategoryView(LoginRequiredMixin, View):
+    '''Implements a view for editing categories'''
+
+    def get(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(user=request.user, instance=category)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
+        if category and form.is_valid():
+            messages.success(self.request, "Category updated successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error(self.request, "Failed to update category.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 
 class CategoryCreateView(LoginRequiredMixin, CreateView):
@@ -115,7 +125,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.add_message(self.request, messages.ERROR, error)
         return super().form_invalid(form)
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -132,10 +142,10 @@ class CategoryDeleteView(LoginRequiredMixin, View):
         category.delete()
         messages.add_message(request, messages.SUCCESS, "Category successfully deleted")
         return redirect('home')
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class CategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for sharing categories'''
@@ -216,7 +226,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         else:
             messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -229,7 +239,7 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
         return redirect(reverse('category', args=[kwargs['categoryId']]))
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -237,7 +247,7 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 class SignUpView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             signUpForm = SignUpForm()
             return render(request, 'signUp.html', {'form': signUpForm})
@@ -282,7 +292,7 @@ class LogInView(View):
                     createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
 
 
-                return redirect('home') 
+                return redirect('home')
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
@@ -300,7 +310,7 @@ class LogOutView(LoginRequiredMixin, View):
 class IndexView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             return render(request, 'index.html')
 
@@ -316,110 +326,118 @@ class HomeView(LoginRequiredMixin, View):
     def get(self, request):
         categories = []
         totalSpent = []
-        overallSpendForMonth = 0
+
         for category in Category.objects.filter(users__in=[request.user]):
             # all categories
             categories.append(str(category))
-            # total spend per catagory
-            categorySpend = 0.00
-            for expence in category.expenditures.all():
-                if(expence.createdAt.month == datetime.now().month):
-                        categorySpend += float(expence.amount)
-                
-            # totalSpent.append((categorySpend/float(category.spendingLimit.getNumber()))*100)
-            totalSpent.append(round(categorySpend,2))
-            overallSpendForMonth += round(categorySpend,2)
-        context = generateGraph(categories, totalSpent,'pie')
-        context['overallSpendForMonth'] =  round(overallSpendForMonth,2)
-        context['month']= datetime.now().strftime('%B')
+            # total spend per category
+            categoryExpenseThisMonth = 0.0
+            today = datetime.now()
+            for expense in category.expenditures.filter(date__month=today.month):
+                    categoryExpenseThisMonth += float(expense.amount)
+            totalSpent.append(round(categoryExpenseThisMonth, 2))
+
+        context = {**generateGraph(categories, totalSpent,'pie'), **{
+            'month': datetime.now().strftime('%B'),
+            'year': datetime.now().strftime('%Y'),
+            'points': Points.objects.get(user=request.user).pointsNum,
+        }}
 
         return render(request, "home.html", context)
     
     def handle_no_permission(self):
         return redirect('logIn')
-    
-class ReportsView(LoginRequiredMixin, View):
 
+
+def convertBudgetToDaily(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'weekly':
+        return category.spendingLimit.getNumber()/7
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/30
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/365
+    else:
+        return category.spendingLimit.getNumber()
+
+def convertBudgetToWeekly(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'daily':
+        return category.spendingLimit.getNumber()*7
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/4
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/54
+    else:
+        return category.spendingLimit.getNumber()
+
+def convertBudgetToMonthly(category):
+    currentTimePeriod = category.spendingLimit.timePeriod
+    if currentTimePeriod == 'daily':
+        return category.spendingLimit.getNumber()*30
+    elif currentTimePeriod == 'monthly':
+        return category.spendingLimit.getNumber()/4
+    elif currentTimePeriod == 'yearly':
+        return category.spendingLimit.getNumber()/54
+    else:
+        return category.spendingLimit.getNumber()
+
+
+class ReportsView(LoginRequiredMixin, View):
+    
     def get(self, request):
+        today = datetime.now()
         categories = []
         totalSpent = []
+
         form = ReportForm(user=request.user)
         dict = generateGraph(categories, totalSpent, 'bar')
         dict.update({"form": form})
         return render(request, "reports.html", dict)
-        
+    
     def post(self, request):
+        today = datetime.now()
         categories = []
         totalSpent = []
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
-            selectedCategory = form.cleaned_data.get('selectedCategory')
-            for selected in selectedCategory:
-                category = Category.objects.get(name=selected)
+
+            if timePeriod == 'daily':
+                Category.objects.filter(users__in=[request.user])
+                #filters = date__year='2023', date__month='01'
+
+            selectedCategories = form.cleaned_data.get('selectedCategory')
+
+            for selected in selectedCategories:
+                category = Category.objects.get(id=selected)
+                budgetCalculated = category.spendingLimit.getNumber()
                 # all categories
-                categories.append(selected)
+                categories.append(category.name)
                 # total spend per catagory
                 categorySpend = 0.00
-                for expence in category.expenditures.all():
+                filteredExpenses = category.expenditures.all()
+                if timePeriod == 'daily':
+                    filteredExpenses = category.expenditures.filter(date__day=today.day)
+                    budgetCalculated = convertBudgetToDaily(category)
+                if timePeriod == 'weekly':
+                    budgetCalculated = convertBudgetToWeekly(category)
+                    startOfWeek = today - timedelta(days=today.weekday())
+                    filteredExpenses = category.expenditures.filter(date__gte=startOfWeek)
+                if timePeriod == 'monthly':
+                    filteredExpenses = category.expenditures.filter(date__month=today.month)
+                for expence in filteredExpenses:
                     categorySpend += float(expence.amount)
-                totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
+                totalSpent.append(categorySpend/float(budgetCalculated)*100)
 
             dict = generateGraph(categories, totalSpent, 'bar')
             dict.update({"form": form})
 
             return render(request, "reports.html", dict)
-        
+        # Handle what happens if it's false
+
     def handle_no_permission(self):
         return redirect('logIn')
-
-
-# def reportsView(request):
-#     '''Implements a view for handling requests to the reports page'''
-
-#     categories = []
-#     totalSpent = []
-
-#     if request.method == 'POST':
-#         form = ReportForm(request.POST, user=request.user)
-#         if form.is_valid():
-#             timePeriod = form.cleaned_data.get('timePeriod')
-#             selectedCategory = form.cleaned_data.get('selectedCategory')
-#             for selected in selectedCategory:
-#                 category = Category.objects.get(name=selected)
-#                 # all categories
-#                 categories.append(selected)
-#                 # total spend per catagory
-#                 categorySpend = 0.00
-#                 for expence in category.expenditures.all():
-#                     categorySpend += float(expence.amount)
-#                 totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
-
-#             dict = generateGraph(categories, totalSpent, 'bar')
-#             dict.update({"form": form})
-
-#             return render(request, "reports.html", dict)
-
-#     form = ReportForm(user=request.user)
-#     dict = generateGraph(categories, totalSpent, 'bar')
-#     dict.update({"form": form})
-#     return render(request, "reports.html", dict)
-
-    # def get(self, request):
-    #     categories = []
-    #     totalSpent = []
-    #     for category in Category.objects.filter(user=self.request.user):
-    #         # all categories
-    #         categories.append(str(category))
-    #         # total spend per catagory
-    #         categorySpend = 0.00
-    #         for expence in category.expenditures.all():
-    #             categorySpend += float(expence.amount)
-    #         totalSpent.append(categorySpend/float(category.spendingLimit.getNumber())*100)
-    #
-    #     return render(request, "reports.html", generateGraph(categories, totalSpent, 'bar'))
-    #
-    #     return render(request, 'reports.html', generateGraph(["a","b","c"], [1,1,2], 'polarArea'))
 
 
 class ProfileView(LoginRequiredMixin, View):
@@ -427,7 +445,7 @@ class ProfileView(LoginRequiredMixin, View):
 
     def get(self, request):
         return render(request,'profile.html')
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -501,7 +519,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
         notification.isSeen = not notification.isSeen
         notification.save()
 
-        # Making the user stay on whichever page they called this request  
+        # Making the user stay on whichever page they called this request
         return redirect(request.META['HTTP_REFERER'])
     
     def handle_no_permission(self):
@@ -622,7 +640,7 @@ class UserListView(LoginRequiredMixin, ListView):
         users = paginator.get_page(page)
         context['users'] = users
         return context
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -631,7 +649,7 @@ def searchUsers(request):
     query = request.GET.get('q')
     if query is None:
         users = User.objects.all()
-    else: 
+    else:
         users = User.objects.filter(
             Q(username__istartswith=query)
         )
