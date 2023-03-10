@@ -6,7 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from ExpenseTracker.models import *
 from ExpenseTracker.forms import *
-from .helpers import addPoints, generateGraph
+from ExpenseTracker.helpers.pointsHelper import addPoints
+from .helpers import generateGraph
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):

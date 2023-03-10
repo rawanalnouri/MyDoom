@@ -7,7 +7,7 @@ from ..forms import SignUpForm, LogInForm
 from django.utils.timezone import datetime
 from ExpenseTracker.models import *
 from ExpenseTracker.forms import *
-from .helpers import addPoints
+from ExpenseTracker.helpers.pointsHelper import addPoints
 from datetime import datetime
 
 

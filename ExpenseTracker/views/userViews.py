@@ -10,7 +10,7 @@ from ExpenseTracker.models import *
 from ExpenseTracker.forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from notificationContextProcessor import getNotifications
+from ExpenseTracker.notificationContextProcessor import getNotifications
     
 
 class ProfileView(LoginRequiredMixin, View):
