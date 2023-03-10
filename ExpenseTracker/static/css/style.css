@@ -237,19 +237,6 @@ body{
 
 }
 
-.happy {
-    background-color: #9bd6a9;
-}
-.anxious {
-    background-color: #f88c97;
-}
-.content {
-    background-color: #fce59f;
-}
-.indifferent {
-    background-color: #a7b4bf;
-}
-
 .base header{
     z-index: 2;
     background: var(--top-menu-color);

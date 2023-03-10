@@ -34,12 +34,19 @@ urlpatterns = [
     path('deleteAllNotifications/', DeleteAllNotifications.as_view(), name='deleteAllNotifications'),
     path('deleteNotifcations/<int:notificationId>/', DeleteNotificationsView.as_view(), name='deleteNotifications'),
     path('editnotifcations/<int:notificationId>/', EditNotificationsView.as_view(), name='editNotifications'),
+    path('declineRequest/<int:notificationId>', DeclineRequestView.as_view(), name='declineRequest'),
+    path('acceptCategoryShareView/<int:notificationId>', AcceptCategoryShareView.as_view(), name='acceptCategoryShare'),
+    path('acceptFollowRequest/<int:notificationId>/', AcceptFollowRequestView.as_view(), name='acceptFollowRequest'),
 
     path('reports/', reportsView, name='reports'),
+
+    path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
     path('createCategory/', CreateCategoryView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', DeleteCategoryView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', ShareCategoryView.as_view(), name='shareCategory'),
-    path('category/<int:categoryId>/', CategoryView.as_view(), name='category'),
+    path('editCategory/<int:categoryId>/', EditCategoryView.as_view(), name='editCategory'),
+
+    path('createExpenditure/<int:categoryId>/', CreateExpenditureView.as_view(), name='createExpenditure'),
     path('category/<int:categoryId>/update/<int:expenditureId>/', UpdateExpenditureView.as_view(), name='updateExpenditure'),
     path('category/<int:categoryId>/delete/<int:expenditureId>/', DeleteExpenditureView.as_view(), name='deleteExpenditure'),
 

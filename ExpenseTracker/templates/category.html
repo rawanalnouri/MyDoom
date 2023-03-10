@@ -5,7 +5,7 @@
 {% block content %}
 <h3 id="category-header">{{ category.name }} 
     <div class="text-end">
-        <button id="open-edit-category-modal" class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#edit-category-modal">
+        <button id="open-edit-category-modal" data-category="{{ category.id }}" class="btn btn-sm btn-outline-dark ms-2">
             <i class="bi bi-pencil"></i>
         </button>
         <button id="open-delete-category-modal" class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#delete-category-modal">
@@ -28,7 +28,7 @@
                   <h5 class="card-title">Expenditure History</h5>
                 </div>
                 <div class="col-auto">
-                  <button id="open-create-expenditure-modal" class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#create-expenditure-modal">
+                  <button id="open-create-expenditure-modal" data-category="{{ category.id }}" class="btn btn-outline-dark btn-sm">
                     <i class="bi bi-plus-lg"></i> Add Expenditure
                   </button>
                 </div>
@@ -56,7 +56,7 @@
             <p class="card-text">Spending limit: {{ category.spendingLimit }}</p>
             <p class="card-text"><small class="text-muted">Last updated: {{ category.updatedAt|date }}</small></p>
             <div class="progress">
-                <div class="progress-bar bg-success" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+              <div id="spending-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="{{category.progress}}" aria-valuemin="0" aria-valuemax="100">{{category.progress}}%</div>
             </div>
             <div class="mt-4">
               <p>Current Progress:</p>
@@ -68,9 +68,9 @@
       </div>
     </div>
   </div>
-{% include 'modals/expenditures/createExpenditure.html' with form=expenditureForm %} 
-{% include 'modals/expenditures/editExpenditure.html' with form=expenditureForm %} 
-{% include 'modals/categories/editCategory.html' with form=categoryForm %}
+{% include 'modals/expenditures/createExpenditure.html' %} 
+{% include 'modals/expenditures/editExpenditure.html' %} 
+{% include 'modals/categories/editCategory.html' %}
 {% include 'modals/categories/shareCategory.html' %} 
 {% include 'modals/categories/deleteCategory.html' %}
 {% include 'modals/categories/viewUsersSharingCategory.html' %}
@@ -78,6 +78,11 @@
 <script>
 
 $(document).ready(function() {
+
+    // Progress bar width
+
+    var progressBar = document.getElementById("spending-progress-bar");
+    progressBar.style.width = "{{category.progress}}%";
 
     // Expenditure modals
 
@@ -94,6 +99,18 @@ $(document).ready(function() {
         });
     });
 
+    $("#open-create-expenditure-modal").on("click", function() {
+        var categoryId = $(this).data('category');
+        $.ajax({
+            url: "/createExpenditure/" + categoryId + "/",
+            success: function(data) {
+                $("form").attr("action", "/createExpenditure/" + categoryId + "/");
+                $("#create-expenditure-modal .update-form").html(data);
+                $("#create-expenditure-modal").modal("show");
+            }
+        });
+    });
+
     // Category modals
 
     $("#open-share-category-modal").on("click", function() {
@@ -104,6 +121,18 @@ $(document).ready(function() {
                 $("form").attr("action", "/shareCategory/" + categoryId + "/");
                 $("#share-category-modal .update-form").html(data);
                 $("#share-category-modal").modal("show");
+            }
+        });
+    });
+
+    $("#open-edit-category-modal").on("click", function() {
+        var categoryId = $(this).data('category');
+        $.ajax({
+            url: "/editCategory/" + categoryId + "/",
+            success: function(data) {
+                $("form").attr("action", "/editCategory/" + categoryId + "/");
+                $("#edit-category-modal .update-form").html(data);
+                $("#edit-category-modal").modal("show");
             }
         });
     });

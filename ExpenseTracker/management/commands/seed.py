@@ -29,8 +29,19 @@ class Command(BaseCommand):
         self.seedUserCategories()
         for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
             user.followers.add(followee)
-        self.seedAdminUser()
+        adminStuff = self.seedAdminUser()
+
         self.seedNotifications()
+
+        # Create dummy share notifcation for base user
+        ShareCategoryNotification.objects.create(
+            toUser=user,
+            fromUser = adminStuff[0],
+            title="New Category Shared!",
+            message = adminStuff[0].username + " wants to share a category '"+ adminStuff[1].name +"' with you",
+            sharedCategory = adminStuff[1],
+            type='category'
+            )
 
     def seedAdminUser(self):
         firstName = 'admin'
@@ -44,11 +55,20 @@ class Command(BaseCommand):
             email = email,
             password = Command.PASSWORD,
         ) 
+
+        category = Category.objects.create (
+            name = "test",
+            description = "test",
+            spendingLimit = random.choice(list(SpendingLimit.objects.all())),
+        )
+        category.users.add(user)
+
         Points.objects.create(
             user = user,
             pointsNum = 50,
         )
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
+        return [user, category]
 
     def seedBaseUser(self):
         firstName = 'John'
@@ -146,13 +166,13 @@ class Command(BaseCommand):
         while expenditureCount < Command.EXPENDITURE_COUNT:
             self._createExpenditure(dayDifference)
             expenditureCount += 1
-            dayDifference += 2
+            dayDifference -= 2
         self.stdout.write(self.style.SUCCESS(f"Number of created expenditures: {expenditureCount}"))
 
     def _createExpenditure(self, dayDifference):
         title = self.faker.word()
         description = self.faker.sentence()
-        date = datetime.date.today() + relativedelta(days=dayDifference)
+        date = datetime.now() + relativedelta(days=dayDifference)
         amount = float(decimal.Decimal(random.randrange(1, 10000))/100)
         Expenditure.objects.create(
             title=title,
@@ -178,9 +198,10 @@ class Command(BaseCommand):
         message = self.faker.sentence()
         isSeen = random.choice([True, False])
         Notification.objects.create(
-            user=user,
+            toUser=user,
             title=title,
             message=message,
-            isSeen = isSeen
+            isSeen = isSeen,
+            type='basic'
         )
 
