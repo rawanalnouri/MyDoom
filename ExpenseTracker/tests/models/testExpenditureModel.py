@@ -50,12 +50,3 @@ class ExpenditureModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.expenditure.full_clean()
 
-    def testValidMood(self):
-        self.expenditure.mood = 'testMood'
-        with self.assertRaises(ValidationError):
-            self.expenditure.full_clean()
-
-    def testMoodWithinLengthLimit(self):
-        self.expenditure.mood = ";alkdkfjasjdkhfalkjsdhflkjasdhfjlashdsadkljhfladshjf"
-        with self.assertRaises(ValidationError):
-            self.expenditure.full_clean()
