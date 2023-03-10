@@ -4,16 +4,26 @@
 
 
 {% block content %}
-    <p>This is the reports page</p>
 
-    <form action="{% url 'reports' %}" method="post">
-      {% csrf_token %}
-      {{ form }}
-      <input type = "submit">
-    </form>
+<div class="row">
+  <div class="card w-25">
+    <div class="card-body">
+      <h5 class="card-title">Make your selection</h5>
+      <form action="{% url 'reports' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type = "submit", class="btn btn-primary">
+      </form>
+    </div>
+  </div>
 
-
-    {% include 'partials/chart.html' %}
+  <div class="card w-75">
+    <div class="card-body">
+      <p class="card-text">{{ text }}</p>
+      {% include 'partials/chart.html' %}
+    </div>
+  </div>
+</div>
 
 
 {% endblock %}

@@ -16,6 +16,7 @@ from django.db.models import Q
 from .helpers.pointsHelper import addPoints
 from django.utils.timezone import datetime
 from .helpers.utils import *
+from .helpers.reportsHelpers import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
 from datetime import timedelta
@@ -43,7 +44,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
-            cur = category.totalSpent() 
+            cur = category.totalSpent()
             spendingData.append(cur)
             spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
@@ -54,7 +55,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
     def handle_no_permission(self):
         return redirect("logIn")
-    
+
 
 class CreateExpenditureView(LoginRequiredMixin, View):
     '''Implements a view for creating expenditures'''
@@ -168,7 +169,7 @@ class CategoryShareView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class AcceptCategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for accepting a share category requests'''
@@ -196,7 +197,7 @@ class AcceptCategoryShareView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class DeclineRequestView(LoginRequiredMixin, View):
     def dispatch(self, request, *args, **kwargs):
@@ -205,8 +206,8 @@ class DeclineRequestView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
-    
+
+
 class ExpenditureUpdateView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
 
@@ -260,7 +261,7 @@ class SignUpView(View):
             pointsObject.user=user
             pointsObject.pointsNum=50
             pointsObject.save()
-    
+
             login(request, user)
             createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
@@ -344,47 +345,13 @@ class HomeView(LoginRequiredMixin, View):
         }}
 
         return render(request, "home.html", context)
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
 
-def convertBudgetToDaily(category):
-    currentTimePeriod = category.spendingLimit.timePeriod
-    if currentTimePeriod == 'weekly':
-        return category.spendingLimit.getNumber()/7
-    elif currentTimePeriod == 'monthly':
-        return category.spendingLimit.getNumber()/30
-    elif currentTimePeriod == 'yearly':
-        return category.spendingLimit.getNumber()/365
-    else:
-        return category.spendingLimit.getNumber()
-
-def convertBudgetToWeekly(category):
-    currentTimePeriod = category.spendingLimit.timePeriod
-    if currentTimePeriod == 'daily':
-        return category.spendingLimit.getNumber()*7
-    elif currentTimePeriod == 'monthly':
-        return category.spendingLimit.getNumber()/4
-    elif currentTimePeriod == 'yearly':
-        return category.spendingLimit.getNumber()/54
-    else:
-        return category.spendingLimit.getNumber()
-
-def convertBudgetToMonthly(category):
-    currentTimePeriod = category.spendingLimit.timePeriod
-    if currentTimePeriod == 'daily':
-        return category.spendingLimit.getNumber()*30
-    elif currentTimePeriod == 'monthly':
-        return category.spendingLimit.getNumber()/4
-    elif currentTimePeriod == 'yearly':
-        return category.spendingLimit.getNumber()/54
-    else:
-        return category.spendingLimit.getNumber()
-
-
 class ReportsView(LoginRequiredMixin, View):
-    
+
     def get(self, request):
         today = datetime.now()
         categories = []
@@ -392,9 +359,9 @@ class ReportsView(LoginRequiredMixin, View):
 
         form = ReportForm(user=request.user)
         dict = generateGraph(categories, totalSpent, 'bar')
-        dict.update({"form": form})
+        dict.update({"form": form, "text": "Waiting for your selection..."})
         return render(request, "reports.html", dict)
-    
+
     def post(self, request):
         today = datetime.now()
         categories = []
@@ -402,6 +369,7 @@ class ReportsView(LoginRequiredMixin, View):
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
+            timePeriodText = ""
 
             if timePeriod == 'daily':
                 Category.objects.filter(users__in=[request.user])
@@ -420,18 +388,21 @@ class ReportsView(LoginRequiredMixin, View):
                 if timePeriod == 'daily':
                     filteredExpenses = category.expenditures.filter(date__day=today.day)
                     budgetCalculated = convertBudgetToDaily(category)
+                    timePeriodText = "day"
                 if timePeriod == 'weekly':
                     budgetCalculated = convertBudgetToWeekly(category)
                     startOfWeek = today - timedelta(days=today.weekday())
                     filteredExpenses = category.expenditures.filter(date__gte=startOfWeek)
+                    timePeriodText = "week"
                 if timePeriod == 'monthly':
                     filteredExpenses = category.expenditures.filter(date__month=today.month)
+                    timePeriodText = "month"
                 for expence in filteredExpenses:
                     categorySpend += float(expence.amount)
                 totalSpent.append(categorySpend/float(budgetCalculated)*100)
 
             dict = generateGraph(categories, totalSpent, 'bar')
-            dict.update({"form": form})
+            dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriodText}."})
 
             return render(request, "reports.html", dict)
         # Handle what happens if it's false
@@ -468,8 +439,8 @@ class EditProfileView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
-    
+
+
 class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     template_name = 'changePassword.html'
     form_class = PasswordChangeForm
@@ -484,7 +455,7 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
 
     def get_success_url(self):
         return reverse('home')
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -505,8 +476,8 @@ class NotificationsView(LoginRequiredMixin, View):
         readNotificationPaginated = readPaginator.get_page(readPage)
         context['readNotificationsPaginated'] = readNotificationPaginated
 
-        return render(request, "notifications.html", context) 
-    
+        return render(request, "notifications.html", context)
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -521,7 +492,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
 
         # Making the user stay on whichever page they called this request
         return redirect(request.META['HTTP_REFERER'])
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -533,8 +504,8 @@ class DeleteNotificationsView(LoginRequiredMixin, View):
         notification = Notification.objects.get(id=kwargs['notificationId'])
         if notification.isSeen:
             Notification.objects.get(id=kwargs['notificationId']).delete()
-        return redirect("notifications")  
-    
+        return redirect("notifications")
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -544,8 +515,8 @@ class DeleteAllNotifications(LoginRequiredMixin, View):
 
     def dispatch(self, request, *args, **kwargs):
         Notification.objects.filter(toUser = request.user, isSeen = True).delete()
-        return redirect("notifications")  
-    
+        return redirect("notifications")
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -577,10 +548,10 @@ class ShowUserView(LoginRequiredMixin, DetailView):
             return super().get(request, *args, **kwargs)
         except Http404:
             return redirect(reverse('users'))
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class FollowToggleView(LoginRequiredMixin, View):
     '''View that handles follow/unfollow user functionality'''
@@ -596,10 +567,10 @@ class FollowToggleView(LoginRequiredMixin, View):
             return redirect('users')
         else:
             return redirect('showUser', userId=userId)
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class AcceptFollowRequestView(LoginRequiredMixin, View):
     '''Implements a view for accepting a follow request category requests'''
@@ -618,10 +589,10 @@ class AcceptFollowRequestView(LoginRequiredMixin, View):
 
         # Deleting notification after being accepted
         return redirect('declineRequest', notificationId = notification.id)
-    
+
     def handle_no_permission(self):
         return redirect('logIn')
-    
+
 
 class UserListView(LoginRequiredMixin, ListView):
     '''View that shows a list of all users and allows user to filter users based on username'''
