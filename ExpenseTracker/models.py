@@ -7,6 +7,7 @@ from libgravatar import Gravatar
 from .helpers.modelUtils import computeTotalSpent
 from datetime import datetime
 from django.utils import timezone
+from decimal import Decimal
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
@@ -67,7 +68,7 @@ class Category(models.Model):
             return round(100*total/float(self.spendingLimit.amount), 2)
     
     def totalSpent(self):
-        return round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2)
+        return Decimal(round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2))
 
     def __str__(self):
         return self.name
