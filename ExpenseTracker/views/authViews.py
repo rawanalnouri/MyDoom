@@ -10,10 +10,11 @@ from ExpenseTracker.forms import *
 from .helpers import addPoints
 from datetime import datetime
 
+
 class SignUpView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             signUpForm = SignUpForm()
             return render(request, 'signUp.html', {'form': signUpForm})
@@ -26,8 +27,11 @@ class SignUpView(View):
             pointsObject.user=user
             pointsObject.pointsNum=50
             pointsObject.save()
-          
+    
             login(request, user)
+            createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
+            createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
 
@@ -35,7 +39,7 @@ class SignUpView(View):
 class LogInView(View):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             form = LogInForm()
             return render(request, 'logIn.html', {"form": form})
@@ -52,6 +56,8 @@ class LogInView(View):
                 if user.last_login.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
                     addPoints(request, 5)
+                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
+
 
                 return redirect('home') 
 
@@ -71,6 +77,6 @@ class LogOutView(LoginRequiredMixin, View):
 class IndexView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return render(request, 'home.html')
+            return redirect('home')
         else:
             return render(request, 'index.html')

@@ -5,6 +5,29 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from ExpenseTracker.models import *
 from ExpenseTracker.forms import *
 
+
+class CreateExpenditureView(LoginRequiredMixin, View):
+    '''Implements a view for creating expenditures'''
+
+    def get(self, request, *args, **kwargs):
+        form = ExpenditureForm()
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = ExpenditureForm(request.POST)
+        if category and form.is_valid():
+            messages.success(self.request, "Expenditure created successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error(self.request, "Failed to create expenditure.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+
 class UpdateExpenditureView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
 

@@ -8,6 +8,7 @@ from ExpenseTracker.models import *
 from ExpenseTracker.forms import *
 from .helpers import addPoints, generateGraph
 
+
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
 
@@ -22,62 +23,27 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         context = {
             'category': category,
-            'expenditureForm': ExpenditureForm(),
-            'categoryForm': CategorySpendingLimitForm(user=self.request.user, instance=category),
             'expenditures': expenditures,
         }
 
-        categories = []
-        totalSpent = []
-        categorySpend = 0
-        for category in Category.objects.filter(id=kwargs["categoryId"], users__in=[self.request.user]):
-            categories.append(str(category))
-            categories.append("Remaining Budget")
-            # total spend per category
-            categorySpend = 0.0
-            for expense in category.expenditures.all():
-                categorySpend += float(expense.amount)
-            totalSpent.append(categorySpend)
-            totalSpent.append(float(category.spendingLimit.getNumber()) - categorySpend)
+        categoryLabels = []
+        spendingData = []
+        for category in Category.objects.filter(id=kwargs["categoryId"]):
+            categoryLabels.append(str(category))
+            categoryLabels.append("Remaining Budget")
+            # append total spent in category to date
+            cur = category.totalSpent() 
+            spendingData.append(cur)
+            spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
-        graphData = generateGraph(categories, totalSpent, "doughnut")
+        graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
 
-        # analysis
-        namesOfExpenses = []
-        allExpensesInRange = category.expenditures.all().filter(date__year="2023", date__month="01")
-        # filter between months
-        # Sample.objects.filter(date__range=["2011-01-01", "2011-01-31"])
-        for expense in allExpensesInRange:
-            namesOfExpenses.append(expense.title)
-
-        context.update({'stuff': namesOfExpenses})
         return context
-
-    def handleForm(self, form, category, error_message, success_message):
-        if category and form.is_valid():
-            messages.success(self.request, success_message)
-            form.save(category)
-        else:
-            messages.error(self.request, error_message)
-
-    def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs["categoryId"])
-        expForm = ExpenditureForm(request.POST)
-        catForm = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
-
-        if "expenditureForm" in request.POST:
-            self.handleForm(expForm, category, "Failed to create expenditure.","Expenditure created successfully.")
-
-        elif "categoryForm" in request.POST:
-            self.handleForm(catForm, category, "Failed to update category.", "Category updated successfully.")
-
-        # using hidden id to modal templates to determine which form is being used
-        context = {"expenditureForm": expForm, "categoryForm": catForm}
-        return redirect(reverse("category", args=[category.id]), context=context)
 
     def handle_no_permission(self):
         return redirect("logIn")
+
 
 class CreateCategoryView(LoginRequiredMixin, CreateView):
     '''Implements a view for creating a new category using a form'''
@@ -96,6 +62,7 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         # add points
         addPoints(self.request,5)
+        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
         return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
@@ -106,6 +73,28 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
     def handle_no_permission(self):
         return redirect('logIn')
 
+
+class EditCategoryView(LoginRequiredMixin, View):
+    '''Implements a view for editing categories'''
+
+    def get(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(user=request.user, instance=category)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
+        if category and form.is_valid():
+            messages.success(self.request, "Category updated successfully.")
+            form.save(category)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error(self.request, "Failed to update category.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
 
 class DeleteCategoryView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
@@ -129,18 +118,18 @@ class ShareCategoryView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ShareCategoryForm(user=request.user, category=category)
+        form = ShareCategoryForm(fromUser=request.user, category=category)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ShareCategoryForm(user=request.user, category=category, data=request.POST)
+        form = ShareCategoryForm(fromUser=request.user, category=category, data=request.POST)
         if form.is_valid():
-            form.save()
-            messages.add_message(request, messages.SUCCESS, "Successfully Added New User to Category")
+            toUser = form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully sent request to share '"+ category.name +"' with "+ toUser.username)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.add_message(request, messages.ERROR, "Failed to Add User to Category")
+            messages.add_message(request, messages.ERROR, "Failed to send share category request ")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def handle_no_permission(self):
