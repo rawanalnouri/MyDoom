@@ -44,16 +44,25 @@ class CategroyShareViewTest(TestCase):
         expectedMessage = "Failed to send share category request "
         self.assertEqual(str(messages[0]), expectedMessage)
 
-    # def testSuccessfulShareCategory(self):
-        # data = {'user': self.userToShareCategoryWith}
-        # response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
-        # self.assertRedirects(response, '/category/1/')
-        # # self.assertEqual(response.status_code, 302)
-        # # self.assertEqual(response.url, reverse('category', args=[self.category.id]))
-        # messages = list(response.context['messages'])
-        # self.assertEqual(len(messages), 1)
-        # expectedMessage = "Successfully sent request to share '"+ self.category.name +"' with "+ self.userToShareCategoryWith.username
-        # self.assertEqual(str(messages[0]), expectedMessage)
+    def testSuccessfulShareCategory(self):
+        data = {'user': self.userToShareCategoryWith.pk}
+        response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
+        self.assertRedirects(response, '/category/1/')
+        self.assertEqual(response.status_code, 200)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        expectedMessage = "Successfully sent request to share '"+ self.category.name +"' with "+ self.userToShareCategoryWith.username
+        self.assertEqual(str(messages[0]), expectedMessage)
+
+
+    def testRedirectIfNotLoggedIn(self):
+        self.client.logout()
+        url = reverse('shareCategory', args=[self.category.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('logIn'))
+        self.assertTemplateUsed('logIn.html')
+
 
     
 

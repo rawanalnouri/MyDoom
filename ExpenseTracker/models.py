@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
 from libgravatar import Gravatar
+from .helpers.modelUtils import computeTotalSpent
+from datetime import datetime
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
@@ -36,13 +38,6 @@ class Expenditure(models.Model):
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
     receipt = models.ImageField(upload_to='receipts/', blank=True)
-    MOOD_CHOICES = [
-        ('happy', 'Happy'),
-        ('content', 'Content'),
-        ('indifferent', 'Indifferent'),
-        ('anxious', 'Anxious')
-    ]
-    mood = models.CharField(max_length=20, choices=MOOD_CHOICES,blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -62,6 +57,16 @@ class Category(models.Model):
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
+
+    def progress(self):
+        total = computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures)
+        if self.spendingLimit.amount==0:
+            return 0.00
+        else:
+            return round(100*total/float(self.spendingLimit.amount), 2)
+    
+    def totalSpent(self):
+        return round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2)
 
     def __str__(self):
         return self.name
@@ -117,10 +122,30 @@ class User(AbstractUser):
 
         return self.followees.count()
 
-    def get_house(self):
+    def getHouse(self):
         houses = ['RED', 'BLUE', 'YELLOW', 'GREEN']
 
         return houses[self.id % len(houses)]
+
+    def totalProgress(self):
+        total = 0.0
+        limit = 0.0
+        for category in self.categories.all():
+            limit += float(category.spendingLimit.amount)
+            total += computeTotalSpent(category.spendingLimit.timePeriod, category.expenditures)
+        if limit==0:
+            return 0.00
+        else:
+            return round(100*total/limit, 2)
+    
+    def totalSpentThisMonth(self):
+        total = 0.0
+        today = datetime.now()
+        for category in self.categories.all():
+            for expense in category.expenditures.filter(date__month=today.month):
+                total += float(expense.amount)
+        return round(total, 2)
+
 
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''
