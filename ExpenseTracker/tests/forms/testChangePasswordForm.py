@@ -4,7 +4,7 @@ from ExpenseTracker.forms import ChangePasswordForm
 from ExpenseTracker.models import *
 
 
-class EditProfileTestCase(TestCase):
+class ChangePasswordFormTest(TestCase):
 
     fixtures = [
         'ExpenseTracker/tests/fixtures/defaultObjects.json'

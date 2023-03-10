@@ -5,7 +5,7 @@ from ExpenseTracker.models import *
 from django.urls import reverse
 
 
-class EditProfileTestCase(TestCase):
+class ChangeProfileViewTest(TestCase):
 
     fixtures = [
         'ExpenseTracker/tests/fixtures/defaultObjects.json'
