@@ -18,7 +18,7 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
-from datetime import timedelta
+from django.utils import timezone
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -285,13 +285,13 @@ class LogInView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-
-                if user.last_login.date() != datetime.now().date():
+                if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
                     addPoints(request, 5)
-                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
-
-
+                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
+                # Update user lastLogin after checking if this is is first login of the day
+                user.lastLogin = timezone.now()
+                user.save(update_fields=['lastLogin'])
                 return redirect('home') 
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")

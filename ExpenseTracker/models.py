@@ -6,6 +6,7 @@ from django.core.validators import MinValueValidator
 from libgravatar import Gravatar
 from .helpers.modelUtils import computeTotalSpent
 from datetime import datetime
+from django.utils import timezone
 
 class SpendingLimit(models.Model):
     '''model for setting and monitoring user's financial goals and spending limits.'''
@@ -90,6 +91,7 @@ class User(AbstractUser):
     followers = models.ManyToManyField(
         'self', symmetrical=False, related_name='followees'
     )
+    lastLogin = models.DateTimeField(default=timezone.now)
 
     class Meta:
         ordering = ['username']
