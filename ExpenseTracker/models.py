@@ -52,8 +52,8 @@ class Category(models.Model):
 
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
-    spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
-    expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')
+    spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE)
+    expenditures = models.ManyToManyField(Expenditure, related_name='expenditures', blank=True)
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
