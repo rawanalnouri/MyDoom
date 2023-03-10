@@ -35,3 +35,8 @@ class usersViewTest(TestCase):
         self.assertEqual(len(response.context['users']), 6) 
         self.assertTrue(response.context['is_paginated'])
         self.assertEqual(response.context['users'].paginator.num_pages, 2)
+
+    def testRedirectsToLoginIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('users'))
+        self.assertRedirects(response, reverse('logIn'))
