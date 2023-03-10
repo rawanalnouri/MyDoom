@@ -43,7 +43,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
-            cur = category.totalSpent() 
+            cur = float(category.totalSpent()) 
             spendingData.append(cur)
             spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
