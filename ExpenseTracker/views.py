@@ -18,7 +18,6 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
-from datetime import timedelta
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
