@@ -31,6 +31,12 @@
       display: false
       }
       {% endif %}
+      {% if type == 'pie' %}
+
+      legend: {
+        position: 'bottom'
+      }
+      {% endif %}
       {% if type == 'bar' %}
       scales: {
         yAxes: [{

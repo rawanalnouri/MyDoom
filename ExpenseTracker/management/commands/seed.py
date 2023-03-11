@@ -61,7 +61,7 @@ class Command(BaseCommand):
             description = "test",
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
-        category.users.add(user)
+        user.categories.add(category)
 
         Points.objects.create(
             user = user,
@@ -166,13 +166,13 @@ class Command(BaseCommand):
         while expenditureCount < Command.EXPENDITURE_COUNT:
             self._createExpenditure(dayDifference)
             expenditureCount += 1
-            dayDifference += 2
+            dayDifference -= 2
         self.stdout.write(self.style.SUCCESS(f"Number of created expenditures: {expenditureCount}"))
 
     def _createExpenditure(self, dayDifference):
         title = self.faker.word()
         description = self.faker.sentence()
-        date = datetime.date.today() + relativedelta(days=dayDifference)
+        date = datetime.now() + relativedelta(days=dayDifference)
         amount = float(decimal.Decimal(random.randrange(1, 10000))/100)
         Expenditure.objects.create(
             title=title,

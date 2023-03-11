@@ -16,19 +16,24 @@ class DeleteNotificationViewTest(TestCase):
 
     def testReadNotificationIsSuccessfullyDeleted(self):
         userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
-        self.client.delete(reverse('deleteNotifications', args=[self.readNotification.id]))
+        self.client.get(reverse('deleteNotifications', args=[self.readNotification.id]))
         self.assertFalse(Notification.objects.filter(id=self.readNotification.id).exists())
         self.assertTrue(len(userNotificationsCountBefore), len(userNotificationsCountBefore)-1)
 
     def testUnreadNotificationsCannotBeDeleted(self):
         userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
-        self.client.delete(reverse('deleteNotifications', args=[self.unreadNotification.id]))
+        self.client.get(reverse('deleteNotifications', args=[self.unreadNotification.id]))
         self.assertTrue(Notification.objects.filter(id=self.unreadNotification.id).exists())
         self.assertTrue(len(userNotificationsCountBefore), len(userNotificationsCountBefore))
 
     def testRedirectToNotificationsPageAfterDelete(self):
-        response = self.client.delete(reverse('deleteNotifications', args=[self.readNotification.id]), follow=True)
+        response = self.client.get(reverse('deleteNotifications', args=[self.readNotification.id]), follow=True)
         userRedirect = reverse('notifications')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'notifications.html')
+
+    def testRedirectsIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('deleteNotifications', args=[self.readNotification.id]))
+        self.assertRedirects(response, reverse('logIn'))
 
