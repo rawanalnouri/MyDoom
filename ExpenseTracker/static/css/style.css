@@ -832,3 +832,48 @@ p {
     margin-left:70px;
     margin-top: 10px;
   }
+
+.progress-bar{
+    background-color: var(--primary-color-light);
+}
+
+.m-l-80{
+    margin-left: 80px;
+}
+
+.m-l-120{
+    margin-left: 120px;
+}
+
+.card-background{
+    background: #f6efe7;
+}
+
+.card-border{
+    border-style: solid;
+    border-color: var(--primary-color);
+}
+
+.m-b-40{
+    margin-bottom: 35px;
+}
+
+.m-l-70{
+    margin-left: 70px;
+}
+
+.m-b-15{
+    margin-bottom: 15px;
+}
+
+.m-l-20{
+    margin-left: 20px;
+}
+
+.padding-chart{
+    padding: 30px 0 30px 0;
+}
+
+.padding-hr{
+    padding-top: 12px;
+}
