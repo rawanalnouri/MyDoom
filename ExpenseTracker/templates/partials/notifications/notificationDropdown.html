@@ -31,21 +31,21 @@ https://www.youtube.com/watch?v=C8pYT1R8yo4&list=PLpyspNLjzwBkV1Lo2CSKLFtzG3PUNT
                                 </td>
                                 <td>
                                     <a role="button" href="{% url 'editNotifications' notificationId=notification.id %}">
-                                        <i class="bi bi-check"></i>
+                                        <i class="bi bi-check btn-purple"></i>
                                     </a>
                                 </td>
                                 {% if notification.type == "category" %}
                                     <tr>
                                         <td>
-                                            <a role="button" class="btn btn-sm btn-success" href="{% url 'acceptCategoryShare' notificationId=notification.id %}">Accept</a>
-                                            <a role="button" class="btn btn-sm btn-danger" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+                                            <a role="button" class="btn btn-sm btn-outline-purple" href="{% url 'acceptCategoryShare' notificationId=notification.id %}">Accept</a>
+                                            <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
                                         </td>
                                     </tr>
                                 {% elif notification.type == "follow" %}
                                 <tr>
                                     <td>
-                                        <a role="button" class="btn btn-sm btn-success" href="{% url 'acceptFollowRequest' notificationId=notification.id %}">Accept</a>
-                                        <a role="button" class="btn btn-sm btn-danger" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+                                        <a role="button" class="btn btn-sm btn-outline-purple" href="{% url 'acceptFollowRequest' notificationId=notification.id %}">Accept</a>
+                                        <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
                                     </td>
                                 </tr>
                                 {% endif %}

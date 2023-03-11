@@ -877,3 +877,69 @@ p {
 .padding-hr{
     padding-top: 12px;
 }
+
+.button-sm{
+    background: transparent;
+    color: var(--primary-color-light);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color-light);
+	font-weight: 400;
+	text-decoration: none;
+	padding: 0.37rem 0.5rem;
+	line-height: 2.3;
+}
+
+.button-sm:hover{
+    background: var(--primary-color-light);
+    color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color-light);
+	font-weight: 400;
+	text-decoration: none;
+	padding: 0.37rem 0.5rem;
+	line-height: 2.3;
+}
+
+
+.btn-outline-purple{
+    background: transparent;
+    color: var(--primary-color-light);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color-light);
+}
+
+.btn-outline-purple:hover{
+    background: var(--primary-color-light);
+    color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color-light);
+}
+
+.btn-outline-blue{
+    background: transparent;
+    color: var(--primary-color);
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color);
+}
+
+.btn-outline-blue:hover{
+    background: var(--primary-color);
+    color: white;
+    border-style: solid;
+    border-width: 1px;
+    border-color: var(--primary-color);
+}
+
+.btn-purple{
+    color: var(--primary-color-light);
+}
+
+.btn-border{
+    border-radius: 20%;
+    border-color: var(--primary-color);
+}
