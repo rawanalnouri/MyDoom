@@ -4,25 +4,46 @@
 
 
 {% block content %}
+<h3 id="category-header">Analyse your spendings</h3>
+<hr>
 
 <div class="row">
   <div class="card w-25">
     <div class="card-body">
-      <h5 class="card-title">Make your selection</h5>
+      <h6 class="card-title">Make your selection</h6>
       <form action="{% url 'reports' %}" method="post">
         {% csrf_token %}
         {{ form }}
-        <input type = "submit", class="btn btn-primary">
+        <input type = "submit", class="btn btn-secondary">
       </form>
     </div>
   </div>
 
-  <div class="card w-75">
+  <div class="card w-75 bg-light">
     <div class="card-body">
       <p class="card-text">{{ text }}</p>
       {% include 'partials/chart.html' %}
     </div>
   </div>
+</div>
+
+<div class = "row">
+    <div class="card w-50 bg-light">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+      <a href="#" class="btn btn-secondary">Button</a>
+    </div>
+  </div>
+
+  <div class="card w-50 bg-light">
+    <div class="card-body">
+      <h5 class="card-title">Card title</h5>
+      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+      <a href="#" class="btn btn-primary">Button</a>
+    </div>
+  </div>
+
 </div>
 
 

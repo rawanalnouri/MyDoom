@@ -403,7 +403,10 @@ class ReportsView(LoginRequiredMixin, View):
 
             dict = generateGraph(categories, totalSpent, 'bar')
             dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriodText}."})
-
+            return render(request, "reports.html", dict)
+        else:
+            dict = generateGraph(categories, totalSpent, 'bar')
+            dict.update({"form": form, "text": "Waiting for your selection..."})
             return render(request, "reports.html", dict)
         # Handle what happens if it's false
 
