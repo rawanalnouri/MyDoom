@@ -5,25 +5,32 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
+
   var config = {
     type: 'line',
     data: {
        datasets: [
        {
            label: 'year',
+           {% if hidden %}
+           hidden: true,
+           {% endif %}
            fill: false,
            borderColor: '#7ABDDF',
-           data: {{ data|safe }},
+           data: {{ data1|safe }},
            // this dataset is drawn below
-           order: 3
+           order: 4
        }, {
            label: '6 months',
+           {% if hidden %}
+           hidden: true,
+           {% endif %}
            fill: false,
            borderColor: '#396479',
            data: {{ data2|safe }},
            type: 'line',
            // this dataset is drawn on top
-           order: 2
+           order: 3
        }, {
            label: '3 months',
            fill: false,
@@ -31,13 +38,32 @@
            data: {{ data3|safe }},
            type: 'line',
            // this dataset is drawn on top
+           order: 2
+       },
+       {% if withbar %}
+       {
+           label: 'bar',
+           data: {{ data|safe }},
+           type: 'bar',
+           // this dataset is drawn on top
            order: 1
-       }],
+       }
+       {% endif %}
+       ],
        labels: {{ labels|safe }}
    },
     options: {
 
-      responsive: true
+      responsive: true,
+      scales: {
+        yAxes: [{
+            display: true,
+            scaleLabel: {
+            display: true,
+            labelString: 'Budget used (%)'
+          }
+        }]
+      }
 
     }
   };

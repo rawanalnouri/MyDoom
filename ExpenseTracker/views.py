@@ -400,6 +400,7 @@ class ReportsView(LoginRequiredMixin, View):
                     filteredExpenses = category.expenditures.filter(date__gte=startOfWeek)
                     timePeriodText = "week"
                 if timePeriod == 'monthly':
+                    budgetCalculated = convertBudgetToMonthly(category)
                     filteredExpenses = category.expenditures.filter(date__month=today.month)
                     timePeriodText = "month"
                 for expence in filteredExpenses:
@@ -417,7 +418,7 @@ class ReportsView(LoginRequiredMixin, View):
             first_day_this_month = today.replace(day=1)
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
-            data2 = []
+            data1 = []
 
             for selected in selectedCategories:
                 category = Category.objects.get(id=selected)
@@ -436,7 +437,39 @@ class ReportsView(LoginRequiredMixin, View):
                     categorySpend = categorySpend/52
                     timePeriodText = "week"
                 if timePeriod == 'monthly':
+                    budgetCalculated = convertBudgetToMonthly(category)
                     categorySpend = categorySpend/12
+                    timePeriodText = "month"
+                amount = categorySpend/float(budgetCalculated)*100
+                if amount < 100:
+                    data1.append(amount)
+                else:
+                    data1.append(100)
+            dict.update({'data1':data1})
+            dict.update({'text2':"Comparison to average over last 12 months"})
+
+            data2 = []
+
+            for selected in selectedCategories:
+                category = Category.objects.get(id=selected)
+                six_months_ago = today + relativedelta(months=-6)
+                last6months = category.expenditures.filter(date__gte=six_months_ago)
+                budgetCalculated = category.spendingLimit.getNumber()
+                # total spend per catagory
+                categorySpend = 0.00
+                for expence in last6months:
+                    categorySpend += float(expence.amount)
+                if timePeriod == 'daily':
+                    budgetCalculated = convertBudgetToDaily(category)
+                    categorySpend = categorySpend/90
+                    timePeriodText = "day"
+                if timePeriod == 'weekly':
+                    budgetCalculated = convertBudgetToWeekly(category)
+                    categorySpend = categorySpend/12
+                    timePeriodText = "week"
+                if timePeriod == 'monthly':
+                    budgetCalculated = convertBudgetToMonthly(category)
+                    categorySpend = categorySpend/3
                     timePeriodText = "month"
                 amount = categorySpend/float(budgetCalculated)*100
                 if amount < 100:
@@ -444,7 +477,7 @@ class ReportsView(LoginRequiredMixin, View):
                 else:
                     data2.append(100)
             dict.update({'data2':data2})
-            dict.update({'text2':"comparison to average over last 12 months"})
+            dict.update({'text2':"Compare your spendings in the past"})
 
             data3 = []
 
@@ -474,7 +507,7 @@ class ReportsView(LoginRequiredMixin, View):
                 else:
                     data3.append(100)
             dict.update({'data3':data3})
-            dict.update({'text3':"comparison to average over last 3 months"})
+            dict.update({'text3':f"Your average {timePeriod} spending"})
 
             return render(request, "reports.html", dict)
         else:
