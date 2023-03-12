@@ -22,25 +22,23 @@
   <div class="card w-75 bg-light">
     <div class="card-body">
       <p class="card-text">{{ text }}</p>
-      {% include 'partials/chart.html' %}
+      {% include 'partials/chart.html' with num=1 %}
     </div>
   </div>
 </div>
 
 <div class = "row">
     <div class="card w-50 bg-light">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-secondary">Button</a>
-    </div>
+      <div class="card-body">
+        <p class="card-text">{{ text }}</p>
+        {% include 'partials/chart.html' with num=2 %}
+      </div>
   </div>
 
   <div class="card w-50 bg-light">
     <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-      <a href="#" class="btn btn-primary">Button</a>
+      <p class="card-text">{{ text }}</p>
+      {% include 'partials/chart.html' with num=3 %}
     </div>
   </div>
 
