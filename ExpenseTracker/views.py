@@ -358,22 +358,20 @@ class ReportsView(LoginRequiredMixin, View):
         categories = []
         totalSpent = []
 
-        # experiment
-
-        first_day_of_this_month = today.replace(day=1)
-        first_day_of_next_month = (first_day_of_this_month + timedelta(days=32)).replace(day=1)
-        first_day_of_twelve_months_ago = first_day_of_next_month - relativedelta(years=1)
+        # experiment###########################################
+        first_day_this_month = today.replace(day=1)
+        first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
+        first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
 
         filteredstuff = []
         for x in Category.objects.all():
-            for i in x.expenditures.filter(date__gte=first_day_of_twelve_months_ago):
+            for i in x.expenditures.filter(date__gte=first_day_twelve_months_ago):
                 filteredstuff.append(i.date)
-        #experiment
+        # experiment###########################################
 
         form = ReportForm(user=request.user)
         dict = generateGraph(categories, totalSpent, 'bar')
         dict.update({"form": form, "text": "Waiting for your selection..."})
-        dict.update({'filtered': filteredstuff})
         return render(request, "reports.html", dict)
 
     def post(self, request):

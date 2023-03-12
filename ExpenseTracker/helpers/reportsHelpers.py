@@ -16,7 +16,7 @@ def convertBudgetToWeekly(category):
     elif currentTimePeriod == 'monthly':
         return category.spendingLimit.getNumber()/4
     elif currentTimePeriod == 'yearly':
-        return category.spendingLimit.getNumber()/54
+        return category.spendingLimit.getNumber()/52
     else:
         return category.spendingLimit.getNumber()
 
