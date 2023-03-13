@@ -72,6 +72,7 @@ class Migration(migrations.Migration):
                 ('firstName', models.CharField(max_length=50)),
                 ('lastName', models.CharField(max_length=50)),
                 ('email', models.EmailField(max_length=254, unique=True)),
+                ('lastLogin', models.DateTimeField(default=django.utils.timezone.now)),
                 ('categories', models.ManyToManyField(related_name='categories', to='ExpenseTracker.Category')),
                 ('followers', models.ManyToManyField(related_name='followees', to=settings.AUTH_USER_MODEL)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),

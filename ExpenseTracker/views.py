@@ -18,7 +18,7 @@ from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
-from datetime import timedelta
+from django.utils import timezone
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -43,7 +43,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
-            cur = category.totalSpent() 
+            cur = float(category.totalSpent()) 
             spendingData.append(cur)
             spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
@@ -133,7 +133,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
 class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         category = Category.objects.get(id = kwargs['categoryId'])
         expenditures = category.expenditures.all()
         for expenditure in expenditures:
@@ -173,7 +173,7 @@ class CategoryShareView(LoginRequiredMixin, View):
 class AcceptCategoryShareView(LoginRequiredMixin, View):
     '''Implements a view for accepting a share category requests'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         notification = ShareCategoryNotification.objects.get(id=kwargs['notificationId'])
         toUser = notification.toUser
         category = notification.sharedCategory
@@ -199,7 +199,7 @@ class AcceptCategoryShareView(LoginRequiredMixin, View):
     
 
 class DeclineRequestView(LoginRequiredMixin, View):
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect(request.META['HTTP_REFERER'])
 
@@ -234,7 +234,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
 class ExpenditureDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
@@ -285,14 +285,14 @@ class LogInView(View):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-
-                if user.last_login.date() != datetime.now().date():
+                if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
                     addPoints(request, 5)
-                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned daily login")
-
-
-                return redirect('home')
+                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
+                # Update user lastLogin after checking if this is is first login of the day
+                user.lastLogin = timezone.now()
+                user.save(update_fields=['lastLogin'])
+                return redirect('home') 
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
@@ -514,7 +514,7 @@ class NotificationsView(LoginRequiredMixin, View):
 class EditNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for marking notifications as read'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
         notification.isSeen = not notification.isSeen
         notification.save()
@@ -529,7 +529,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
 class DeleteNotificationsView(LoginRequiredMixin, View):
     '''Implements a view function for deleting a notification'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
         if notification.isSeen:
             Notification.objects.get(id=kwargs['notificationId']).delete()
@@ -542,7 +542,7 @@ class DeleteNotificationsView(LoginRequiredMixin, View):
 class DeleteAllNotifications(LoginRequiredMixin, View):
     '''Implements a view function for deleting all read notifications'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         Notification.objects.filter(toUser = request.user, isSeen = True).delete()
         return redirect("notifications")  
     
@@ -604,7 +604,7 @@ class FollowToggleView(LoginRequiredMixin, View):
 class AcceptFollowRequestView(LoginRequiredMixin, View):
     '''Implements a view for accepting a follow request category requests'''
 
-    def dispatch(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         notification = FollowRequestNotification.objects.get(id=kwargs['notificationId'])
         toUser = notification.toUser
         fromUser = notification.fromUser
