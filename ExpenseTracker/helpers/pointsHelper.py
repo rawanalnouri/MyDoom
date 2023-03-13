@@ -103,9 +103,9 @@ def trackPoints(request,category,isOver,totalSpent):
         else:
             closeAmount = currentCategory.spendingLimit.amount * Decimal(0.85)
             if newAmount>=closeAmount:
-                createBasicNotification(request.user,"Watch out","you are nearing your spending limit")
+                createBasicNotification(request.user,"Watch out!","You are nearing your spending limit for " + currentCategory.name)
             addPoints(request,5)
-            createBasicNotification(request.user,"Points Won!","5 points for staying within target :)")
+            createBasicNotification(request.user,"Points Won!","5 points for staying within target for " + currentCategory.name)
         
     else:
         #if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft 
