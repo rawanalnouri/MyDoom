@@ -9,6 +9,8 @@ def addPoints(request,n):
     points = Points.objects.get(user=request.user).pointsNum
     pointsObject.pointsNum = points+n
     pointsObject.save()
+   
+
 
 
 
