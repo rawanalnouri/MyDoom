@@ -16,6 +16,21 @@ def updatePoints(request,amount):
     else:
         pointsObject.pointsNum = points+amount
     pointsObject.save()
+    housePointsUpdate(request,amount)
+
+
+def housePointsUpdate(request,amount):
+    currentHouse = request.user.house
+    housePoints = currentHouse.points
+    currentHouse.points= housePoints+amount
+    currentHouse.save()
+    createBasicNotification(request.user,"House points increased!",amount)
+
+   
+
+    
+    
+
    
 
 
