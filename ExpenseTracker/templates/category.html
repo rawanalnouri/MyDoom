@@ -8,7 +8,7 @@
         <button id="open-edit-category-modal" data-category="{{ category.id }}" class="btn btn-sm btn-outline-dark ms-2">
             <i class="bi bi-pencil"></i>
         </button>
-        <button id="open-delete-category-modal" class="btn btn-sm btn-outline-dark ms-2" data-bs-toggle="modal" data-bs-target="#delete-category-modal">
+        <button id="open-delete-category-modal" class="btn btn-sm btn-outline-dark ms-2">
             <i class="bi bi-trash3"></i>
         </button>
         <button id="open-share-category-modal" data-category="{{ category.id }}" class="btn btn-sm btn-outline-dark ms-2">
@@ -86,6 +86,10 @@ $(document).ready(function() {
 
     // Expenditure modals
 
+    $("#open-create-expenditure-modal").on("click", function() {
+        $("#create-expenditure-modal").modal("show");
+    });
+
     $(".open-edit-expenditure-modal").on("click", function() {
         var expenditureId = $(this).data('expenditure');
         var categoryId = $(this).data('category');
@@ -112,6 +116,14 @@ $(document).ready(function() {
     });
 
     // Category modals
+
+    $("#open-edit-category-modal").on("click", function() {
+        $("#edit-category-modal").modal("show");
+    });
+
+    $("#open-delete-category-modal").on("click", function() {
+        $("#delete-category-modal").modal("show");
+    });
 
     $("#open-share-category-modal").on("click", function() {
         var categoryId = $(this).data('category');

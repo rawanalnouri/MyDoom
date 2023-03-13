@@ -221,7 +221,7 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
         form = ExpenditureForm(instance=expenditure, data=request.POST)
         if form.is_valid():
-            category = Category.objects.get(id=kwargs['categoryId'])
+            category = Category.objects.filter(id=kwargs['categoryId'], users__in=[request.user]).first()
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -316,7 +316,6 @@ class IndexView(View):
         else:
             return render(request, 'index.html')
 
-
 def generateGraph(categories, spentInCategories, type):
     dict = {'labels': categories, 'data': spentInCategories, 'type':type}
     return dict
@@ -354,6 +353,7 @@ class HomeView(LoginRequiredMixin, View):
 def reportsView(request):
     '''Implements a view for handling requests to the reports page'''
 
+    # login_url = reverse_lazy('logIn')
     categories = []
     totalSpent = []
 
@@ -446,7 +446,6 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     
     def handle_no_permission(self):
         return redirect('logIn')
-
 
 class NotificationsView(LoginRequiredMixin, View):
 
@@ -588,7 +587,7 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
-    paginate_by = 10
+    paginate_by = 15
 
     def get_context_data(self, *args, **kwargs):
         """Generate content to be displayed in the template."""

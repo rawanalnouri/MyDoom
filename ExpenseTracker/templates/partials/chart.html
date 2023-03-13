@@ -1,4 +1,4 @@
-<div id="container" style="width: 90%">
+<div id="container" style="width: 100%">
   <canvas id="pie-chart"></canvas>
 </div>
 
@@ -11,11 +11,14 @@
         {
           data: {{ data|safe }},
           backgroundColor: [
-            "#7DD3E8",
-            "#54B2CA",
-            "#2D8EA6",
-            "#C0C0C0",
-            "#D3D3D3",
+            "#8282DC",
+            "#AF82DC",
+            "#DC82DC",
+            "#DC82AF",
+            "#DC8282",
+            "#DCAF82",
+            "#F6EBE0",
+
           ],
           label: "Population",
         },
@@ -65,7 +68,7 @@
         height = chart.chart.height,
         ctx = chart.chart.ctx;
     ctx.restore();
-    var fontSize = (height / 114).toFixed(2);
+    var fontSize = (height / 250).toFixed(2);
     ctx.font = fontSize + "em sans-serif";
     ctx.textBaseline = "middle";
     var text = "{{category.name}}",
