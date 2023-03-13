@@ -350,20 +350,82 @@ class HomeView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
 
+def createNameAndValueLists(categories, timePeriod):
+    today = datetime.now()
+    returnedArrays =[]
+    names = []
+    values =[]
+    for selected in categories:
+        category = Category.objects.get(id=selected)
+        budgetCalculated = ''
+        categorySpend = 0.00
+        filteredExpenses = ''
+        # all categories
+        names.append(category.name)
+        # total spend per catagory
+        if timePeriod == 'daily':
+            yesterday = today - timedelta(days=1)
+            filteredExpenses = category.expenditures.filter(date__gte=yesterday)
+            budgetCalculated = convertBudgetToDaily(category)
+            timePeriodText = "day"
+        if timePeriod == 'weekly':
+            budgetCalculated = convertBudgetToWeekly(category)
+            week_start = today
+            week_start -= timedelta(days=week_start.weekday())
+            week_end = week_start + timedelta(days=7)
+            startOfWeek = today - timedelta(days=today.weekday())
+            filteredExpenses = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
+            timePeriodText = "week"
+        if timePeriod == 'monthly':
+            budgetCalculated = convertBudgetToMonthly(category)
+            filteredExpenses = category.expenditures.filter(date__month=today.month)
+            timePeriodText = "month"
+        for expence in filteredExpenses:
+            categorySpend += float(expence.amount)
+        amount = categorySpend/float(budgetCalculated)*100
+        if amount < 100:
+            values.append(amount)
+        else:
+            values.append(100)
+    returnedArrays.append(names)
+    returnedArrays.append(values)
+    return returnedArrays
+
+def createArraysData(categories, timePeriod, filter, divisions):
+    data1 =[]
+    for selected in categories:
+        category = Category.objects.get(id=selected)
+        last12months = category.expenditures.filter(date__gte=filter)
+        budgetCalculated = category.spendingLimit.getNumber()
+        # total spend per catagory
+        categorySpend = 0.00
+        for expence in last12months:
+            categorySpend += float(expence.amount)
+        if timePeriod == 'daily':
+            budgetCalculated = convertBudgetToDaily(category)
+            categorySpend = categorySpend/divisions[0]
+            timePeriodText = "day"
+        if timePeriod == 'weekly':
+            budgetCalculated = convertBudgetToWeekly(category)
+            categorySpend = categorySpend/divisions[1]
+            timePeriodText = "week"
+        if timePeriod == 'monthly':
+            budgetCalculated = convertBudgetToMonthly(category)
+            categorySpend = categorySpend/divisions[2]
+            timePeriodText = "month"
+        amount = categorySpend/float(budgetCalculated)*100
+        if amount < 100:
+            data1.append(amount)
+        else:
+            data1.append(100)
+    return data1
 
 class ReportsView(LoginRequiredMixin, View):
 
+
     def get(self, request):
-        today = datetime.now()
-        categories = []
-        totalSpent = []
-
-        # experiment###########################################
-
-        # experiment###########################################
-
         form = ReportForm(user=request.user)
-        dict = generateGraph(categories, totalSpent, 'bar')
+        dict = generateGraph([], [], 'bar')
         dict.update({"form": form, "text": "Waiting for your selection..."})
         return render(request, "reports.html", dict)
 
@@ -374,45 +436,12 @@ class ReportsView(LoginRequiredMixin, View):
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
+            selectedCategories = form.cleaned_data.get('selectedCategory')
             timePeriodText = ""
 
-            if timePeriod == 'daily':
-                Category.objects.filter(users__in=[request.user])
-                #filters = date__year='2023', date__month='01'
-
-            selectedCategories = form.cleaned_data.get('selectedCategory')
-
-            for selected in selectedCategories:
-                category = Category.objects.get(id=selected)
-                budgetCalculated = category.spendingLimit.getNumber()
-                # all categories
-                categories.append(category.name)
-                # total spend per catagory
-                categorySpend = 0.00
-                filteredExpenses = category.expenditures.all()
-                if timePeriod == 'daily':
-                    filteredExpenses = category.expenditures.filter(date__day=today.day)
-                    budgetCalculated = convertBudgetToDaily(category)
-                    timePeriodText = "day"
-                if timePeriod == 'weekly':
-                    budgetCalculated = convertBudgetToWeekly(category)
-                    week_start = today
-                    week_start -= timedelta(days=week_start.weekday())
-                    week_end = week_start + timedelta(days=7)
-                    startOfWeek = today - timedelta(days=today.weekday())
-                    filteredExpenses = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
-                    timePeriodText = "week"
-                if timePeriod == 'monthly':
-                    budgetCalculated = convertBudgetToMonthly(category)
-                    filteredExpenses = category.expenditures.filter(date__month=today.month)
-                    timePeriodText = "month"
-                for expence in filteredExpenses:
-                    categorySpend += float(expence.amount)
-                amount = categorySpend/float(budgetCalculated)*100
-                if amount < 100:
-                    totalSpent.append(amount)
-                else:
-                    totalSpent.append(100)
+            createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
+            categories = createdArrays[0]
+            totalSpent = createdArrays[1]
 
             dict = generateGraph(categories, totalSpent, 'bar')
             dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriodText}."})
@@ -421,94 +450,21 @@ class ReportsView(LoginRequiredMixin, View):
             first_day_this_month = today.replace(day=1)
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
-            data1 = []
+            data1 = createArraysData(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
 
-            for selected in selectedCategories:
-                category = Category.objects.get(id=selected)
-                last12months = category.expenditures.filter(date__gte=first_day_twelve_months_ago)
-                budgetCalculated = category.spendingLimit.getNumber()
-                # total spend per catagory
-                categorySpend = 0.00
-                for expence in last12months:
-                    categorySpend += float(expence.amount)
-                if timePeriod == 'daily':
-                    budgetCalculated = convertBudgetToDaily(category)
-                    categorySpend = categorySpend/365
-                    timePeriodText = "day"
-                if timePeriod == 'weekly':
-                    budgetCalculated = convertBudgetToWeekly(category)
-                    categorySpend = categorySpend/52
-                    timePeriodText = "week"
-                if timePeriod == 'monthly':
-                    budgetCalculated = convertBudgetToMonthly(category)
-                    categorySpend = categorySpend/12
-                    timePeriodText = "month"
-                amount = categorySpend/float(budgetCalculated)*100
-                if amount < 100:
-                    data1.append(amount)
-                else:
-                    data1.append(100)
+
             dict.update({'data1':data1})
             dict.update({'text2':"Comparison to average over last 12 months"})
 
-            data2 = []
+            six_months_ago = today + relativedelta(months=-6)
+            data2 = createArraysData(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
 
-            for selected in selectedCategories:
-                category = Category.objects.get(id=selected)
-                six_months_ago = today + relativedelta(months=-6)
-                last6months = category.expenditures.filter(date__gte=six_months_ago)
-                budgetCalculated = category.spendingLimit.getNumber()
-                # total spend per catagory
-                categorySpend = 0.00
-                for expence in last6months:
-                    categorySpend += float(expence.amount)
-                if timePeriod == 'daily':
-                    budgetCalculated = convertBudgetToDaily(category)
-                    categorySpend = categorySpend/90
-                    timePeriodText = "day"
-                if timePeriod == 'weekly':
-                    budgetCalculated = convertBudgetToWeekly(category)
-                    categorySpend = categorySpend/12
-                    timePeriodText = "week"
-                if timePeriod == 'monthly':
-                    budgetCalculated = convertBudgetToMonthly(category)
-                    categorySpend = categorySpend/3
-                    timePeriodText = "month"
-                amount = categorySpend/float(budgetCalculated)*100
-                if amount < 100:
-                    data2.append(amount)
-                else:
-                    data2.append(100)
             dict.update({'data2':data2})
-            dict.update({'text2':"Compare your spendings in the past"})
+            dict.update({'text2':f"Compare your average {timePeriod} spendings in the past"})
 
-            data3 = []
+            three_months_ago = today + relativedelta(months=-3)
+            data3 = createArraysData(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
 
-            for selected in selectedCategories:
-                category = Category.objects.get(id=selected)
-                three_months_ago = today + relativedelta(months=-3)
-                last3months = category.expenditures.filter(date__gte=three_months_ago)
-                budgetCalculated = category.spendingLimit.getNumber()
-                # total spend per catagory
-                categorySpend = 0.00
-                for expence in last3months:
-                    categorySpend += float(expence.amount)
-                if timePeriod == 'daily':
-                    budgetCalculated = convertBudgetToDaily(category)
-                    categorySpend = categorySpend/90
-                    timePeriodText = "day"
-                if timePeriod == 'weekly':
-                    budgetCalculated = convertBudgetToWeekly(category)
-                    categorySpend = categorySpend/12
-                    timePeriodText = "week"
-                if timePeriod == 'monthly':
-                    categorySpend = categorySpend/3
-                    timePeriodText = "month"
-                amount = categorySpend/float(budgetCalculated)*100
-                if amount < 100:
-                    data3.append(amount)
-                else:
-                    data3.append(100)
             dict.update({'data3':data3})
             dict.update({'text3':f"Your average {timePeriod} spending"})
 
