@@ -46,3 +46,8 @@ class DeleteAllNotificationViewTest(TestCase):
         # Check the next page displays the remaining 5 notifications
         response = self.client.get(reverse('notifications') + '?page=2')
         self.assertEqual(len(response.context['readNotificationsPaginated']), 5)
+
+    def testRedirectsIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('notifications'))
+        self.assertRedirects(response, reverse('logIn'))
