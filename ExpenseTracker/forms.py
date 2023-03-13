@@ -107,7 +107,7 @@ class EditProfile(forms.ModelForm):
 class ChangePasswordForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         self.fields['old_password'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Old Password'
@@ -120,7 +120,7 @@ class ChangePasswordForm(PasswordChangeForm):
             'class': 'form-control',
             'placeholder': 'Confirm New Password'
         })
-    
+
 
 class ShareCategoryForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.none())
@@ -137,10 +137,10 @@ class ShareCategoryForm(forms.ModelForm):
 
     # Sends a share request to the user selected
     def save(self, commit=True):
-        toUser = self.cleaned_data['user'] 
+        toUser = self.cleaned_data['user']
         title = "New Category Shared!"
         message = self.fromUser.username + " wants to share a category '"+ self.category.name +"' with you"
-        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)      
+        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)
         return toUser
 
 

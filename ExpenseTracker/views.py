@@ -396,8 +396,11 @@ class ReportsView(LoginRequiredMixin, View):
                     timePeriodText = "day"
                 if timePeriod == 'weekly':
                     budgetCalculated = convertBudgetToWeekly(category)
+                    week_start = today
+                    week_start -= timedelta(days=week_start.weekday())
+                    week_end = week_start + timedelta(days=7)
                     startOfWeek = today - timedelta(days=today.weekday())
-                    filteredExpenses = category.expenditures.filter(date__gte=startOfWeek)
+                    filteredExpenses = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
                     timePeriodText = "week"
                 if timePeriod == 'monthly':
                     budgetCalculated = convertBudgetToMonthly(category)
