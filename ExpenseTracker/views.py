@@ -67,10 +67,10 @@ class CreateExpenditureView(LoginRequiredMixin, View):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = ExpenditureForm(request.POST)
         if category and form.is_valid():
-            cureentCategoryInfo = checkIfOver(category)
+            currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
             form.save(category)
-            trackPoints(request,category,cureentCategoryInfo[0],cureentCategoryInfo[1])
+            trackPoints(request,category,currentCategoryInfo[0],currentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
