@@ -9,7 +9,7 @@ from django.utils import timezone
 
 
 class TestLoginView(TestCase, LogInTester):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -76,14 +76,3 @@ class TestLoginView(TestCase, LogInTester):
         notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
         self.assertEqual(notification.title, "New Points Earned!")
         self.assertEqual(notification.message, "5 points earned for daily login")
-
-
-
-
-
-
-
-
-
-
-

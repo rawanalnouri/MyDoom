@@ -39,5 +39,3 @@ class EditNotificationViewTest(TestCase):
         self.client.logout()
         response = self.client.get(reverse('editNotifications', args=[self.readNotification.id]))
         self.assertRedirects(response, reverse('logIn'))
-
-

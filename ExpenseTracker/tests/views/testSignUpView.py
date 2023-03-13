@@ -72,5 +72,3 @@ class SignUpViewTest(TestCase, LogInTester):
         userHomePage = reverse('home')
         self.assertRedirects(response, userHomePage, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "home.html")
-
-

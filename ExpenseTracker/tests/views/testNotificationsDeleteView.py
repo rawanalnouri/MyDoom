@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 class DeleteNotificationViewTest(TestCase):
-    fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
@@ -36,4 +36,3 @@ class DeleteNotificationViewTest(TestCase):
         self.client.logout()
         response = self.client.get(reverse('deleteNotifications', args=[self.readNotification.id]))
         self.assertRedirects(response, reverse('logIn'))
-
