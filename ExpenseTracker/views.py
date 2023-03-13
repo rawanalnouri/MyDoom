@@ -7,13 +7,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.http import Http404
 from django.core.paginator import Paginator
-from .helpers.pointsHelper import addPoints
+from .helpers.pointsHelper import *
 from django.utils.timezone import datetime
 from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from .helpers.pointsHelper import addPoints
+from .helpers.pointsHelper import updatePoints
 from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
@@ -67,8 +67,10 @@ class CreateExpenditureView(LoginRequiredMixin, View):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = ExpenditureForm(request.POST)
         if category and form.is_valid():
+            currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
             form.save(category)
+            trackPoints(request,category,currentCategoryInfo[0],currentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
@@ -117,7 +119,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         # add points
-        addPoints(self.request,5)
+        updatePoints(self.request,5)
         createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
         return redirect(reverse('category', args=[category.id]))
 
@@ -287,7 +289,7 @@ class LogInView(View):
                 login(request, user)
                 if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
-                    addPoints(request, 5)
+                    updatePoints(request, 5)
                     createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
                 # Update user lastLogin after checking if this is is first login of the day
                 user.lastLogin = timezone.now()
