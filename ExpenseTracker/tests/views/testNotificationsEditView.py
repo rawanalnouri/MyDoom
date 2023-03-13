@@ -4,7 +4,7 @@ from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
 
-class DeleteNotificationViewTest(TestCase):
+class EditNotificationViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -16,7 +16,7 @@ class DeleteNotificationViewTest(TestCase):
 
     def testRedirectToPageBeforeEdit(self):
         urlBeforeEdit = reverse('home')
-        response = self.client.post(reverse('editNotifications', args=[self.readNotification.id]),  HTTP_REFERER=urlBeforeEdit, follow=True)
+        response = self.client.get(reverse('editNotifications', args=[self.readNotification.id]),  HTTP_REFERER=urlBeforeEdit, follow=True)
         userRedirect = reverse('home')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
@@ -34,5 +34,10 @@ class DeleteNotificationViewTest(TestCase):
         reverse('editNotifications', args=[self.unreadNotification.id])
         self.assertTrue(len(userReadNotificationsCountBefore), len(userReadNotificationsCountBefore)+1)
         self.assertTrue(len(userUnreadNotificationsCountBefore), len(userUnreadNotificationsCountBefore)-1)
+
+    def testRedirectsIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('editNotifications', args=[self.readNotification.id]))
+        self.assertRedirects(response, reverse('logIn'))
 
 
