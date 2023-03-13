@@ -53,5 +53,8 @@ urlpatterns = [
     path('users/', UserListView.as_view(), name='users'),
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
+
+
+    path('leaderboard/', leaderboardView.as_view() ,name='leaderboard'),
 ]
 

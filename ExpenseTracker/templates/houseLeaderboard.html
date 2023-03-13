@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game Leaderboard</title>
+	<style>
+		/* Styling for the podiums */
+		.podium {
+			display: inline-block;
+			width: 30%;
+			margin: 10px;
+			border: 1px solid black;
+			text-align: center;
+			background-color: #f1f1f1;
+			border-radius: 10px;
+			padding: 10px;
+			box-shadow: 2px 2px 2px #888888;
+		}
+		
+		/* Styling for the first place podium */
+		.first-place {
+			background-color: gold;
+		}
+		
+		/* Styling for the second place podium */
+		.second-place {
+			background-color: silver;
+		}
+		
+		/* Styling for the third place podium */
+		.third-place {
+			background-color: #cd7f32;
+		}
+		
+		/* Styling for the leaderboard table */
+		table {
+			width: 80%;
+			margin: 0 auto;
+			border-collapse: collapse;
+			font-family: Arial, sans-serif;
+			box-shadow: 2px 2px 2px #888888;
+		}
+		
+		/* Styling for the table headings */
+		th {
+			background-color: #4CAF50;
+			color: white;
+			padding: 8px;
+			text-align: left;
+		}
+		
+		/* Styling for the table cells */
+		td {
+			border: 1px solid #ddd;
+			padding: 8px;
+			text-align: left;
+		}
+	</style>
+</head>
+<body>
+	<h1>Game Leaderboard</h1>
+	
+	<div class="podium first-place">
+		<h2>1st Place</h2>
+		<p>Player 1</p>
+		<p>Score: 1000</p>
+	</div>
+	
+	<div class="podium second-place">
+		<h2>2nd Place</h2>
+		<p>Player 2</p>
+		<p>Score: 900</p>
+	</div>
+	
+	<div class="podium third-place">
+		<h2>3rd Place</h2>
+		<p>Player 3</p>
+		<p>Score: 800</p>
+	</div>
+	
+	<div class="podium">
+		<h2>4th Place</h2>
+		<p>Player 4</p>
+		<p>Score: 700</p>
+	</div>
+	
+	<table>
+		<thead>
+			<tr>
+				<th>Rank</th>
+				<th>Player Name</th>
+				<th>Score</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1</td>
+				<td>Player 1</td>
+				<td>1000</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>Player 2</td>
+				<td>900</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>Player 3</td>
+				<td>800</td>
+			</tr>
+			<tr>
+				<td>4</td>
+				<td>Player 4</td>
+				<td>700</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
