@@ -266,10 +266,12 @@ class SignUpView(View):
             login(request, user)
             createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+            
             n = user.id % 4
             house=House.objects.get(id=n+1)
             user.house=house
             user.save()
+            housePointsUpdate(request,50)
            
     
             # assign house
