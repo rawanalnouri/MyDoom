@@ -7,6 +7,8 @@ from django.contrib import auth
 from django.contrib.auth.hashers import check_password
 from ExpenseTracker.tests.helpers import LogInTester
 
+#tests for the sign up view
+
 class SignUpViewTest(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

@@ -3,6 +3,8 @@ from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the delete all notification view
+
 class DeleteAllNotificationViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

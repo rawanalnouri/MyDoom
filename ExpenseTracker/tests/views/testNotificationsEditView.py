@@ -4,6 +4,8 @@ from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the edit notification view
+
 class EditNotificationViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

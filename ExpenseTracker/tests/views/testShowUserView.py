@@ -2,6 +2,8 @@ from ExpenseTracker.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the show user view
+
 class ShowUserViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

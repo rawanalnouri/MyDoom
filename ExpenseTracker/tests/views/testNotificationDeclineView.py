@@ -4,6 +4,8 @@ from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the decline notification view
+
 class NotificationDeclineRequestView(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

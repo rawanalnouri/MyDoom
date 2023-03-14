@@ -4,6 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.core.paginator import Page
 
+#tests for the notification view
+
 
 class DeleteAllNotificationViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

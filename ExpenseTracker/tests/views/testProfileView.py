@@ -4,6 +4,8 @@ from django.urls import reverse
 from ExpenseTracker.forms import EditProfile
 from ExpenseTracker.models import *
 
+#tests for the profile view
+
 class ProfileViewTest(TestCase):
 
     fixtures = [
