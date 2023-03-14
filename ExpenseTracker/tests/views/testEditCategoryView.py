@@ -16,6 +16,9 @@ class EditCategoryViewTest(TestCase):
         self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
 
+
+    # Verifies that the Edit Category view can be accessed 
+    # and displays the correct form.
     def testGetEditCategoryView(self):
         url = reverse('editCategory', kwargs={'categoryId': self.category.id})
         response = self.client.get(url)
@@ -23,6 +26,8 @@ class EditCategoryViewTest(TestCase):
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertIsInstance(response.context['form'], CategorySpendingLimitForm)
 
+    #  Tests if a valid form is submitted for editing a category
+    #  and it is updated successfully.
     def testPostEditCategoryWhenFormIsValid(self):
         data = {
             'name': 'Updated Title', 
@@ -38,6 +43,9 @@ class EditCategoryViewTest(TestCase):
         expectedMessage = "Category updated successfully."
         self.assertEqual(str(messages[0]), expectedMessage)
 
+
+    # Tests if an invalid form is submitted for editing a category 
+    # and the update fails with an appropriate message.
     def testPostEditCategoryWhenFormIsInvalid(self):
         data = {
             'name': '', 
@@ -52,6 +60,8 @@ class EditCategoryViewTest(TestCase):
         expectedMessage = "Failed to update category."
         self.assertEqual(str(messages[0]), expectedMessage)
     
+    # Verifies that the user is redirected to the login page if they 
+    # are not logged in while accessing the Edit Category view.
     def testEditCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('editCategory', kwargs={'categoryId': self.category.id})
@@ -60,6 +70,8 @@ class EditCategoryViewTest(TestCase):
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
 
+    # Tests that pagination is working correctly for the Category view, 
+    # and that only the correct number of expenditures are displayed on each page.
     def testCategoryViewPagination(self):
         # Create additional expenditures
         for i in range(15):

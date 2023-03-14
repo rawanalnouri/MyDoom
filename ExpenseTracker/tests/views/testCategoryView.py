@@ -17,6 +17,11 @@ class CategoryViewTest(TestCase):
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
 
+    # This test ensures that the category view returns a 
+    # 200 status code and uses the correct template.
+    # 
+    #  It also checks that the view returns the expected 
+    # context variables (i.e. the category and its associated expenditures).
     def test_category_view_get(self):
         url = reverse('category', args=[self.category.id])
         response = self.client.get(url)
@@ -29,6 +34,11 @@ class CategoryViewTest(TestCase):
         self.assertEqual(len(context['expenditures']), 1)
         self.assertEqual(context['expenditures'][0], self.expenditure)
     
+    # This test ensures that if a user is not logged in and tries to
+    # access the category view, they will be redirected to the login page.
+    # 
+    #  It checks that the view returns a 302 status code and redirects 
+    # to the login page. It also checks that the login template is used.
     def testCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('category', kwargs={'categoryId': self.category.id})

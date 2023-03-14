@@ -23,17 +23,23 @@ class HomeViewTest(TestCase):
         self.user.categories.add(self.category)
         self.user.save()
 
-
+    # This test ensures that the home view is using the correct HTML template, which should be home.html.
     def testHomeViewUsesCorrectTemplate(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
 
+    # This test checks if the user is redirected to the login page if they are not 
+    # logged in when trying to access the home page.
     def testHomeViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
         response = self.client.get(reverse('home'))
         self.assertRedirects(response, '/logIn/')
 
+    # This test checks if the totalSpentThisMonth() method returns the 
+    # correct monthly total spent by the user, and if the data dictionary 
+    # used in the home view context contains the correct total spent in each 
+    # expenditure category.
     def testCorrectMonthlyTotalSpentForEachCategory(self):
         totalSpentThisMonth = self.expenditure.amount
         categorySpentThisMonth = self.expenditure.amount
