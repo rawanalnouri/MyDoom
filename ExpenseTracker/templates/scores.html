@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Scores{% endblock %}
+
+
+{% block content %}
+
+
+<style>
+    .bar-chart {
+        display: flex;
+        align-items: flex-end;
+        height: 200px;
+    }
+    .bar {
+        width: 30%;
+        text-align: center;
+        border-top-left-radius: 30px;
+        border-top-right-radius: 30px;
+        position: relative;
+    }
+    .bar-label {
+        position: absolute;
+        bottom: 25px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .bar-number {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: x-small;
+        
+    /* Add a rounded border */
+        border-radius: 10px;
+        border: 1px solid black;
+        padding: 1px 3px;
+    }
+    .first { background-color: #F2F2F0 }
+    .second { background-color: #FFE6B3; }
+    .third { background-color: #E6E6E6; }
+    .fourth { background-color: #E6C2A2; }
+    .th-normal {
+    font-weight: normal;
+    }
+</style>
+
+<h3 id="category-header">Leaderboard</h3>
+<hr>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card border">
+                    <div class="card-body">
+                        <div class="bar-chart">
+                            <div class="bar second" style="height: 75%;">
+                                <div class="bar-label">2nd</div>
+                                <div class="bar-number">3490 PTS</div>
+                            </div> 
+                            <div class="bar first" style="height: 100%;">
+                                <div class="bar-label">1st</div>
+                                <div class="bar-number">5647 PTS</div>
+                            </div>
+                            <div class="bar third" style="height: 50%;">
+                                <div class="bar-label">3rd</div>
+                                <div class="bar-number">3210 PTS</div>
+                            </div>
+                            <div class="bar fourth" style="height: 30%;">
+                                <div class="bar-label">4th</div>
+                                <div class="bar-number">2896 PTS</div>
+                            </div>
+                        </div>
+                        <br>
+                        <p style="text-align: center;">
+                            We have a winner!
+                            <br>
+                            <span class="text-muted">Cherry Blossom is in the lead with </span> 
+                            3490 PTS,
+                            <span class="text-muted"> congratulations!</span>
+                        </p>
+                    </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    Second card
+                    <br>
+                    Personal house data/charts
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card" style="width: 100%;">
+                <div class="card-body" >
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-muted th-normal">Place</th>
+                                <th scope="col" class="text-muted th-normal"></th>
+                                <th scope="col" class="text-muted th-normal">Username</th>
+                                <th scope="col" class="text-muted th-normal">Full Name</th>
+                                <th scope="col" class="text-muted th-normal">House</th>
+                                <th scope="col" class="text-muted th-normal">Points</th>
+                                <th scope="col" class="text-muted th-normal">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>
+                                    <img src="{{ user.user.miniGravatar }}" alt="Gravatar of {{ user.user.username }}" class="rounded-circle" width="45" height="45">
+                                </td>
+                                <td>@{{ user.user.username }}</td>
+                                <td>{{ user.user.fullName }}</td>
+                                <td>Cherry Blossom</td>
+                                <td>{{ user.pointsNum }}</td>
+                                <td>
+                                    <a role="button" href="{% url 'showUser' user.id %}">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        {% if users.has_previous %}
+                            <a id="pagination-button" href="?page={{ users.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
+                        {% endif %}
+                        page {{ users.number }} of {{ users.paginator.num_pages }}
+                        {% if users.has_next %}
+                            <a id="pagination-button" href="?page={{ users.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
