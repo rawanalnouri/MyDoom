@@ -94,14 +94,18 @@ class EditCategoryView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
-        if category and form.is_valid():
+        if form.is_valid():
+            category = form.save()
             messages.success(self.request, "Category updated successfully.")
-            form.save(category)
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
+            # add points
+            updatePoints(self.request,5)
+            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+            return redirect(reverse('category', args=[category.id]))
         else:
-            messages.error(self.request, "Failed to update category.")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
-
+            for error in form.non_field_errors():
+                messages.error(self.request, error)
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -119,22 +123,27 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        category = form.save()
-        messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
-        # add points
-        updatePoints(self.request,5)
-        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
-        return redirect(reverse('category', args=[category.id]))
+        try:
+            category = form.save()
+            messages.success(self.request, "Successfully Created Category")
+            # add points
+            updatePoints(self.request,5)
+            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+            category.save()
+            return redirect(reverse('category', args=[category.id]))
+        except ValidationError as e:
+            messages.error(self.request, e.message_dict) 
+            return self.form_invalid(form)
 
     def form_invalid(self, form):
         for error in form.non_field_errors():
-            messages.add_message(self.request, messages.ERROR, error)
+            messages.error(self.request, error)
         return super().form_invalid(form)
 
     def handle_no_permission(self):
         return redirect('logIn')
-
-
+    
+        
 class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 

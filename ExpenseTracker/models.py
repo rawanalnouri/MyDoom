@@ -73,18 +73,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-    def validate_unique(self, exclude=None):
-        super().validate_unique(exclude=exclude)
-        existingCategories = Category.objects.filter(name=self.name, users__in=self.users.all())
-        if existingCategories.exists():
-            raise ValidationError('Category with this name already exists for this user.')
-
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        super().save(*args, **kwargs)
-
-
+            
 class User(AbstractUser):
     '''model for user authentication.'''
 
