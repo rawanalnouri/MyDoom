@@ -5,6 +5,8 @@ from django.contrib import auth
 from django.contrib import messages
 from ExpenseTracker.tests.helpers import LogInTester
 
+#tests for the log out view
+
 class TestLogOut(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

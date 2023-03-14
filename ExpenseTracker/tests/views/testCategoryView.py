@@ -3,6 +3,8 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure
 import datetime
 
+#tests for the category view
+
 class CategoryViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

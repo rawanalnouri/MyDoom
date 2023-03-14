@@ -4,6 +4,8 @@ from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
 
+#tests for the expenditure update view
+
 class ExpenditureUpdateViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
     

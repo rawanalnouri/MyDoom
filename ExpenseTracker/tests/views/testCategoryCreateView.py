@@ -2,6 +2,8 @@ from ExpenseTracker.models import User, Category
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the create category view
+
 class CategoryCreateViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

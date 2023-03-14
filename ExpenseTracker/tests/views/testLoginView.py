@@ -7,6 +7,7 @@ from ExpenseTracker.tests.helpers import LogInTester
 from datetime import datetime, timedelta
 from django.utils import timezone
 
+#tests for the login view
 
 class TestLoginView(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

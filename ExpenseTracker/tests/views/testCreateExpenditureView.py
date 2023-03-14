@@ -4,6 +4,8 @@ from ExpenseTracker.models import User, Category, Expenditure, Points, Notificat
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
 
+#tests for the create expenditure view
+
 class CreateExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

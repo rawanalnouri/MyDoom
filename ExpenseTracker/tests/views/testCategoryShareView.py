@@ -4,6 +4,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib import messages
 
+#tests for the share category view
+
 
 class CategroyShareViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

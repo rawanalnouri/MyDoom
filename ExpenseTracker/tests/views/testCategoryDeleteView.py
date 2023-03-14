@@ -2,6 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 
+#tests for the delete category view
+
 class CategoryDeleteViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

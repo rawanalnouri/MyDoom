@@ -2,6 +2,8 @@ from ExpenseTracker.models import User, Notification, FollowRequestNotification
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the accept follow request view
+
 class AcceptFollowRequestViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

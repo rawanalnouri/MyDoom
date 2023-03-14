@@ -4,6 +4,8 @@ from ExpenseTracker.forms import ChangePasswordForm
 from ExpenseTracker.models import *
 from django.urls import reverse
 
+#tests for the change password view
+
 
 class ChangeProfileViewTest(TestCase):
 
