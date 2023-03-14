@@ -24,11 +24,13 @@
             <a href="#categories" class="menu-btn">
                 <i class="bi bi-grid"></i><span>Categories <i class="bi bi-chevron-down drop-down"></i></span>
             </a>
-            <div class="sub-menu">
-                {% for category in user.categories.all %}
-                    <a href="{% url 'category' category.id %}"><span>{{ category.name }}</span></a>
-                {% endfor %}
-                <a href="{% url 'createCategory' %}" class="sub-item"><span>Add Category</span></a>
+            <div class="scrollable-container" style="width: 100%; overflow-y: auto; max-height: 300px;">
+                <div class="sub-menu">
+                    {% for category in user.categories.all %}
+                        <a href="{% url 'category' category.id %}"><span>{{ category.name }}</span></a>
+                    {% endfor %}
+                    <a href="{% url 'createCategory' %}" class="sub-item"><span>Add Category</span></a>
+                </div>
             </div>
         </li>
         <li class="item">
