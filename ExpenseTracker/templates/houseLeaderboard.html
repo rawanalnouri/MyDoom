@@ -5,6 +5,13 @@
     <title>Leaderboard</title>
     <style>
       /* Add some styling for the leaderboard and podiums */
+
+      .pageTitle{
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+        font-size: 50px;
+      }
+
       .leaderboard {
         width: 600px;
         margin: 0 auto;
@@ -42,6 +49,12 @@
         background-color: #999;
         height: 150px;
       }
+
+      .table {
+        width: 1000px;
+        margin: 0 auto;
+        font-family: Arial, sans-serif;
+      }
       
       /* Styling for the leaderboard table */
 		table {
@@ -70,7 +83,9 @@
   </head>
   <body>
     <div class="leaderboard">
+     <div class="pageTitle">
       <h1>Leaderboard</h1>
+      </div>
       <div class="podium gold">
         <h2>1st Place</h2>
         
@@ -97,6 +112,9 @@
       </div>
     </div>
     <br>
+
+     <div class="table">
+     <h1>House rankings</h1>
     <table>
 		<thead>
 			<tr>
@@ -128,6 +146,48 @@
             </tr>
         </tbody>
     </table>
+    </div>
+
+
+
+    <div class="table">
+    <h1>User rankings</h1>
+    <table>
+
+
+      <thead>
+			<tr>
+				<th>Rank</th>
+				<th>Username</th>
+				<th>Score</th>
+			</tr>
+		  </thead>
+
+
+      <tbody>
+        <tr>
+          <td>John</td>
+          <td>Red House</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Jane</td>
+          <td>Green House</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Bob</td>
+          <td>Blue House</td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Sarah</td>
+          <td>Yellow House</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
     
     
   </body>
