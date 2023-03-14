@@ -625,6 +625,7 @@ def searchUsers(request):
 
 class LeaderBoardView(LoginRequiredMixin,View):
     def get(self,request):
-        return render(request, "houseLeaderboard.html")
+        houses = House.objects.order_by('-points')
+        return render(request, "houseLeaderboard.html",{'houses':houses})
 
 

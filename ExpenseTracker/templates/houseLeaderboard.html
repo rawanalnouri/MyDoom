@@ -148,7 +148,14 @@
       </thead>
 
       <tbody>
-        <tr>
+      {% for houses in houses %}
+      <tr>
+      <td>{{houses.house}}</td>
+      <td>{{houses.points}}</td>
+      <td></td>
+      </tr>
+      {%endfor%}
+        {% comment %} <tr>
           <td>1</td>
           <td>Player 1</td>
           <td>1000</td>
@@ -167,7 +174,7 @@
           <td>4</td>
           <td>Player 4</td>
           <td>700</td>
-              </tr>
+              </tr> {% endcomment %}
           </tbody>
 
     </table>
@@ -188,7 +195,11 @@
 		  </thead>
 
       <tbody>
-        <tr>
+    
+      
+
+      
+         <tr>
           <td>John</td>
           <td>Red House</td>
           <td></td>
@@ -207,7 +218,7 @@
           <td>Sarah</td>
           <td>Yellow House</td>
           <td></td>
-        </tr>
+        </tr> 
       </tbody>
     </table>
     </div>
