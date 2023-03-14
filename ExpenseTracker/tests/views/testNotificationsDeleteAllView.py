@@ -18,7 +18,7 @@ class DeleteAllNotificationViewTest(TestCase):
             Notification.objects.create(toUser=self.user, title='test'+str(i), message='test message', isSeen=True)
 
         userNotificationsCountBefore = Notification.objects.filter(toUser=self.user)
-        self.client.delete(reverse('deleteAllNotifications'))
+        self.client.get(reverse('deleteAllNotifications'))
         self.assertFalse(Notification.objects.filter(id=self.readNotification.id).exists())
         self.assertFalse(Notification.objects.filter(id=3).exists())
         self.assertFalse(Notification.objects.filter(id=4).exists())
@@ -26,8 +26,13 @@ class DeleteAllNotificationViewTest(TestCase):
         self.assertTrue(len(userNotificationsCountBefore), 1)
 
     def testRedirectToNotificationsPageAfterAllDelete(self):
-        response = self.client.delete(reverse('deleteAllNotifications'), follow=True)
+        response = self.client.get(reverse('deleteAllNotifications'), follow=True)
         userRedirect = reverse('notifications')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'notifications.html')
 
+    def testRedirectsIfUserNotLoggedIn(self):
+        """Test delete all notifications view with an anonymous user."""
+        self.client.logout()
+        response = self.client.get(reverse('deleteAllNotifications'))
+        self.assertRedirects(response, reverse('logIn'))

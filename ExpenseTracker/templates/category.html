@@ -86,6 +86,10 @@ $(document).ready(function() {
 
     // Expenditure modals
 
+    $("#open-create-expenditure-modal").on("click", function() {
+        $("#create-expenditure-modal").modal("show");
+    });
+
     $(".open-edit-expenditure-modal").on("click", function() {
         var expenditureId = $(this).data('expenditure');
         var categoryId = $(this).data('category');
@@ -112,6 +116,14 @@ $(document).ready(function() {
     });
 
     // Category modals
+
+    $("#open-edit-category-modal").on("click", function() {
+        $("#edit-category-modal").modal("show");
+    });
+
+    $("#open-delete-category-modal").on("click", function() {
+        $("#delete-category-modal").modal("show");
+    });
 
     $("#open-share-category-modal").on("click", function() {
         var categoryId = $(this).data('category');

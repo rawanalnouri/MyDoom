@@ -1,37 +1,56 @@
+<!-- A user profile template derived from https://mdbootstrap.com/docs/standard/extended/profiles/-->
 {% extends 'base.html' %}
 
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-  <div class="row justify-content-center">
-    <div class="col-md-12">
-      <div class="card shadow-sm" style="width: 70%;">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center">
-              <img class="rounded-circle mx-3 my-2" src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" width="90">
-              <div>
-                <h3 class="card-title m-1">{{ user.fullName }}</h3>
-                <p class="card-text m-1">{{ user.followers.count }} followers</p>
+<div class="page-content page-container">
+  <div class="padding-profile">
+    <div class="row container d-flex justify-content-center">
+      <div class="col-sm-1 col-md-9">
+        <div class="card user-card-full" style="width: 50rem;height: 30rem;">
+          <div class="row m-l-0 m-r-0">
+              <div class="col-sm-4 bg-c-lite-green user-profile">
+                  <div class="card-block text-center text-white">
+                      <div class="m-b-25">
+                          <img src="{{ user.gravatar }}" class="rounded-circle mx-1 my-2">
+                      </div>
+                      <h6 class="f-w-600">{{ user.username }}</h6>
+                      {% if user.followers.count == 1 %}
+                        <p>{{ user.followers.count }} Friend </p>
+                      {% else %}
+                        <p>{{ user.followers.count }} Friends </p>
+                      {% endif %}
+                      <i class=" mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
+                  </div>
               </div>
-            </div>
-          </div>
-          <hr>
-          <h5 class="card-title mb-4">Personal Information</h5>
-          <div class="row">
-            <div class="col-md-6">
-              <p class="card-text"><strong>Full name:</strong> {{ user.fullName }}</p>
-              <p class="card-text"><strong>Username:</strong> {{ user.username }}</p>
-              <p class="card-text"><strong>Email:</strong> {{ user.email }}</p>
-            </div>
-          </div>
-          <div class="d-flex justify-content-end">
-            <a href="{% url 'editProfile' %}" class="btn btn-outline-secondary">Edit Profile</a>
+              <div class="col-sm-8">
+                  <div class="card-block">
+                      <h6 class="m-b-20 p-b-5 b-b-default f-w-600 f-s">Personal Information</h6>
+                      <div class="row">
+                          <div>
+                            <p class="m-b-10 f-w-600">Full Name</p>
+                            <h6 class="text-muted f-w-400">{{ user.firstName }} {{ user.lastName }}</h6>
+                          </div>
+                          <div class="padding">
+                            <p class="m-b-10 f-w-600">Username</p>
+                            <h6 class="text-muted f-w-400">{{ user.username }}</h6>
+                          </div>
+                          <div class="padding">
+                              <p class="m-b-10 f-w-600">Email</p>
+                              <h6 class="text-muted f-w-400">{{ user.email }}</h6>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="position-absolute bottom-0 end-0 b-p">
+                    <a href="{% url 'editProfile' %}" class="button-clear">Edit Profile</a>
+                  </div>
+              </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
 {% endblock %}

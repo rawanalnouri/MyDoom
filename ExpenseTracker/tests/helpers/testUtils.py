@@ -22,4 +22,3 @@ class Test(TestCase):
         self.assertEqual(newNotification.title, title)
         self.assertEqual(newNotification.message, message)
         self.assertEqual(newNotification.isSeen, False)
-
