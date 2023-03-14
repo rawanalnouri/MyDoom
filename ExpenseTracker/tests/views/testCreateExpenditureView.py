@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from ExpenseTracker.models import User, Category, Expenditure
+from ExpenseTracker.models import User, Category, Expenditure, Points, Notification
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
 
@@ -12,10 +12,13 @@ class CreateExpenditureViewTest(TestCase):
         self.client.force_login(self.user)
         self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
-        self.user.categories.add(self.category)
-        self.expenditure = Expenditure.objects.get(id=1)
-        self.category.expenditures.add(self.expenditure)
         self.url = reverse('createExpenditure', kwargs={'categoryId': self.category.id})
+
+        self.data = {
+            'title': 'testexpenditure2', 
+            'date': datetime.date.today(), 
+            'amount': 10
+        }
 
     def test_get_create_expenditure_form(self):
         response = self.client.get(self.url)
@@ -24,12 +27,7 @@ class CreateExpenditureViewTest(TestCase):
         self.assertIsInstance(response.context['form'], ExpenditureForm)
 
     def testCreateExpenditureViewWhenFormIsValid(self):
-        data = {
-            'title': 'testexpenditure2', 
-            'date': datetime.date.today(), 
-            'amount': 10
-        }
-        response = self.client.post(reverse('createExpenditure', args=[self.category.id]), data, follow=True)
+        response = self.client.post(self.url, self.data, follow=True)
         self.assertRedirects(response, '/category/1/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Expenditure.objects.count(), 2)
@@ -40,12 +38,10 @@ class CreateExpenditureViewTest(TestCase):
         self.assertEqual(str(messages[0]), expectedMessage)
     
     def testCreateExpenditureViewWhenFormIsInvalid(self):
-        data = {
-            'title': '', 
-            'date': '', 
-            'amount': -1
-        }
-        response = self.client.post(reverse('createExpenditure', args=[self.category.id]), data)
+        self.data['title'] = ''
+        self.data['date'] = ''
+        self.data['amount'] = -1
+        response = self.client.post(self.url, self.data)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
@@ -57,8 +53,147 @@ class CreateExpenditureViewTest(TestCase):
 
     def testEditCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
-        url = reverse('createExpenditure', kwargs={'categoryId': self.category.id})
+        url = self.url
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
+
+    def testUserGainsFivePointsForStayingWithinLimit(self):
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have increased
+        self.assertEqual(userPointsAfter, userPointsBefore+5)
+        # Check if user received points notification
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Won!")
+        self.assertEqual(notification.message, "5 points for staying within target for " + self.category.name)
+        
+    def testUserRecievesNotificationForNearingSpendingLimit(self):
+        self.data['amount'] = 17
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have increased, as still within limit
+        self.assertEqual(userPointsAfter, userPointsBefore+5)
+        notificationsReceived = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+       # Check if user received points notification
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notificationsReceived[0].title, "Points Won!")
+        self.assertEqual(notificationsReceived[0].message, "5 points for staying within target for " + self.category.name)
+        # Check if user receives notification for nearing limit
+        self.assertEqual(notificationsReceived[1].title, "Watch out!")
+        self.assertEqual(notificationsReceived[1].message, "You are nearing your spending limit for " + self.category.name)
+     
+    def testUserDoesnntLosePointsIfAtLimit(self):
+        self.data['amount'] = 20
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have increased
+        self.assertEqual(userPointsAfter, userPointsBefore+5)
+
+    def testUserLosesThreePointsIfTenPercentOverLimit(self):
+        self.data['amount'] = 22
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 10% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-3)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "3 points lost for going over target")
+
+    
+    def testUserLosesFivePointsIfTenToThirtyPercentOver(self):
+        self.data['amount'] = 26
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 30% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-5)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "5 points lost for going over target")  
+        
+    def testUserLosesTenPointsIfThirtyToFiftyPercentOver(self):
+        self.data['amount'] = 30
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 50% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-10)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "10 points lost for going over target") 
+
+    def testUserLosesFifteenPointsIfFiftyToSeventyPercentOver(self):
+        self.data['amount'] = 34
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 50% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-15)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "15 points lost for going over target") 
+
+    def testUserLosesTwentyPointsIfSeventyToHundredPercentOver(self):
+        self.data['amount'] = 40
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 50% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-20)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "20 points lost for going over target") 
+
+    def testUserLosesTwentyFivePointsIfOverHundredPercent(self):
+        self.data['amount'] = 41
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        # Check if user points have decreased as 50% over limit
+        self.assertEqual(userPointsAfter, userPointsBefore-25)
+       # Check if user receives notification for losing points
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "Points Lost!")
+        self.assertEqual(notification.message, "25 points lost for going over target") 
+
+    def testUserLosesCorrectPointsIfAlreadyOverLimit(self):
+        previousExpenditure = Expenditure.objects.get(id=1)
+        previousExpenditure.amount = 45
+        previousExpenditure.date = datetime.date.today()
+        previousExpenditure.save()
+        self.category.expenditures.add(previousExpenditure)
+
+        # Should only lose 3 points
+        self.data['amount'] = 1
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        self.assertEqual(userPointsAfter, userPointsBefore-3)
+
+    def testUserPointsCantBeNegative(self):
+        # Set user points to low value
+        userPoints = Points.objects.get(id=1)
+        userPoints.pointsNum = 3
+        userPoints.save()
+        # User should lose 25 points, but points are low - so points should be 0
+        self.data['amount'] = 45
+        self.client.post(self.url, self.data)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        self.assertEqual(userPointsAfter, 0)
+
+
+
+
+
+

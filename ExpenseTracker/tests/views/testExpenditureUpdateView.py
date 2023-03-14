@@ -49,3 +49,8 @@ class ExpenditureUpdateViewTest(TestCase):
         self.assertIsInstance(response.context['form'], ExpenditureForm)
         self.assertFalse(response.context['form'].is_valid())
         self.assertContains(response, 'This field is required')
+
+    def testRedirectsToLoginIfUserNotLoggedIn(self):
+        self.client.logout()
+        response = self.client.get(reverse('updateExpenditure', args=[self.category.id, self.expenditure.id]))
+        self.assertRedirects(response, reverse('logIn'))

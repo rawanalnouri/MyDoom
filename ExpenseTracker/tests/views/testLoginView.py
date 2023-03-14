@@ -1,11 +1,11 @@
-from ExpenseTracker.models import User 
+from ExpenseTracker.models import User, Points, Notification
 from ExpenseTracker.forms import LogInForm
-from django import forms
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib import auth
 from django.contrib import messages
 from ExpenseTracker.tests.helpers import LogInTester
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 
 class TestLoginView(TestCase, LogInTester):
@@ -32,6 +32,13 @@ class TestLoginView(TestCase, LogInTester):
         listOfMessages = list(response.context['messages'])
         self.assertEqual(len(listOfMessages),0)
 
+    def testRedirectToHomeIfUserAuthenticated(self):
+        # User should be taken to the home page if logged in
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        userHomePage = reverse('home')
+        self.assertRedirects(response, userHomePage, status_code=302, target_status_code=200)
+
     def testUnsuccessfulLogin(self):
         self.input['password'] = ''
         response = self.client.post(self.url, self.input)
@@ -55,5 +62,17 @@ class TestLoginView(TestCase, LogInTester):
         self.assertEqual(len(listOfMessages), 0)
 
 
+    def testUserEarnsPointsIfFirstLogin(self):
+        self.user.lastLogin = timezone.make_aware(datetime.now() - timedelta(days=1))
+        self.user.save()
+        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        self.client.post(self.url, self.input)
+        userPointsAfter = Points.objects.get(user=self.user).pointsNum
 
+        # Check if user points have increased
+        self.assertEqual(userPointsAfter, userPointsBefore+5)
 
+        # Check if user received points notification
+        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
+        self.assertEqual(notification.title, "New Points Earned!")
+        self.assertEqual(notification.message, "5 points earned for daily login")

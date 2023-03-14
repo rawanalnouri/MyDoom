@@ -24,7 +24,7 @@
                   <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
               </td>
               <td>{{ user.fullName }}</td>
-              <td><a href="{% url 'showUser' user.id %}">{{ user.username }}</a></td>
+              <td><a class="btn-purple" href="{% url 'showUser' user.id %}">@{{ user.username }}</a></td>
               </tr>
           {% endfor %}
           </tbody>

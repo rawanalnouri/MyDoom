@@ -61,7 +61,7 @@ class Command(BaseCommand):
             description = "test",
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
-        category.users.add(user)
+        user.categories.add(category)
 
         Points.objects.create(
             user = user,

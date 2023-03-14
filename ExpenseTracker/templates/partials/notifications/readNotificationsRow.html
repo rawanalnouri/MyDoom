@@ -3,14 +3,13 @@
         {% include "partials/notifications/notificationRowContent.html" with notification=notification %}
     </td>
     <td class="text-end ">
-        <a role="button" style="border-radius: 60px;" class=" btn btn-sm btn-primary"  href="{% url 'editNotifications' notificationId=notification.id %}">
+        <a role="button" style="border-radius: 60px;" class="btn btn-sm btn-outline-purple"  href="{% url 'editNotifications' notificationId=notification.id %}">
             <i class="bi bi-check"></i>
         </a>
 
-        <a role="button" style="border-radius: 60px;" class=" btn btn-sm btn-outline-danger"  data-bs-toggle="modal" data-bs-target="#delete-notification-modal{{notification.id}}">
+        <a role="button" style="border-radius: 60px;" class="btn btn-sm btn-outline-blue" data-bs-toggle="modal" data-bs-target="#delete-notification-modal{{notification.id}}">
             <i class="bi bi-x"></i>
         </a>
         {% include 'modals/notifications/deleteNotification.html' with notification=notification %}
-
     </td>
 </tr>
