@@ -142,19 +142,23 @@
       <thead>
         <tr>
           <th>Rank</th>
-          <th>Player Name</th>
+          <th>House</th>
           <th>Score</th>
         </tr>
       </thead>
 
       <tbody>
-      {% for houses in houses %}
+
       <tr>
-      <td>{{houses.house}}</td>
-      <td>{{houses.points}}</td>
-      <td></td>
+
+      
+      {% for house in houses %}
+      <td>{{forloop.counter}}</td>
+      <td>{{house.house}}</td>
+      <td>{{house.points}}</td>
       </tr>
       {%endfor%}
+        </tr>
         {% comment %} <tr>
           <td>1</td>
           <td>Player 1</td>
