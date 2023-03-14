@@ -15,7 +15,6 @@ class HomeViewTest(TestCase):
         self.expenditure.save()
         self.category = Category.objects.get(id=1)
         self.category.expenditures.add(self.expenditure)
-        self.category.save()
         self.category.users.add(self.user)
         self.category.save()
         self.user.categories.add(self.category)

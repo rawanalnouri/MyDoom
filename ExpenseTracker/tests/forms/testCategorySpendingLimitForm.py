@@ -58,3 +58,18 @@ class CategorySpendingLimitFormTest(TestCase):
         self.assertTrue(self.user in self.category.users.all())
         self.assertEqual(category.spendingLimit.timePeriod, 'weekly')
         self.assertEqual(category.spendingLimit.amount, 10)
+    
+    def testFormCleanPreventsUserFromCreatingTwoCategoriesWithSameName(self):
+        form = CategorySpendingLimitForm(data=self.data, user=self.user)
+        self.assertTrue(form.is_valid())
+        cleaned_data = form.clean()
+        self.assertEqual(cleaned_data['name'], 'Food')
+        self.assertEqual(cleaned_data['description'], 'This is a test category')
+        self.assertEqual(cleaned_data['timePeriod'], 'weekly')
+        self.assertEqual(cleaned_data['amount'], 10)
+        # Check two categories with the same name cannot be created
+        self.data['name'] = 'testcategory'
+        form2 = CategorySpendingLimitForm(data=self.data, user=self.user)
+        self.assertFalse(form2.is_valid())
+        with self.assertRaisesMessage(forms.ValidationError, 'Category with this name already exists for this user.', code='invalid'):
+            form2.clean()
