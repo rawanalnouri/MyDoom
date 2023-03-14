@@ -3,6 +3,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure
 from ExpenseTracker.forms import CategorySpendingLimitForm
 import datetime
+from django.contrib.messages import get_messages
 
 
 class EditCategoryViewTest(TestCase):
@@ -44,12 +45,12 @@ class EditCategoryViewTest(TestCase):
             'amount': -1
         }
         response = self.client.post(reverse('editCategory', args=[self.category.id]), data)
-        self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
-        messages = list(response.context['messages'])
+        self.assertRedirects(response, reverse('category', args=[self.category.id]))
+        messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         expectedMessage = "Failed to update category."
         self.assertEqual(str(messages[0]), expectedMessage)
-    
+        
     def testEditCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('editCategory', kwargs={'categoryId': self.category.id})

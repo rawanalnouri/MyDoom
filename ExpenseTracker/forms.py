@@ -93,7 +93,14 @@ class CategorySpendingLimitForm(forms.ModelForm):
             category.users.add(self.user)
             self.user.categories.add(category)
         return category
-
+    
+    def clean(self):
+        cleanedData = super().clean()
+        name = cleanedData.get('name')
+        existingCategories = Category.objects.filter(name__iexact=name, users__in=[self.user]).exclude(id=self.instance.id)
+        if existingCategories.exists():
+            raise forms.ValidationError('Category with this name already exists for this user.', code='invalid')
+        return cleanedData
 
 class EditProfile(forms.ModelForm):
     firstName = forms.CharField(label='First name')
