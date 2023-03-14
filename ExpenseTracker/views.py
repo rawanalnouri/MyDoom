@@ -349,6 +349,23 @@ class HomeView(LoginRequiredMixin, View):
         return redirect('logIn')
     
 
+class ScoresView(LoginRequiredMixin, ListView):
+    '''Implements a view for handling requests to the scores page'''
+    model = Points
+    template_name = "scores.html"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
+        pageNumber = self.request.GET.get('page')
+        context['users'] = paginator.get_page(pageNumber)
+        return context
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+
 def reportsView(request):
     '''Implements a view for handling requests to the reports page'''
 
