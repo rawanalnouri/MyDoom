@@ -101,4 +101,4 @@ def trackPoints(request, category, isOver, totalSpent):
 
     else:
         # if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft
-        losePoints(request,Decimal(currentCategory.spendingLimit.amount),currentCategory.spendingLimit.amount + newExpenditureAmount,)
+        losePoints(request,Decimal(currentCategory.spendingLimit.amount),currentCategory.spendingLimit.amount + newExpenditureAmount)
