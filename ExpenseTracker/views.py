@@ -102,8 +102,8 @@ class EditCategoryView(LoginRequiredMixin, View):
             createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
             return redirect(reverse('category', args=[category.id]))
         else:
-            for error in form.non_field_errors():
-                messages.error(self.request, error)
+            errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
+            messages.error(self.request, "\n".join(errorMessages))
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         
     def handle_no_permission(self):

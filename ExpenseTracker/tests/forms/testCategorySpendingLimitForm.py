@@ -4,14 +4,14 @@ from ExpenseTracker.models import Category, SpendingLimit, User
 from ExpenseTracker.forms import CategorySpendingLimitForm
 
 class CategorySpendingLimitFormTest(TestCase):
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
-        self.spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
-        self.category = Category.objects.create(name='Test Category', spendingLimit=self.spendingLimit)
+        self.user = User.objects.get(id=1)
+        self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
         self.data = {
-            'name': 'Test Category',
+            'name': 'Food',
             'description': 'This is a test category',
             'timePeriod': 'weekly',
             'amount': 10
@@ -43,7 +43,7 @@ class CategorySpendingLimitFormTest(TestCase):
         form = CategorySpendingLimitForm(data=self.data, user=self.user)
         form.is_valid()
         category = form.save()
-        self.assertEqual(category.name, 'Test Category')
+        self.assertEqual(category.name, 'Food')
         self.assertEqual(category.description, 'This is a test category')
         self.assertTrue(self.user in self.category.users.all())
         self.assertEqual(category.spendingLimit.timePeriod, 'weekly')
@@ -53,7 +53,7 @@ class CategorySpendingLimitFormTest(TestCase):
         form = CategorySpendingLimitForm(data=self.data, instance=self.category, user=self.user)
         form.is_valid()
         category = form.save()
-        self.assertEqual(category.name, 'Test Category')
+        self.assertEqual(category.name, 'Food')
         self.assertEqual(category.description, 'This is a test category')
         self.assertTrue(self.user in self.category.users.all())
         self.assertEqual(category.spendingLimit.timePeriod, 'weekly')
