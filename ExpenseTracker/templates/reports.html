@@ -4,16 +4,56 @@
 
 
 {% block content %}
-    <p>This is the reports page</p>
+<h3 id="category-header">Analyse your spendings</h3>
+<hr>
 
-    <form action="{% url 'reports' %}" method="post">
-      {% csrf_token %}
-      {{ form }}
-      <input type = "submit">
-    </form>
+<div class="row">
+  <div class="card w-25">
+    <div class="card-body">
+      <h6 class="card-title">Make your selection</h6>
+      <form action="{% url 'reports' %}" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type = "submit", class="btn btn-secondary">
+      </form>
+    </div>
+  </div>
 
+  <div class="card w-75 bg-light shadow-sm">
+    <div class="card-body">
+      <p class="card-text text-center">{{ text }}</p>
+      {% include 'partials/chart.html' with num=1 %}
+    </div>
+  </div>
+</div>
 
-    {% include 'partials/chart.html' %}
+<div class = "row">
+    <div class="card w-50 bg-light">
+      <div class="card-body">
+        <p class="card-text text-center">{{ text2 }}</p>
+        <!-- <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label class="btn btn-secondary">
+            <input type="radio" name="options" id="option1" autocomplete="off"> 3 months
+          </label>
+          <label class="btn btn-secondary">
+            <input type="radio" name="options" id="option2" autocomplete="off"> 6 months
+          </label>
+          <label class="btn btn-secondary">
+            <input type="radio" name="options" id="option3" autocomplete="off"> 12 months
+          </label>
+        </div> -->
+        {% include 'partials/mixedCharts.html' with num=2 withbar=True hidden=True %}
+      </div>
+  </div>
+
+  <div class="card w-50 bg-light">
+    <div class="card-body">
+      <p class="card-text text-center">{{ text3 }}</p>
+      {% include 'partials/mixedCharts.html' with num=3 %}
+    </div>
+  </div>
+
+</div>
 
 
 {% endblock %}

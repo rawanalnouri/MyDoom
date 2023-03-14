@@ -1,6 +1,7 @@
-<div id="container" style="width: 100%">
-  <canvas id="pie-chart"></canvas>
+<div id="container{{num}}" style="width: 100%">
+  <canvas id="chart{{num}}"></canvas>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
@@ -20,7 +21,7 @@
             "#F6EBE0",
 
           ],
-          label: "Population",
+          label: "Percentage of budget",
         },
       ],
       labels: {{ labels|safe }}
@@ -41,9 +42,16 @@
       }
       {% endif %}
       {% if type == 'bar' %}
+      legend: {
+      display: false
+    },
       scales: {
         yAxes: [{
             display: true,
+            scaleLabel: {
+            display: true,
+            labelString: 'Budget used (%)'
+          },
             ticks: {
                 beginAtZero: true,   // minimum value will be 0.
                 max: 100
@@ -80,10 +88,9 @@
 });
  {% endif %}
 
-  window.onload = function () {
-    var ctx = document.getElementById("pie-chart").getContext("2d");
-    window.myPie = new Chart(ctx, config);
-  };
-
+  const myChart{{num}} = new Chart(
+  document.getElementById('chart{{num}}'),
+  config
+);
 
 </script>
