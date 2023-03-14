@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
-from ExpenseTracker.models import User, Category, Expenditure
+from ExpenseTracker.models import User, Category, SpendingLimit
 from ExpenseTracker.forms import CategorySpendingLimitForm
-import datetime
+from django.contrib.messages import get_messages
 
 #tests for the edit category view
 
@@ -54,8 +54,8 @@ class EditCategoryViewTest(TestCase):
             'amount': -1
         }
         response = self.client.post(reverse('editCategory', args=[self.category.id]), data)
-        self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
-        messages = list(response.context['messages'])
+        self.assertRedirects(response, reverse('category', args=[self.category.id]))
+        messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         expectedMessage = "Failed to update category."
         self.assertEqual(str(messages[0]), expectedMessage)
@@ -70,16 +70,29 @@ class EditCategoryViewTest(TestCase):
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
 
-    # Tests that pagination is working correctly for the Category view, 
-    # and that only the correct number of expenditures are displayed on each page.
-    def testCategoryViewPagination(self):
-        # Create additional expenditures
-        for i in range(15):
-            expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
-            self.category.expenditures.add(expenditure)
-        # Check only 15 expenditures are displayed per page
-        response = self.client.get(reverse('category', args=[self.category.id]))
-        self.assertEqual(len(response.context['expenditures']), 10)
-        # Check the next page displays the remaining 5 expenditures
-        response = self.client.get(reverse('category', args=[self.category.id]) + '?page=2')
-        self.assertEqual(len(response.context['expenditures']), 5)
+
+    # This test checks that when a user tries to edit a category and enters a name 
+    # that already exists for the same user, an error message is displayed and the category is not updated.
+    #  The test creates a new category with a unique name and then sends a 
+    # POST request to edit the category with the same name as the existing category.
+    # 
+    #  It then checks that the response contains the expected error 
+    # message and that the category is not updated.
+    def testEditCategoryViewSameNameError(self):
+        newSpendingLimit = SpendingLimit.objects.create(timePeriod='weekly', amount=10)
+        newCategory = Category.objects.create(name='Food', description='This is another test category', spendingLimit=newSpendingLimit)
+        newCategory.users.add(self.user)
+        # Create a post request data with the same name as the existing category
+        postData = {
+            'name': 'testcategory',
+            'description': 'This is an edited test category',
+            'timePeriod': 'monthly',
+            'amount': 20
+        }
+        response = self.client.post(reverse('editCategory', args=[newCategory.id]), data=postData)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('category', args=[newCategory.id]))
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Category with this name already exists for this user.")
+        self.assertEqual(messages[0].level_tag, "danger")

@@ -22,7 +22,7 @@ class CategoryViewTest(TestCase):
     # 
     #  It also checks that the view returns the expected 
     # context variables (i.e. the category and its associated expenditures).
-    def test_category_view_get(self):
+    def testCategoryViewGet(self):
         url = reverse('category', args=[self.category.id])
         response = self.client.get(url)
 
@@ -46,3 +46,14 @@ class CategoryViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
+
+    def testCategoryViewPagination(self):
+        for i in range(15):
+            expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
+            self.category.expenditures.add(expenditure)
+        # Check only 15 expenditures are displayed per page
+        response = self.client.get(reverse('category', args=[self.category.id]))
+        self.assertEqual(len(response.context['expenditures']), 10)
+        # Check the next page displays the remaining 5 expenditures
+        response = self.client.get(reverse('category', args=[self.category.id]) + '?page=2')
+        self.assertEqual(len(response.context['expenditures']), 6)

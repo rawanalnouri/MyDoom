@@ -146,7 +146,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Number of created categories: {categoryCount}"))
 
     def _createCategory(self):
-        name = self.faker.word()
+        name = self.faker.unique.word()
         description = self.faker.sentence()
         spendingLimit = random.choice(list(SpendingLimit.objects.all()))
         user = random.choice(list(User.objects.all()))
