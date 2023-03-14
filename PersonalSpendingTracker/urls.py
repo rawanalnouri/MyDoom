@@ -55,6 +55,6 @@ urlpatterns = [
     path('searchUsers/', searchUsers, name='searchUsers'),
 
 
-    path('leaderboard/', leaderboardView.as_view() ,name='leaderboard'),
+    path('leaderboard/', LeaderBoardView.as_view(),name='leaderboard'),
 ]
 

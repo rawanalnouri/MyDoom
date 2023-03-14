@@ -622,3 +622,9 @@ def searchUsers(request):
             Q(username__istartswith=query)
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
+
+class LeaderBoardView(LoginRequiredMixin,View):
+    def get(self,request):
+        return render(request, "houseLeaderboard.html")
+
+
