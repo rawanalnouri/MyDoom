@@ -22,7 +22,7 @@ class ExpenditureAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for expenditures."""
 
     list_display = [
-        'title', 'amount', 'description',
+        'title', 'amount', 'description', 'receipt',
     ]
 
 @admin.register(SpendingLimit)
