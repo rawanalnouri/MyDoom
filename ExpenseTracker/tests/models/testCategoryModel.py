@@ -26,9 +26,10 @@ class CategoryModelTestCase(TestCase):
         self.expenditure = Expenditure.objects.get(id = 1)
         self.category = Category.objects.get(id = 1)
 
-        # self.category.users.add(self.user1)
-        # self.category.spendingLimit = self.spendingLimit
-        # self.category.expenditures.add(self.expenditure)
+        self.category.users.add(self.user1)
+        self.category.users.add(self.user2)
+        self.category.spendingLimit = self.spendingLimit
+        self.category.expenditures.add(self.expenditure)
 
     def testCategoryIsValid(self):
         try:
