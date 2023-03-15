@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
+from django.forms import ValidationError
 from libgravatar import Gravatar
 from .helpers.modelUtils import computeTotalSpent
 from datetime import datetime
@@ -72,8 +73,7 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
-
+            
 class User(AbstractUser):
     '''model for user authentication.'''
 
