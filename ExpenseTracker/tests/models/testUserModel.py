@@ -100,3 +100,37 @@ class UserModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
 
+    def testNoBlankEmail(self):
+        self.user.email = ''
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testEmailMustBeUnique(self):
+        self.user.email = self.user2.email
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testMustContainAUsername(self):
+        self.user.email = '@example.org'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testMustContainAtSymbol(self):
+        self.user.email = 'johndoe.example.org'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testMustContainDomainName(self):
+        self.user.email = 'johndoe@.org'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testMustContainDomain(self):
+        self.user.email = 'johndoe@example'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testOnlyOneAt(self):
+        self.user.email = 'johndoe@@example.org'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
