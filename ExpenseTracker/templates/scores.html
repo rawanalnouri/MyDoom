@@ -55,28 +55,28 @@
                     <div class="card-body">
                         <div class="bar-chart">
                             <div class="bar second" style="height: 75%;">
-                                <div class="bar-label">2nd</div>
-                                <div class="bar-number">3490 PTS</div>
+                                <div class="bar-label">{{users.1.user.username}}</div>
+                                <div class="bar-number">{{users.1.pointsNum}}</div>
                             </div> 
                             <div class="bar first" style="height: 100%;">
-                                <div class="bar-label">1st</div>
-                                <div class="bar-number">5647 PTS</div>
+                                <div class="bar-label">{{users.0.user.username}}</div>
+                                <div class="bar-number">{{users.0.pointsNum}}</div>
                             </div>
                             <div class="bar third" style="height: 50%;">
-                                <div class="bar-label">3rd</div>
-                                <div class="bar-number">3210 PTS</div>
+                                <div class="bar-label">{{users.2.user.username}}</div>
+                                <div class="bar-number">{{users.2.pointsNum}}</div>
                             </div>
                             <div class="bar fourth" style="height: 30%;">
-                                <div class="bar-label">4th</div>
-                                <div class="bar-number">2896 PTS</div>
+                                <div class="bar-label">{{users.3.user.username}}</div>
+                                <div class="bar-number">{{users.3.pointsNum}}</div>
                             </div>
                         </div>
                         <br>
                         <p style="text-align: center;">
                             We have a winner!
                             <br>
-                            <span class="text-muted">Cherry Blossom is in the lead with </span> 
-                            3490 PTS,
+                            <span class="text-muted">{{users.0.user.username}} is in the lead with </span> 
+                            {{users.0.pointsNum}} PTS,
                             <span class="text-muted"> congratulations!</span>
                         </p>
                     </div>
@@ -120,7 +120,7 @@
                                 </td>
                                 <td>@{{ user.user.username }}</td>
                                 <td>{{ user.user.fullName }}</td>
-                                <td>Cherry Blossom</td>
+                                <td>{{user.user.house.house}}</td>
                                 <td>{{ user.pointsNum }}</td>
                                 <td>
                                     <a role="button" href="{% url 'showUser' user.id %}">
