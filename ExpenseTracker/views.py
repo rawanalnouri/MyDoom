@@ -46,7 +46,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
-            cur = float(category.totalSpent()) 
+            cur = float(category.totalSpent())
             spendingData.append(cur)
             spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
 
@@ -297,7 +297,7 @@ class LogInView(View):
                 # Update user lastLogin after checking if this is is first login of the day
                 user.lastLogin = timezone.now()
                 user.save(update_fields=['lastLogin'])
-                return redirect('home') 
+                return redirect('home')
 
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
         return render(request, 'logIn.html', {"form": form})
@@ -353,79 +353,68 @@ class HomeView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
 
-def createNameAndValueLists(categories, timePeriod):
+
+def createArraysData(categories, timePeriod, filter='', divisions=''):
     today = datetime.now()
     returnedArrays =[]
     names = []
     values =[]
-    for selected in categories:
-        category = Category.objects.get(id=selected)
-        budgetCalculated = ''
-        categorySpend = 0.00
-        filteredExpenses = ''
-        # all categories
-        names.append(category.name)
-        # total spend per catagory
-        if timePeriod == 'daily':
-            yesterday = today - timedelta(days=1)
-            filteredExpenses = category.expenditures.filter(date__gte=yesterday)
-            budgetCalculated = convertBudgetToDaily(category)
-            timePeriodText = "day"
-        if timePeriod == 'weekly':
-            budgetCalculated = convertBudgetToWeekly(category)
-            week_start = today
-            week_start -= timedelta(days=week_start.weekday())
-            week_end = week_start + timedelta(days=7)
-            startOfWeek = today - timedelta(days=today.weekday())
-            filteredExpenses = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
-            timePeriodText = "week"
-        if timePeriod == 'monthly':
-            budgetCalculated = convertBudgetToMonthly(category)
-            filteredExpenses = category.expenditures.filter(date__month=today.month)
-            timePeriodText = "month"
-        for expence in filteredExpenses:
-            categorySpend += float(expence.amount)
-        amount = categorySpend/float(budgetCalculated)*100
-        if amount < 100:
-            values.append(amount)
-        else:
-            values.append(100)
-    returnedArrays.append(names)
-    returnedArrays.append(values)
-    return returnedArrays
-
-def createArraysData(categories, timePeriod, filter, divisions):
     data1 =[]
+    last12months=''
     for selected in categories:
         category = Category.objects.get(id=selected)
-        last12months = category.expenditures.filter(date__gte=filter)
+        if filter!='':
+            last12months = category.expenditures.filter(date__gte=filter)
         budgetCalculated = category.spendingLimit.getNumber()
         # total spend per catagory
         categorySpend = 0.00
-        for expence in last12months:
-            categorySpend += float(expence.amount)
+        if filter!='':
+            for expence in last12months:
+                categorySpend += float(expence.amount)
+        else:
+            names.append(category.name)
         if timePeriod == 'daily':
             budgetCalculated = convertBudgetToDaily(category)
-            categorySpend = categorySpend/divisions[0]
+            if filter!='':
+                categorySpend = categorySpend/divisions[0]
+            else:
+                yesterday = today - timedelta(days=1)
+                last12months = category.expenditures.filter(date__gte=yesterday)
             timePeriodText = "day"
         if timePeriod == 'weekly':
             budgetCalculated = convertBudgetToWeekly(category)
-            categorySpend = categorySpend/divisions[1]
+            if filter!='':
+                categorySpend = categorySpend/divisions[1]
+            else:
+                week_start = today
+                week_start -= timedelta(days=week_start.weekday())
+                week_end = week_start + timedelta(days=7)
+                startOfWeek = today - timedelta(days=today.weekday())
+                last12months = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
             timePeriodText = "week"
         if timePeriod == 'monthly':
             budgetCalculated = convertBudgetToMonthly(category)
-            categorySpend = categorySpend/divisions[2]
+            if filter!='':
+                categorySpend = categorySpend/divisions[2]
+            else:
+                last12months = category.expenditures.filter(date__month=today.month)
             timePeriodText = "month"
+        if filter=='':
+            for expence in last12months:
+                categorySpend += float(expence.amount)
         amount = categorySpend/float(budgetCalculated)*100
         if amount < 100:
             data1.append(amount)
         else:
             data1.append(100)
-    return data1
+    if filter!='':
+        return data1
+    else:
+        returnedArrays.append(names)
+        returnedArrays.append(data1)
+        return returnedArrays
 
 class ReportsView(LoginRequiredMixin, View):
-
-
     def get(self, request):
         form = ReportForm(user=request.user)
         dict = generateGraph([], [], 'bar')
@@ -442,7 +431,8 @@ class ReportsView(LoginRequiredMixin, View):
             selectedCategories = form.cleaned_data.get('selectedCategory')
             timePeriodText = ""
 
-            createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
+            createdArrays = createArraysData(selectedCategories, timePeriod)
+            #createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
             categories = createdArrays[0]
             totalSpent = createdArrays[1]
 
