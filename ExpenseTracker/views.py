@@ -19,6 +19,7 @@ from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
 from datetime import datetime
 from django.utils import timezone
+import os
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -65,7 +66,7 @@ class CreateExpenditureView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ExpenditureForm(request.POST)
+        form = ExpenditureForm(request.POST, request.FILES)
         if category and form.is_valid():
             currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
@@ -219,9 +220,9 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(instance=expenditure, data=request.POST)
+        form = ExpenditureForm(request.POST, request.FILES, instance=expenditure)
         if form.is_valid():
-            category = Category.objects.get(id=kwargs['categoryId'])
+            category = Category.objects.get(id=kwargs['categoryId'])     
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -238,6 +239,11 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
+        # Remoing receipt from folder if exists
+        receiptPath = os.path.join(settings.MEDIA_ROOT, expenditure.receipt.name)
+        if not os.path.isdir(receiptPath):
+            os.remove(receiptPath)
+
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
         return redirect(reverse('category', args=[kwargs['categoryId']]))
