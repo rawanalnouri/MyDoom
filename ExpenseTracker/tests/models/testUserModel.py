@@ -47,6 +47,34 @@ class UserModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
 
+    def testUsernameCanBe30CharactersLong(self):
+        self.user.username = 'x' * 30
+        self.user.full_clean()
+
+    def testUsernameCannotBeOver30CharactersLong(self):
+        self.user.username = 'x' * 31
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testUsernameMustBeUnique(self):
+        self.user.username = self.user2.username
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testUsernameContainsOnlyAlphanumericals(self):
+        self.user.username = 'john!doe'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testUsernameContainAtLeast3Alphanumericals(self):
+        self.user.username = 'jo'
+        with self.assertRaises(ValidationError):
+            self.user.full_clean()
+
+    def testUsernameCanContainNumbers(self):
+        self.user.username = 'j0hndoe2'
+        self.user.full_clean()
+
     def testNoBlankFirstName(self):
         self.user.firstName = None
         with self.assertRaises(ValidationError):
@@ -59,11 +87,6 @@ class UserModelTestCase(TestCase):
 
     def testNoBlankEmail(self):
         self.user.email = None
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
-
-    def testUsernameWithinLengthLimit(self):
-        self.user.username = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
         with self.assertRaises(ValidationError):
             self.user.full_clean()
 
