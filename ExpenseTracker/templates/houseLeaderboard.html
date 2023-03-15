@@ -2,12 +2,14 @@
 
 {% block title %}Home{% endblock %}
 
-{% block content %}
+{%block content%}
+
 
 
 <!DOCTYPE html>
 <html>
   <head>
+
     <meta charset="UTF-8">
 
     <title>Leaderboard</title>
@@ -102,31 +104,32 @@
      <div class="pageTitle">
       <h1>Leaderboard</h1>
       </div>
+     
       <div class="podium gold">
+       
         <h2>1st Place</h2>
-        
-        <p>John Smith</p>
-        <p>Score: 1000</p>
+        <p>{{houses.0.house}}</p>
+        <p>{{houses.0.points}}</p>
+     
       </div>
       <div class="podium silver">
         <h2>2nd Place</h2>
-       
-        <p>Jane Doe</p>
-        <p>Score: 800</p>
+        <p>{{houses.1.house}}</p>
+        <p>{{houses.1.points}}</p>
       </div>
       <div class="podium bronze">
         <h2>3rd Place</h2>
-       
-        <p>Bob Johnson</p>
-        <p>Score: 600</p>
+        <p>{{houses.2.house}}</p>
+        <p>{{houses.2.points}}</p>
       </div>
       <div class="podium fourth">
         <h2>4th Place</h2>
- 
-        <p>Sarah Lee</p>
-        <p>Score: 400</p>
+        <p>{{houses.3.house}}</p>
+        <p>{{houses.3.points}}</p>
       </div>
+     
     </div>
+
 
 
     <br>
@@ -159,26 +162,7 @@
       </tr>
       {%endfor%}
         </tr>
-        {% comment %} <tr>
-          <td>1</td>
-          <td>Player 1</td>
-          <td>1000</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Player 2</td>
-          <td>900</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>Player 3</td>
-          <td>800</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td>Player 4</td>
-          <td>700</td>
-              </tr> {% endcomment %}
+       
           </tbody>
 
     </table>
