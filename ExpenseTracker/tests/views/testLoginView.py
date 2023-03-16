@@ -6,6 +6,7 @@ from django.contrib import messages
 from ExpenseTracker.tests.helpers import LogInTester
 from datetime import datetime, timedelta
 from django.utils import timezone
+from ExpenseTracker.tests.helpers import *
 
 #tests for the login view
 
@@ -88,11 +89,26 @@ class TestLoginView(TestCase, LogInTester):
         userPointsBefore = Points.objects.get(user=self.user).pointsNum
         self.client.post(self.url, self.input)
         userPointsAfter = Points.objects.get(user=self.user).pointsNum
-
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
 
-        # Check if user received points notification
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "New Points Earned!")
-        self.assertEqual(notification.message, "5 points earned for daily login")
+        # Check if user received points notifications
+ 
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points gained!", titles)
+        self.assertIn(str(self.user.house.name) + " has gained 5 points", messages)
+        self.assertIn("New Points Earned!", titles)
+        self.assertIn("5 points earned for daily login", messages)
+
+
+
+
+
+
+
+
+
+
+
