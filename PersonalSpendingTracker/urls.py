@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ExpenseTracker.views import *
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -55,3 +57,7 @@ urlpatterns = [
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
 ]
+
+# Hanlding adding urls for user added media
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

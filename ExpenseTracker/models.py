@@ -40,7 +40,7 @@ class Expenditure(models.Model):
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
-    receipt = models.ImageField(upload_to='receipts/', blank=True)
+    receipt = models.ImageField(upload_to='receipts/', blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -195,9 +195,3 @@ class Points(models.Model):
     ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pointsNum = models.IntegerField(default=0)
-
-
-
-
-
-    

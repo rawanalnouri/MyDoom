@@ -13,7 +13,7 @@ from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from .helpers.pointsHelper import updatePoints
+from .helpers.pointsHelper import updatePoints, createPoints
 from django.utils.timezone import datetime
 from .helpers.utils import *
 from .helpers.reportsHelpers import *
@@ -22,6 +22,7 @@ from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+import os
 
 class CategoryView(LoginRequiredMixin, TemplateView):
     '''Displays a specific category and handles create expenditure and edit category form submissions.'''
@@ -71,12 +72,12 @@ class CreateExpenditureView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ExpenditureForm(request.POST)
+        form = ExpenditureForm(request.POST, request.FILES)
         if category and form.is_valid():
             currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
             form.save(category)
-            trackPoints(request,category,currentCategoryInfo[0],currentCategoryInfo[1])
+            trackPoints(self.request.user, category,currentCategoryInfo[0], currentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
@@ -101,7 +102,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             category = form.save()
             messages.success(self.request, "Category updated successfully.")
             # add points
-            updatePoints(self.request,5)
+            updatePoints(self.request.user,5)
             createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
             return redirect(reverse('category', args=[category.id]))
         else:
@@ -130,7 +131,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
             category = form.save()
             messages.success(self.request, "Successfully Created Category")
             # add points
-            updatePoints(self.request,5)
+            updatePoints(self.request.user,5)
             createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
             category.save()
             return redirect(reverse('category', args=[category.id]))
@@ -234,16 +235,19 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(instance=expenditure, data=request.POST)
+        form = ExpenditureForm(request.POST, request.FILES, instance=expenditure)
         if form.is_valid():
-            category = Category.objects.get(id=kwargs['categoryId'])
+            category = Category.objects.get(id=kwargs['categoryId'])     
             form.save(category)
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
-
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Failed to update expenditure - {field}: {error}')
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+                                
+    
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -253,6 +257,11 @@ class ExpenditureDeleteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
+        # Remoing receipt from folder if exists
+        receiptPath = os.path.join(settings.MEDIA_ROOT, expenditure.receipt.name)
+        if not os.path.isdir(receiptPath):
+            os.remove(receiptPath)
+
         expenditure.delete()
         messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
         return redirect(reverse('category', args=[kwargs['categoryId']]))
@@ -273,14 +282,11 @@ class SignUpView(View):
         signUpForm = SignUpForm(request.POST)
         if signUpForm.is_valid():
             user = signUpForm.save()
-            pointsObject = Points()
-            pointsObject.user=user
-            pointsObject.pointsNum=50
-            pointsObject.save()
-
+            points = createPoints(user)
             login(request, user)
-            createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
-            createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+
+            createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
+            createBasicNotification(user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
             
             n = user.id % 4
             house=House.objects.get(id=n+1)
@@ -288,12 +294,10 @@ class SignUpView(View):
             user.save()
             house.memberCount=house.memberCount+1
             house.save()
-            housePointsUpdate(request,50)
+            housePointsUpdate(user, 50)
            
     
             # assign house
-
-        
 
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -317,8 +321,8 @@ class LogInView(View):
                 login(request, user)
                 if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
-                    updatePoints(request, 5)
-                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
+                    updatePoints(user, 5)
+                    createBasicNotification(user, "New Points Earned!", "5 points earned for daily login")
                 # Update user lastLogin after checking if this is is first login of the day
                 user.lastLogin = timezone.now()
                 user.save(update_fields=['lastLogin'])

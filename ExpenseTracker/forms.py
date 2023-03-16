@@ -3,6 +3,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
 from ExpenseTracker.helpers.utils import *
+import os
 
 
 class SignUpForm(forms.ModelForm):
@@ -55,15 +56,29 @@ class ExpenditureForm(forms.ModelForm):
         model = Expenditure
         fields = ['title', 'description', 'amount', 'date', 'receipt']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'})
+            'date': forms.DateInput(attrs={'type': 'date'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super(ExpenditureForm, self).__init__(*args, **kwargs)
+        self.initialReceipt = None
+        if kwargs:
+            self.initialReceipt = kwargs["instance"].receipt
+        
     def save(self, category, commit=True):
         expenditure = super().save()
         if commit:
             category.expenditures.add(expenditure)
             category.save()
-            expenditure.save()
+
+            # Removing old file from media folder
+            newReceipt = self.cleaned_data.get("receipt")
+            if (self.initialReceipt != None and self.initialReceipt != newReceipt):
+                path = os.path.join(settings.MEDIA_ROOT, self.initialReceipt.name)
+                if not os.path.isdir(path):
+                    os.remove(path)
+
+            expenditure.save() 
         return expenditure
 
 
@@ -84,8 +99,10 @@ class CategorySpendingLimitForm(forms.ModelForm):
 
     def save(self, commit=True):
         category = super().save(commit=False)
-        spendingLimit = SpendingLimit.objects.create(timePeriod=self.cleaned_data['timePeriod'],
-                                                     amount=self.cleaned_data['amount'])
+        spendingLimit = SpendingLimit.objects.create(
+            timePeriod=self.cleaned_data['timePeriod'],
+            amount=self.cleaned_data['amount']
+        )
         category.spendingLimit = spendingLimit
         if commit:
             spendingLimit.save()
