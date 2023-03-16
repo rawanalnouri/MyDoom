@@ -229,9 +229,9 @@ TIME_PERIOD_CHOICES = [
 #     #     self.fields['selectedCategory'].choices = self.createCategorySelection()
 
 TIME_PERIOD_CHOICES = [
-    ('daily', 'Daily'),
-    ('weekly', 'Weekly'),
-    ('monthly', 'Monthly'),
+    ('day', 'Daily'),
+    ('week', 'Weekly'),
+    ('month', 'Monthly'),
 ]
 
 '''Form to allow a user to select a category to generate a report for'''
