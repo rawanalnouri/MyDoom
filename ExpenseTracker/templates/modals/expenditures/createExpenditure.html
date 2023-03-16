@@ -6,7 +6,7 @@
                 <button onclick="$('#create-expenditure-modal').modal('hide');" class="btn btn-outline">&times;</button>
             </div>
             <div class="modal-body">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="update-form"></div>
                     <button type="submit" class="btn btn-secondary" name="expenditureForm">Confirm</button>
