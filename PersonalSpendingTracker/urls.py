@@ -35,6 +35,7 @@ urlpatterns = [
     path('acceptFollowRequest/<int:notificationId>/', AcceptFollowRequestView.as_view(), name='acceptFollowRequest'),
 
     path('reports/', reportsView, name='reports'),
+    path('scores/', ScoresView.as_view(), name='scores'),
     path('createCategory/', CategoryCreateView.as_view(), name='createCategory'),
     path('deleteCategory/<int:categoryId>/', CategoryDeleteView.as_view(), name='deleteCategory'),
     path('shareCategory/<int:categoryId>/', CategoryShareView.as_view(), name='shareCategory'),
@@ -54,4 +55,3 @@ urlpatterns = [
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
 ]
-
