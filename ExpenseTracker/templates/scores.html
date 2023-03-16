@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Scores{% endblock %}
+
+{% block content %}
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#user-leaderboard">Users</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#house-leaderboard">Houses</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div id="user-leaderboard" class="tab-pane fade show active">
+    <br>
+    <h3>User leaderboard</h3>
+    <br>
+    {% include 'partials/userLeaderboard.html' %}
+  </div>
+  <div id="house-leaderboard" class="tab-pane fade">
+    <br>
+    <h3>House leaderboard</h3>
+    {% include 'partials/houseLeaderboard.html' %}
+  </div>
+</div>
+
+<script>
+  $(document).ready(function(){
+  $(".nav-tabs a").click(function(){
+    $(this).tab('show');
+  });
+});
+</script>
+{% endblock %}

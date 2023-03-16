@@ -1,3 +1,5 @@
+#tests for the search user view
+
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User
@@ -18,12 +20,15 @@ class SearchUsersViewTest(TestCase):
         )
         self.url = reverse('searchUsers')
 
+
+    #  This test checks whether the search function returns no results for an invalid username query. 
     def testSearchUsersWithInvalidUsernameQuery(self):
         response = self.client.get(self.url, {'q': 'invalidusername'})
         self.assertTemplateUsed(response, 'partials/users/searchResults.html')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'invalidusername', count=0)
 
+    # This test checks whether the search function returns the correct result for a valid username query.
     def testSearchUsersWithValidUsernameQuery(self):
         # test search users with complete valid username
         response = self.client.get(self.url, {'q': 'janedoe'})
@@ -36,6 +41,7 @@ class SearchUsersViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Jane', count=1)
 
+    # This test checks whether the search function returns the correct number of results when there are multiple users in the system. 
     def testSearchUsersWithMultipleUsersReturned(self):
         users = createUsers(15)
         response = self.client.get(self.url, {'q': 'user'})
@@ -48,7 +54,8 @@ class SearchUsersViewTest(TestCase):
         users = response.context['users']
         self.assertEqual(users.count(), 15)
         self.assertTemplateUsed(response, 'partials/users/searchResults.html')
-    
+
+    # This test checks whether the search function filters the search results correctly based on the search query. 
     def testSearchUsersFiltersMultipleUsers(self):
         users = createUsers(15)
         response = self.client.get(self.url, {'q': 'user'})
@@ -62,6 +69,7 @@ class SearchUsersViewTest(TestCase):
         self.assertEqual(users.count(), 1)
         self.assertTemplateUsed(response, 'partials/users/searchResults.html')
 
+    # This test checks whether the search function returns all users in the system when no search query is provided. 
     def testSearchUsersWithoutQuery(self):
         url = reverse('searchUsers')
         response = self.client.get(url)

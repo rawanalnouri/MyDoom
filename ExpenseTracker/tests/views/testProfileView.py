@@ -1,3 +1,5 @@
+#tests for the profile view
+
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
@@ -22,15 +24,19 @@ class ProfileViewTest(TestCase):
             'email': 'johndoe2@example.org',
         }
 
+    #  This test checks that the url attribute of the ProfileView class is set to '/profile/'.
     def testProfileUrl(self):
         self.assertEqual(self.url, '/profile/')
 
+
+    # This test checks that a logged-in user can access their own profile page. 
     def testGetProfile(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile.html')
         self.assertContains(response,self.user.username)
 
+    # This test checks that a user who is not logged in is taken to the login page when accessing the profile page. 
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('profile')
