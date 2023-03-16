@@ -372,6 +372,7 @@ class ScoresView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
         pageNumber = self.request.GET.get('page')
+        context['houses'] = House.objects.order_by('-points')
         context['users'] = paginator.get_page(pageNumber)
         return context
 
@@ -641,10 +642,5 @@ def searchUsers(request):
             Q(username__istartswith=query)
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
-
-class LeaderBoardView(LoginRequiredMixin,View):
-    def get(self,request):
-        houses = House.objects.order_by('-points')
-        return render(request, "houseLeaderboard.html",{'houses':houses})
 
 
