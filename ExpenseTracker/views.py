@@ -108,7 +108,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
             messages.error(self.request, "\n".join(errorMessages))
             return redirect(reverse('category', args=[kwargs['categoryId']]))
-        
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -135,7 +135,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
             category.save()
             return redirect(reverse('category', args=[category.id]))
         except ValidationError as e:
-            messages.error(self.request, e.message_dict) 
+            messages.error(self.request, e.message_dict)
             return self.form_invalid(form)
 
     def form_invalid(self, form):
@@ -145,8 +145,8 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
-        
+
+
 class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
@@ -281,7 +281,7 @@ class SignUpView(View):
             login(request, user)
             createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
-            
+
             n = user.id % 4
             house=House.objects.get(id=n+1)
             user.house=house
@@ -289,11 +289,11 @@ class SignUpView(View):
             house.memberCount=house.memberCount+1
             house.save()
             housePointsUpdate(request,50)
-           
-    
+
+
             # assign house
 
-        
+
 
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -394,8 +394,8 @@ class ScoresView(LoginRequiredMixin, ListView):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
-    
+
+
 class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         form = ReportForm(user=request.user)
@@ -667,5 +667,3 @@ def searchUsers(request):
             Q(username__istartswith=query)
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
-
-
