@@ -393,9 +393,6 @@ class ScoresView(LoginRequiredMixin, ListView):
         return redirect('logIn')
     
 
-def reportsView(request):
-    '''Implements a view for handling requests to the reports page'''
-
 def createArraysData(categories, timePeriod, filter, divisions):
     data1 =[]
     for selected in categories:
@@ -426,8 +423,6 @@ def createArraysData(categories, timePeriod, filter, divisions):
     return data1
 
 class ReportsView(LoginRequiredMixin, View):
-
-
     def get(self, request):
         form = ReportForm(user=request.user)
         dict = generateGraph([], [], 'bar')
