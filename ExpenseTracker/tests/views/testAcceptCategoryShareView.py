@@ -1,8 +1,8 @@
+# Tests for the accept category share view
+
 from ExpenseTracker.models import User, Notification, ShareCategoryNotification
 from django.test import TestCase
 from django.urls import reverse
-
-#tests for the accept category share view
 
 class AcceptCategoryShareViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -17,7 +17,7 @@ class AcceptCategoryShareViewTest(TestCase):
             password = "Password123"
         )
         self.client.force_login(self.toUser)
-        # Updating who sent the notification
+        # Updating who sent the notification.
         self.shareNotification = ShareCategoryNotification.objects.get(id=3)
         self.shareNotification.fromUser = self.fromUser
         self.shareNotification.save()
@@ -26,9 +26,7 @@ class AcceptCategoryShareViewTest(TestCase):
         self.category.save()
         self.url = reverse('acceptCategoryShare', args=[self.shareNotification.id])
 
-    # test ensures that when a category is shared, 
-    # the number of users in the category increases by 
-    # one and the toUser is added to the category.
+    # Test ensures that when a category is shared, the number of users in the category increases by one and the toUser is added to the category.
     def testCategoryIsShared(self):
         usersBefore = self.category.users.count()
         self.client.get(self.url)
@@ -36,16 +34,14 @@ class AcceptCategoryShareViewTest(TestCase):
         self.assertEqual(usersAfter, usersBefore+1) 
         self.assertTrue(self.category.users.filter(id=self.toUser.id).exists())
 
-    # test ensures that the fromUser receives a notification 
-    # after a category has been successfully shared.
+    # Test ensures that the fromUser receives a notification after a category has been successfully shared.
     def testFromUserRecievesNotification(self):
         self.client.get(self.url)
         latestNotification = Notification.objects.filter(toUser=self.fromUser).latest('createdAt')
         self.assertTrue(latestNotification.title, 'Category share request accepted' )
         self.assertTrue(latestNotification.message, self.toUser.username + " has accepted your request to share '"+ self.category.name +"'" )
 
-    # test ensures that if the user is not logged in, they will be redirected 
-    # to the login page before accessing the category share functionality.
+    # Test ensures that if the user is not logged in, they will be redirected to the login page before accessing the category share functionality.
     def testRedirectsIfUserNotLoggedIn(self):
         self.client.logout()
         response = self.client.get(self.url)
