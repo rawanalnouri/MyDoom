@@ -4,9 +4,20 @@
         "model": "ExpenseTracker.house",
         "pk": 1,
         "fields": {
-            "name": "Test1",
+            "name": "House1",
             "memberCount": 2,
-            "points": 10
+            "points": 50
+        }
+
+    },
+
+    {
+        "model": "ExpenseTracker.house",
+        "pk": 2,
+        "fields": {
+            "name": "Test2",
+            "memberCount": 1,
+            "points": 75
         }
 
     },
@@ -33,7 +44,8 @@
             "date": "2023-01-01",
             "amount": 10,
             "createdAt": "2023-01-16T17:41:28+00:00",
-            "updatedAt": "2023-01-16T17:41:28+00:00"
+            "updatedAt": "2023-01-16T17:41:28+00:00",
+            "receipt": null
         }
     },
     {
