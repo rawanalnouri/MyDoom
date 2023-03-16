@@ -2,6 +2,8 @@ from ExpenseTracker.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+#tests for the show user view
+
 class ShowUserViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
@@ -9,6 +11,14 @@ class ShowUserViewTest(TestCase):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
 
+
+    # This test case checks if the "show user" view is working correctly 
+    # for a logged-in user. 
+    # 
+    # It sends a GET request to the view with the user ID as a parameter, 
+    # checks if the response status code is 200, confirms that the correct 
+    # template is used, checks that the correct user object is passed to the context, 
+    # and verifies that the "following" and "followable" context variables are False.
     def testShowUserViewLoggedInUser(self):
         """Test show user view with a logged in user."""
         response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
@@ -18,12 +28,19 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['following'])
         self.assertFalse(response.context['followable'])
 
+    # This test case verifies that the "show user" view redirects 
+    # an anonymous user to the login page if they try to access it. 
+    # 
+    # It first logs out the user, sends a GET request to the view with 
+    # the user ID as a parameter, and checks that the response is a redirect 
+    # to the login page.
     def testShowUserViewRedirectsIfUserNotLoggedIn(self):
         """Test show user view with an anonymous user."""
         self.client.logout()
         response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
         self.assertRedirects(response, reverse('logIn'))
 
+
     def testShowUserViewLoggedInUser(self):
         """Test show user view with a logged in user."""
         response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))
@@ -33,11 +50,22 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['following'])
         self.assertFalse(response.context['followable'])
 
+    # This test case ensures that the "show user" view redirects 
+    # to the "users" page if an invalid user ID is provided. 
+    # 
+    # It sends a GET request to the view with an invalid user ID, 
+    # and checks that the response is a redirect to the "users" page.
     def testShowUserViewWithInvalidIdUser(self):
         """Test show user view with an invalpk user pk."""
         response = self.client.get(reverse('showUser', kwargs={'userId': 999}))
         self.assertRedirects(response, reverse('users'))
 
+    # This test case checks that the "show user" view correctly 
+    # sets the "followable" context variable to True when the user being viewed 
+    # is not currently being followed by the logged-in user. 
+    # 
+    # It creates a new user, sends a GET request to the view with 
+    # that user's ID, and checks that the "followable" variable is True.
     def testShowUserViewFollowable(self):
         """Test show user view when user is followable."""
         user2 = User.objects.create_user(
@@ -52,6 +80,13 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['following'])
         self.assertTrue(response.context['followable'])
 
+    # This test case checks that the "show user" view correctly sets the "following" 
+    # context variable to True when the user being viewed is currently being 
+    # followed by the logged-in user. 
+    # 
+    # It creates a new user, adds the logged-in 
+    # user as a follower, sends a GET request to the view with that user's ID, 
+    # and checks that the "following" variable is True.
     def testShowUserViewFollowing(self):
         """Test show user view when user is being followed."""
         user2 = User.objects.create_user(
@@ -67,6 +102,14 @@ class ShowUserViewTest(TestCase):
         self.assertTrue(response.context['following'])
         self.assertTrue(response.context['followable'])
 
+    # This test case checks that the "show user" view correctly handles
+    #  the case where the logged-in user is viewing their own profile.
+    # 
+    #  It sends a GET request to the view with the logged-in user's ID, 
+    # checks that the response status code is 200, confirms that the 
+    # correct template is used, checks that the correct user object 
+    # is passed to the context, and verifies that the "following" and 
+    # "followable" context variables are False.
     def testShowUserViewSameUser(self):
         """Test show user view when user is the same user as logged in user."""
         response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))

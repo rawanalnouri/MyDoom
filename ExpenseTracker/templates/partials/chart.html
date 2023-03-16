@@ -1,6 +1,7 @@
-<div id="container" style="width: 90%">
-  <canvas id="pie-chart"></canvas>
+<div id="container{{num}}" style="width: 100%">
+  <canvas id="chart{{num}}"></canvas>
 </div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
@@ -11,13 +12,16 @@
         {
           data: {{ data|safe }},
           backgroundColor: [
-            "#7DD3E8",
-            "#54B2CA",
-            "#2D8EA6",
-            "#C0C0C0",
-            "#D3D3D3",
+            "#8282DC",
+            "#AF82DC",
+            "#DC82DC",
+            "#DC82AF",
+            "#DC8282",
+            "#DCAF82",
+            "#F6EBE0",
+
           ],
-          label: "Population",
+          label: "Percentage of budget",
         },
       ],
       labels: {{ labels|safe }}
@@ -38,9 +42,16 @@
       }
       {% endif %}
       {% if type == 'bar' %}
+      legend: {
+      display: false
+    },
       scales: {
         yAxes: [{
             display: true,
+            scaleLabel: {
+            display: true,
+            labelString: 'Budget used (%)'
+          },
             ticks: {
                 beginAtZero: true,   // minimum value will be 0.
                 max: 100
@@ -65,7 +76,7 @@
         height = chart.chart.height,
         ctx = chart.chart.ctx;
     ctx.restore();
-    var fontSize = (height / 114).toFixed(2);
+    var fontSize = (height / 250).toFixed(2);
     ctx.font = fontSize + "em sans-serif";
     ctx.textBaseline = "middle";
     var text = "{{category.name}}",
@@ -77,10 +88,9 @@
 });
  {% endif %}
 
-  window.onload = function () {
-    var ctx = document.getElementById("pie-chart").getContext("2d");
-    window.myPie = new Chart(ctx, config);
-  };
-
+  const myChart{{num}} = new Chart(
+  document.getElementById('chart{{num}}'),
+  config
+);
 
 </script>

@@ -20,13 +20,10 @@
   </head>
   <body>
     <div class="base">
-      <header>
+      <header>        
         {% include 'partials/topMenu.html' %}
       </header>
-      {% if user.is_authenticated %}
-        {% include 'partials/sideMenu.html' %} 
-      {% endif %}
-
+      
       <div >
         {% include 'partials/messages.html' %}
         {% block content %}{% endblock %}

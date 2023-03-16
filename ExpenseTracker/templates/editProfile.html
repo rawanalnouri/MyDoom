@@ -3,14 +3,38 @@
 {% block title %}Edit profile{% endblock %}
 
 {% block content %}
+<div class="page-content page-container">
+    <div class="padding-profile">
+      <div class="row container d-flex justify-content-center">
+        <div class="col-sm-1 col-md-9">
+          <div class="card user-card-full" style="width: 50rem;height: 30rem;">
+            <div class="row m-l-0 m-r-0">
+                <div class="col-sm-6">
+                    <div class="card-block">
+                        <h6 class="m-b-20 p-b-5 f-w-600 f-s-s text-p text-center">Edit Profile Information</h6>
+                        <div class="round-container">
+                            <img src="{{ user.gravatar }}" class="mx-3 my-2 img-padding">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-6">
+                    <div class="card-block">
+                        <div class="row">
+                            <form action ="{% url 'editProfile'%}" method="post" class="form-p">
+                                {% csrf_token %}
+                                {% include 'partials/bootstrapForm.html' with form=form %}
+                                <input type="submit" class="button-sm-clear" value="Update">
+                                <a href="{% url 'profile' %}" class="button-clear">View Profile</a>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<h3>Edit profile information</h3>
-<hr>
-<form action ="{% url 'editProfile'%}" method="post">
-    {% csrf_token %}
-    {% include 'partials/bootstrapForm.html' with form=form %}
-    <input type="submit" class="btn btn-outline-secondary btn-sm" value="Update">
-    <a href="{% url 'profile' %}" class="btn btn-outline-secondary btn-sm">View Profile</a>
-</form>
 
 {% endblock %}

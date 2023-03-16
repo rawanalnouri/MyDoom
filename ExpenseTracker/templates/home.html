@@ -10,13 +10,12 @@
 
 <div class="container mt-2">
   <div class="row">
-
     <div class="col-md-4">
-
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Personal Information</h5>
-            <div class="card mb-2 p-3 shadow-sm" style="width: 75%; display: grid; grid-template-columns: 1fr 2fr;">
+          <h5 class="card-title m-l-80">Personal Information</h5>
+          <h5 class="user-card-full"></h5>
+            <div class="card card-border mb-2 p-3 shadow-sm" style="width: 75%; display: grid; grid-template-columns: 1fr 2fr;">
               <div>
                 <img class="rounded-circle" src="{{ user.gravatar }}" alt="Gravatar of {{ user.username }}" width="75">
                 <p class="card-text">{{ user.followers.count }} followers</p>
@@ -27,12 +26,13 @@
                 <p class="card-text small"><strong>Email:</strong> {{ user.email }}</p>
               </div>
             </div>
+            <div class="padding-hr"></div>
           
             <hr style="width: 75%;">
 
-            <p class="card-text">House Progress:</p>
+            <h6 class="card-title m-t-40 m-l-120 m-b-15">House Progress:</h6>
             <div class="d-flex justify-content-between align-items-center" style="width: 75%;">
-              <div class="card mb-3 shadow-sm">
+              <div class="card card-border mb-3 shadow-sm">
                 <div class="card-body">
                   <div class="card-text">
                     <p>{{user.house.name}}</p>
@@ -52,24 +52,27 @@
 
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">General Information</h5>
+          <h5 class="card-title m-l-80">General Information</h5>
+          <h5 class="user-card-full"></h5>
           <div class="d-flex justify-content-between align-items-center" style="width: 75%;">
-            <div class="card shadow-sm">
+            <div class="card card-border shadow-sm">
               <div class="card-body">
                 <div class="card-text">
                   <p>{{month}} {{year}}</p>
-                  <h3>£{{user.totalSpentThisMonth}}</h3>
+                  <h3 class="m-b-25">£{{user.totalSpentThisMonth}}</h3>
+    
                 </div>
               </div>
             </div>
           </div>
+          <div class="padding"></div>
 
           <hr style="width: 75%;">
 
-          <p class="card-text">Category Spending this Month:</p>
+          <h6 class="card-text m-t-40 m-l-70">Category Spending this Month:</h6>
         </div>  
       </div>
-      <div class="card mb-3 shadow-sm" style="width: 99%">
+      <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 95%">
         {% include 'partials/chart.html' %}
       </div>
 
@@ -77,23 +80,23 @@
 
     <div class="col-md-4">
 
-      <div class="card">
+      <h5 class="card-title m-l-80 m-b-40 m-t-40">Category Information</h5>
+      <div class="card card-border" style="width: 23rem;height: 36rem;">
         <div class="card-body">
-          <h5 class="card-title">Category Information</h5>
             <p class="card-text">Total progress:</p>
-            <div class="card p-2 shadow-sm" style="width: 350px;">
+            <div class="card p-2 shadow-sm" style="width: 330px;">
                 <div class="progress">
                   <div id="total-progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" data-total="{{ user.totalProgress }}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
             </div>
 
-            <hr style="width: 75%;">
+            <hr style="width: 100%;">
             
             {% load mathfilters %}
-            <p class="card-text">Category Progress: </p>
-            <div class="scrollable-container" style="width: 80%; overflow-y: auto; max-height: 400px;">
+            <p class="card-texts">Category Progress: </p>
+            <div class="scrollable-container" style="width: 100%; overflow-y: auto; max-height: 400px;">
               {% for category in user.categories.all %}
-                <div class="card mb-3 shadow-sm" style="width: 350px;">
+                <div class="card mb-3 shadow-sm" style="width: 330px;">
                   <div class="card-body">
                     <div class="text-muted small">Spending limit: {{ category.spendingLimit }}</div>
                     <div class="d-flex justify-content-between mb-2">

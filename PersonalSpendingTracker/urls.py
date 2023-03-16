@@ -55,4 +55,3 @@ urlpatterns = [
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
 ]
-
