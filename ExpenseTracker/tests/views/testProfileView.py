@@ -1,10 +1,10 @@
+#tests for the profile view
+
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.forms import EditProfile
 from ExpenseTracker.models import *
-
-#tests for the profile view
 
 class ProfileViewTest(TestCase):
 
@@ -30,21 +30,13 @@ class ProfileViewTest(TestCase):
 
 
     # This test checks that a logged-in user can access their own profile page. 
-    # 
-    # It sends a GET request to the profile URL and checks that the response has a status code of 200, 
-    # uses the correct template (profile.html), and contains the logged-in user's username.
     def testGetProfile(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile.html')
         self.assertContains(response,self.user.username)
 
-    # This test checks that a user who is not logged in is redirected to the login 
-    # page when they try to access the profile page. 
-    # 
-    # It logs the user out, sends a GET request to the profile URL, and checks 
-    # that the response has a status code of 302 (redirect), that it redirects 
-    # to the login page, and that the login page template is used.
+    # This test checks that a user who is not logged in is taken to the login page when accessing the profile page. 
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('profile')

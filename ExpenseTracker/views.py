@@ -278,6 +278,19 @@ class SignUpView(View):
             login(request, user)
             createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+            
+            n = user.id % 4
+            house=House.objects.get(id=n+1)
+            user.house=house
+            user.save()
+            house.memberCount=house.memberCount+1
+            house.save()
+            housePointsUpdate(request,50)
+           
+    
+            # assign house
+
+        
 
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -362,46 +375,26 @@ class HomeView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
 
-def createNameAndValueLists(categories, timePeriod):
-    today = datetime.now()
-    returnedArrays =[]
-    names = []
-    values =[]
-    for selected in categories:
-        category = Category.objects.get(id=selected)
-        budgetCalculated = ''
-        categorySpend = 0.00
-        filteredExpenses = ''
-        # all categories
-        names.append(category.name)
-        # total spend per catagory
-        if timePeriod == 'daily':
-            yesterday = today - timedelta(days=1)
-            filteredExpenses = category.expenditures.filter(date__gte=yesterday)
-            budgetCalculated = convertBudgetToDaily(category)
-            timePeriodText = "day"
-        if timePeriod == 'weekly':
-            budgetCalculated = convertBudgetToWeekly(category)
-            week_start = today
-            week_start -= timedelta(days=week_start.weekday())
-            week_end = week_start + timedelta(days=7)
-            startOfWeek = today - timedelta(days=today.weekday())
-            filteredExpenses = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
-            timePeriodText = "week"
-        if timePeriod == 'monthly':
-            budgetCalculated = convertBudgetToMonthly(category)
-            filteredExpenses = category.expenditures.filter(date__month=today.month)
-            timePeriodText = "month"
-        for expence in filteredExpenses:
-            categorySpend += float(expence.amount)
-        amount = categorySpend/float(budgetCalculated)*100
-        if amount < 100:
-            values.append(amount)
-        else:
-            values.append(100)
-    returnedArrays.append(names)
-    returnedArrays.append(values)
-    return returnedArrays
+class ScoresView(LoginRequiredMixin, ListView):
+    '''Implements a view for handling requests to the scores page'''
+    model = Points
+    template_name = "scores.html"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
+        pageNumber = self.request.GET.get('page')
+        context['houses'] = House.objects.order_by('-points')
+        context['users'] = paginator.get_page(pageNumber)
+        return context
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+
+def reportsView(request):
+    '''Implements a view for handling requests to the reports page'''
 
 def createArraysData(categories, timePeriod, filter, divisions):
     data1 =[]
@@ -705,3 +698,5 @@ def searchUsers(request):
             Q(username__istartswith=query)
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
+
+

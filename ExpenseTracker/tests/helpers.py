@@ -18,3 +18,15 @@ def createUsers(num):
         )
         users.append(user)
     return users
+
+def getNotificationTitles(notifications):
+    titles=[]
+    for notif in notifications:
+        titles.append(notif.title)
+    return titles
+
+def getNotificationMessages(notifications):
+    messages=[]
+    for notif in notifications:
+        messages.append(notif.message)
+    return messages
