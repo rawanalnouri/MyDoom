@@ -36,12 +36,8 @@ class ShowUserViewTest(TestCase):
         response = self.client.get(reverse('showUser', kwargs={'userId': 999}))
         self.assertRedirects(response, reverse('users'))
 
-    # This test case checks that the "show user" view correctly 
-    # sets the "followable" context variable to True when the user being viewed 
-    # is not currently being followed by the logged-in user. 
-    # 
-    # It creates a new user, sends a GET request to the view with 
-    # that user's ID, and checks that the "followable" variable is True.
+    # This test case checks that the "show user" view correctly sets the "followable" context variable to
+    # True when the user being viewed  is not currently being followed by the logged-in user. 
     def testShowUserViewFollowable(self):
         """Test show user view when user is followable."""
         user2 = User.objects.create_user(
@@ -56,13 +52,8 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['following'])
         self.assertTrue(response.context['followable'])
 
-    # This test case checks that the "show user" view correctly sets the "following" 
-    # context variable to True when the user being viewed is currently being 
-    # followed by the logged-in user. 
-    # 
-    # It creates a new user, adds the logged-in 
-    # user as a follower, sends a GET request to the view with that user's ID, 
-    # and checks that the "following" variable is True.
+    # This test case checks that the "show user" view correctly sets the "following" context variable 
+    # to True when the user being viewed is currently being followed by the logged-in user. 
     def testShowUserViewFollowing(self):
         """Test show user view when user is being followed."""
         user2 = User.objects.create_user(
@@ -78,14 +69,7 @@ class ShowUserViewTest(TestCase):
         self.assertTrue(response.context['following'])
         self.assertTrue(response.context['followable'])
 
-    # This test case checks that the "show user" view correctly handles
-    #  the case where the logged-in user is viewing their own profile.
-    # 
-    #  It sends a GET request to the view with the logged-in user's ID, 
-    # checks that the response status code is 200, confirms that the 
-    # correct template is used, checks that the correct user object 
-    # is passed to the context, and verifies that the "following" and 
-    # "followable" context variables are False.
+    # This test case checks that the "show user" view correctly handles the case where the logged-in user is viewing their own profile.
     def testShowUserViewSameUser(self):
         """Test show user view when user is the same user as logged in user."""
         response = self.client.get(reverse('showUser', kwargs={'userId': self.user.id}))

@@ -1,11 +1,10 @@
+# Tests for the share category view
+
 from ExpenseTracker.models import User, Category
 from ExpenseTracker.forms import ShareCategoryForm
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib import messages
-
-#tests for the share category view
-
 
 class CategroyShareViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -27,12 +26,11 @@ class CategroyShareViewTest(TestCase):
         self.userToShareCategoryWith.followers.add(self.user)
 
 
-    # tests whether the URL for sharing a category is correct.
+    # Tests whether the URL for sharing a category is correct.
     def testUrl(self):
         self.assertEqual('/shareCategory/1/', self.url)
 
-    # tests whether the share category form is rendered correctly 
-    # and the expected form is used.
+    # Tests whether the share category form is rendered correctly and the expected form is used.
     def testCategoryShareViewGet(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -40,8 +38,7 @@ class CategroyShareViewTest(TestCase):
         shareCategoryForm = response.context['form']
         self.assertTrue(isinstance(shareCategoryForm,ShareCategoryForm))
 
-    # tests whether an unsuccessful attempt to share a category 
-    # results in the correct error message being displayed to the user.
+    # Tests whether an unsuccessful attempt to share a category results in the correct error message being displayed to the user.
     def testUnsuccessfulShareCategory(self):
         data = {'user': ''}
         response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
@@ -51,9 +48,7 @@ class CategroyShareViewTest(TestCase):
         expectedMessage = "Failed to send share category request "
         self.assertEqual(str(messages[0]), expectedMessage)
 
-    # tests whether a successful attempt to share a category 
-    # results in the correct success message being displayed to the 
-    # user and whether the user is redirected to the correct page.
+    # Tests whether a successful attempt to share a category results in the correct success message being displayed and whether the user is taken to the correct page.
     def testSuccessfulShareCategory(self):
         data = {'user': self.userToShareCategoryWith.pk}
         response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
@@ -65,8 +60,7 @@ class CategroyShareViewTest(TestCase):
         self.assertEqual(str(messages[0]), expectedMessage)
 
 
-    #  tests whether a user who is not logged in is redirected 
-    # to the login page when attempting to share a category.
+    # Tests whether a user who is not logged in is redirected to the login page when attempting to share a category.
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('shareCategory', args=[self.category.id])
