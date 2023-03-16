@@ -85,7 +85,7 @@ def createArraysData(categories, timePeriod, filter='', divisions=''):
 
         amount = categorySpend/float(budgetCalculated)*100
         if amount < 100:
-            data.append(amount)
+            data.append(round(amount,2))
         else:
             data.append(100)
     if filter!='':
