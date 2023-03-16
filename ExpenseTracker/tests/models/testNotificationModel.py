@@ -5,7 +5,10 @@ from django.core.exceptions import ValidationError
 
 
 class NotificationModelTestCase(TestCase):
+    fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
+
     def setUp(self):
+
 
         #For basic notification model
         firstName = 'John'
@@ -42,14 +45,6 @@ class NotificationModelTestCase(TestCase):
             password = password2
         )
 
-        # self.shareCategoryNotification = ShareCategoryNotification.objects.create(
-        #     toUser = self.user,
-        #     title = "Test Title",
-        #     message = "This is a 'share category' notification message text for test purposes.",
-        #     type = 'category'
-        #     sharedCategory = #insert category here
-        # )
-
         self.followRequestNotification = FollowRequestNotification.objects.create(
             toUser = self.user,
             title = "Test Title",
@@ -57,6 +52,18 @@ class NotificationModelTestCase(TestCase):
             type = 'follow',
             fromUser = self.user2
         )
+
+        self.category = Category.objects.get(id = 1)
+
+        self.shareCategoryNotification = ShareCategoryNotification.objects.create(
+            toUser = self.user,
+            title = "Test Title",
+            message = "This is a 'share category' notification message text for test purposes.",
+            type = 'category',
+            sharedCategory = self.category,
+            fromUser = self.user2
+        )
+    
 
     def testNotificationIsValid(self):
         try:
@@ -121,4 +128,24 @@ class NotificationModelTestCase(TestCase):
         user2 = User.objects.get(email = self.followRequestNotification.fromUser.email)
         self.assertEqual(user2, self.followRequestNotification.fromUser)
 
-    #def testCreatedDateIsNow
+   # share category notification tests
+
+    def testNoBlankSharedFromUser(self):
+        self.shareCategoryNotification.fromUser = None
+        with self.assertRaises(ValidationError):
+            self.shareCategoryNotification.full_clean()
+
+    def testNoBlankCategory(self):
+        self.shareCategoryNotification.sharedCategory = None
+        with self.assertRaises(ValidationError):
+            self.shareCategoryNotification.full_clean()
+
+    def testSharedFromUserExists(self):
+        self.user2.save()
+        user2 = User.objects.get(email = self.shareCategoryNotification.fromUser.email)
+        self.assertEqual(user2, self.shareCategoryNotification.fromUser)
+
+    def testCategoryExists(self):
+        self.category.save()
+        category = Category.objects.get(name = self.shareCategoryNotification.sharedCategory.name)
+        self.assertEqual(category, self.shareCategoryNotification.sharedCategory)

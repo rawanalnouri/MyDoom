@@ -1,4 +1,3 @@
-
 from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
 from django.utils.timezone import datetime, timedelta
 from .utils import createBasicNotification
@@ -20,6 +19,33 @@ def createPoints(user):
     points = Points.objects.create(user=user, pointsNum=50)
     points.save()
     return points.pointsNum
+
+
+def housePointsUpdate(request, amount):
+    currentHouse = request.user.house
+    housePoints = currentHouse.points
+    currentHouse.points = housePoints + amount
+    currentHouse.save()
+    
+    title = ''
+    message = ''
+    if amount < 0:
+        amount = amount * -1
+        title = "House points lost!"
+        message = str(currentHouse.name) + " has lost " + str(amount) + " points"
+    else:
+        title = "House points gained!"
+        message = str(currentHouse.name) + " has gained " + str(amount) + " points"
+    
+    createBasicNotification(request.user, title, message )
+
+   
+
+    
+    
+
+   
+
 
 '''
 Handles user losing points based on the percentage they've gone above their spending limit.
@@ -48,22 +74,24 @@ def losePoints(user, limit, spent):
         createBasicNotification(user, "Points Lost!", "25 points lost for going over target")
 
 
-''' 
+""" 
 Checks if the user is already over their spending limit.
 Returns boolean for if over over and the total amount the user has spent within their 
 current spending limit.
-'''
+"""
+
+
 def checkIfOver(category):
     currentCategory = Category.objects.get(id=category.id)
 
     totalSpent = currentCategory.totalSpent()
-    if abs(currentCategory.spendingLimit.amount) >= abs(totalSpent): 
+    if abs(currentCategory.spendingLimit.amount) >= abs(totalSpent):
         return (False, totalSpent)
     else:
-        return(True, totalSpent)
+        return (True, totalSpent)
 
-    
-''' 
+
+'''
 Handles the user gaining and losing points.
 User gains 5 points for staying within limit, and get notifications if they have used 85% or more 
 of their spending Limit.

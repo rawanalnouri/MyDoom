@@ -110,7 +110,14 @@ class CategorySpendingLimitForm(forms.ModelForm):
             category.users.add(self.user)
             self.user.categories.add(category)
         return category
-
+    
+    def clean(self):
+        cleanedData = super().clean()
+        name = cleanedData.get('name')
+        existingCategories = Category.objects.filter(name__iexact=name, users__in=[self.user]).exclude(id=self.instance.id)
+        if existingCategories.exists():
+            raise forms.ValidationError('Category with this name already exists for this user.', code='invalid')
+        return cleanedData
 
 class EditProfile(forms.ModelForm):
     firstName = forms.CharField(label='First name')
@@ -124,7 +131,7 @@ class EditProfile(forms.ModelForm):
 class ChangePasswordForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         self.fields['old_password'].widget.attrs.update({
             'class': 'form-control',
             'placeholder': 'Old Password'
@@ -137,7 +144,7 @@ class ChangePasswordForm(PasswordChangeForm):
             'class': 'form-control',
             'placeholder': 'Confirm New Password'
         })
-    
+
 
 class ShareCategoryForm(forms.ModelForm):
     user = forms.ModelChoiceField(queryset=User.objects.none())
@@ -154,10 +161,10 @@ class ShareCategoryForm(forms.ModelForm):
 
     # Sends a share request to the user selected
     def save(self, commit=True):
-        toUser = self.cleaned_data['user'] 
+        toUser = self.cleaned_data['user']
         title = "New Category Shared!"
         message = self.fromUser.username + " wants to share a category '"+ self.category.name +"' with you"
-        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)      
+        createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)
         return toUser
 
 
@@ -165,6 +172,83 @@ TIME_PERIOD_CHOICES = [
     ('daily', 'Daily'),
     ('weekly', 'Weekly'),
     ('monthly', 'Monthly'),
+]
+
+'''Form to allow a user to select a category to generate a report for'''
+
+
+# class CustomModelMultipleChoiceField(forms.ModelMultipleChoiceField):
+#     def label_from_instance(self, member):
+#         return "%s" % member.name
+#
+# class ReportForm(forms.Form):
+#     # def __init__(self, *args, **kwargs):
+#     #     self._pwd = kwargs.pop('pwd', None)
+#     #     super().__init__(*args, **kwargs)
+#
+#     # def __init__(self, *args, **kwargs):
+#     #     self.user = kwargs.pop('user')
+#     #     super(ReportForm, self).__init__(*args, **kwargs)
+#     #     self.fields['selectedCategory'].choices = self.createCategorySelection()
+#
+#     # def __init__(self, *args, **kwargs):
+#     #     self._pwd = kwargs.pop('pwd', None)
+#     #     super().__init__(*args, **kwargs)
+#     #     password1 = self._pwd
+#     # def __init__(self, *args, **kwargs):
+#     #     """ Grants access to the request object so that only members of the current user
+#     #     are given as options"""
+#     #
+#     #     self.request = kwargs.pop('request')
+#     #     super(CreateMealForm, self).__init__(*args, **kwargs)
+#     #     self.fields['selectedCategory'].queryset = Member.objects.filter(
+#     #         user=self.request.user)
+#
+#     # def __init__(self, company_pk=None, *args, **kwargs):
+#     #     super(AddUserForm, self).__init__(*args, **kwargs)
+#     #     self.fields['user'].queryset = User.objects.filter(company__pk=company_pk)
+#     #
+#     # user = forms.ModelChoiceField(queryset=User.objects.all())
+#
+#     categoryArray = []
+#     # for x in Category.objects.filter(users__in=[self.user]):
+#     # for x in [1, 2, 3]:
+#     for x in Category.objects.all():
+#         categoryArray.append((x, x))
+#
+#     # def createCategorySelection(self):
+#     #     categoryArray = []
+#     #     # for x in Category.objects.filter(users__in=[self.user]):
+#     #     # for x in [1, 2, 3]:
+#     #     # for x in password1:
+#     #         categoryArray.append((x, x))
+#
+#     timePeriod = forms.ChoiceField(choices = FAVORITE_COLORS_CHOICES, label = "Time Frame")
+#     selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices = categoryArray, label = "Categories")
+#
+#     def userInput(self):
+#         time = self.cleaned_data.get('timePeriod')
+#         categories = self.cleaned_data.get('selectedCategory')
+#         password1 = self._pwd # access your password from view
+#
+#     # selectedCategory = CustomModelMultipleChoiceField(
+#     #     queryset=None,
+#     #     widget=forms.CheckboxSelectMultiple
+#     # )
+#     # selectedCategory = forms.ModelMultipleChoiceField(
+#     #     queryset=Category.objects.all(),
+#     #     widget=forms.CheckboxSelectMultiple
+#     # )
+#
+#     # def __init__(self, *args, **kwargs):
+#     #     self.user = kwargs.pop('user')
+#     #     super(ReportForm, self).__init__(*args, **kwargs)
+#     #     self.fields['selectedCategory'].choices = self.createCategorySelection()
+
+TIME_PERIOD_CHOICES = [
+    ('day', 'Daily'),
+    ('week', 'Weekly'),
+    ('month', 'Monthly'),
 ]
 
 '''Form to allow a user to select a category to generate a report for'''
@@ -180,5 +264,5 @@ class ReportForm(forms.Form):
     def createCategorySelection(self):
         categoryArray = []
         for x in Category.objects.filter(users__in=[self.user]):
-            categoryArray.append((x, x))
+            categoryArray.append((x.id, x))
         return categoryArray

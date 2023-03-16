@@ -1,3 +1,5 @@
+# Tests for the expenditure update view
+
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
@@ -16,6 +18,7 @@ class ExpenditureUpdateViewTest(TestCase):
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
     
+    # Tests whether the GET request to update an expenditure form returns the expected status code, template, and instance of the form. 
     def testGetMethod(self):
         response = self.client.get(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
         self.assertEqual(response.status_code, 200)
@@ -23,6 +26,7 @@ class ExpenditureUpdateViewTest(TestCase):
         self.assertIsInstance(response.context['form'], ExpenditureForm)
         self.assertEqual(response.context['form'].instance, self.expenditure)
 
+    # Tests whether the POST request with valid data to update an expenditure returns the expected status code.
     def testPostMethodValidData(self):
         self.url = reverse('updateExpenditure', args=[self.category.id, self.expenditure.id])
         response = self.client.post(self.url, data={
@@ -38,7 +42,8 @@ class ExpenditureUpdateViewTest(TestCase):
         self.assertEqual(updated_expenditure.title, 'Updated Title')
         self.assertEqual(updated_expenditure.description, 'Updated Description')
         self.assertEqual(updated_expenditure.amount, 200.00)
-        
+
+    # Tests whether the POST request with invalid data to update an expenditure returns the expected status code, template, and form. 
     def testPostMethodWithInvalidData(self):
         response = self.client.post(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
             'title': '',
@@ -54,6 +59,7 @@ class ExpenditureUpdateViewTest(TestCase):
         self.assertEqual(len(messages), 3)
 
 
+    # Tests whether a user who is not logged in is redirected to the login page when attempting to update an expenditure.
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
         response = self.client.get(reverse('updateExpenditure', args=[self.category.id, self.expenditure.id]))
