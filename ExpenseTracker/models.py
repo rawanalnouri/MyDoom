@@ -79,7 +79,7 @@ class House(models.Model):
     # image= models.ImageField(upload_to='images/') 
     points = models.IntegerField(default=0)
     # HOUSE_CHOICES = {'one','two','three','four'}
-    house = models.CharField(max_length=20, blank=False)
+    name = models.CharField(max_length=20, blank=False)
     numOfMembers = models.IntegerField(default=0)
   
 

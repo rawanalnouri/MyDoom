@@ -108,23 +108,23 @@
       <div class="podium gold">
        
         <h2>1st Place</h2>
-        <p>{{houses.0.house}}</p>
+        <p>{{houses.0.name}}</p>
         <p>{{houses.0.points}}</p>
      
       </div>
       <div class="podium silver">
         <h2>2nd Place</h2>
-        <p>{{houses.1.house}}</p>
+        <p>{{houses.1.name}}</p>
         <p>{{houses.1.points}}</p>
       </div>
       <div class="podium bronze">
         <h2>3rd Place</h2>
-        <p>{{houses.2.house}}</p>
+        <p>{{houses.2.name}}</p>
         <p>{{houses.2.points}}</p>
       </div>
       <div class="podium fourth">
         <h2>4th Place</h2>
-        <p>{{houses.3.house}}</p>
+        <p>{{houses.3.name}}</p>
         <p>{{houses.3.points}}</p>
       </div>
      
@@ -157,7 +157,7 @@
       
       {% for house in houses %}
       <td>{{forloop.counter}}</td>
-      <td>{{house.house}}</td>
+      <td>{{house.name}}</td>
       <td>{{house.points}}</td>
       </tr>
       {%endfor%}
