@@ -4,7 +4,7 @@
         "model": "ExpenseTracker.house",
         "pk": 1,
         "fields": {
-            "name": "Test1",
+            "name": "House1",
             "memberCount": 2,
             "points": 10
         }

@@ -7,22 +7,22 @@ from decimal import Decimal
 Updates the user's point based on the amount given as an argument.
 If amount is negative the user loses points otherwise they gain points.
 '''
-def updatePoints(user, amount):
-    points = Points.objects.get(user=user)
+def updatePoints(requestUser, amount):
+    points = Points.objects.get(user=requestUser)
     if points.pointsNum + amount < 0:
         points.pointsNum = 0
     else:
         points.pointsNum = points.pointsNum + amount
     points.save()
+    housePointsUpdate(requestUser, amount)
 
-def createPoints(user):
-    points = Points.objects.create(user=user, pointsNum=50)
+def createPoints(requestUser):
+    points = Points.objects.create(user=requestUser, pointsNum=50)
     points.save()
     return points.pointsNum
 
-
-def housePointsUpdate(request, amount):
-    currentHouse = request.user.house
+def housePointsUpdate(user, amount):
+    currentHouse = user.house
     housePoints = currentHouse.points
     currentHouse.points = housePoints + amount
     currentHouse.save()
@@ -37,15 +37,7 @@ def housePointsUpdate(request, amount):
         title = "House points gained!"
         message = str(currentHouse.name) + " has gained " + str(amount) + " points"
     
-    createBasicNotification(request.user, title, message )
-
-   
-
-    
-    
-
-   
-
+    createBasicNotification(user, title, message)
 
 '''
 Handles user losing points based on the percentage they've gone above their spending limit.
@@ -64,7 +56,7 @@ def losePoints(user, limit, spent):
         updatePoints(user, -10)
         createBasicNotification(user,"Points Lost!", "10 points lost for going over target")
     elif percentage>50 and percentage<=70:
-        updatePoints(-15)
+        updatePoints(user, -15)
         createBasicNotification(user, "Points Lost!", "15 points lost for going over target")
     elif percentage>70 and percentage<=100:
         updatePoints(user, -20)
@@ -117,14 +109,6 @@ def trackPoints(user, category, isOver, totalSpent):
     else:
         #if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft 
         losePoints(user, Decimal(currentCategory.spendingLimit.amount), currentCategory.spendingLimit.amount + newExpenditureAmount)
-
-        
-
-
-
-
-
-
 
 
 

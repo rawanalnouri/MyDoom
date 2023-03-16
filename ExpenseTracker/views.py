@@ -102,7 +102,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             category = form.save()
             messages.success(self.request, "Category updated successfully.")
             # add points
-            updatePoints(self.request,5)
+            updatePoints(self.request.user,5)
             createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
             return redirect(reverse('category', args=[category.id]))
         else:
@@ -131,7 +131,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
             category = form.save()
             messages.success(self.request, "Successfully Created Category")
             # add points
-            updatePoints(self.request,5)
+            updatePoints(self.request.user,5)
             createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
             category.save()
             return redirect(reverse('category', args=[category.id]))
@@ -284,8 +284,9 @@ class SignUpView(View):
             user = signUpForm.save()
             points = createPoints(user)
             login(request, user)
-            createBasicNotification(self.request.user, "New Points Earned!", str(points) + " points earned for signing up!")
-            createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+
+            createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
+            createBasicNotification(user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
             
             n = user.id % 4
             house=House.objects.get(id=n+1)
@@ -293,12 +294,10 @@ class SignUpView(View):
             user.save()
             house.memberCount=house.memberCount+1
             house.save()
-            housePointsUpdate(request,50)
+            housePointsUpdate(user, 50)
            
     
             # assign house
-
-        
 
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -323,7 +322,7 @@ class LogInView(View):
                 if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
                     updatePoints(user, 5)
-                    createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
+                    createBasicNotification(user, "New Points Earned!", "5 points earned for daily login")
                 # Update user lastLogin after checking if this is is first login of the day
                 user.lastLogin = timezone.now()
                 user.save(update_fields=['lastLogin'])
