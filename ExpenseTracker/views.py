@@ -271,6 +271,8 @@ class SignUpView(View):
             house=House.objects.get(id=n+1)
             user.house=house
             user.save()
+            house.memberCount=house.memberCount+1
+            house.save()
             housePointsUpdate(request,50)
            
     

@@ -5,7 +5,7 @@
         "pk": 1,
         "fields": {
             "name": "Test1",
-            "numOfMembers": 2,
+            "memberCount": 2,
             "points": 10
         }
 
