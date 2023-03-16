@@ -80,9 +80,7 @@ class House(models.Model):
     points = models.IntegerField(default=0)
     # HOUSE_CHOICES = {'one','two','three','four'}
     name = models.CharField(max_length=20, blank=False)
-    numOfMembers = models.IntegerField(default=0)
-  
-
+    memberCount = models.IntegerField(default=0)
 
 class User(AbstractUser):
     '''model for user authentication.'''

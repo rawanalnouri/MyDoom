@@ -48,44 +48,46 @@ class Command(BaseCommand):
         lastName = 'admin'
         email = self._email(firstName, lastName)
         username = 'admin'
-        user = User.objects.create_superuser(
+        admin = User.objects.create_superuser(
             username = username,
             firstName = firstName,
             lastName = lastName,
             email = email,
             password = Command.PASSWORD,
-        ) 
-
+        )
         category = Category.objects.create (
             name = "test",
             description = "test",
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
-        user.categories.add(category)
-
+        admin.categories.add(category)
         Points.objects.create(
-            user = user,
+            user = admin,
             pointsNum = 50,
         )
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
-        return [user, category]
+        return [admin, category]
 
     def seedBaseUser(self):
         firstName = 'John'
         lastName = 'Doe'
         email = self._email(firstName, lastName)
         username = 'johndoe'
+        house = random.choice(list(House.objects.all()))
         user = User.objects.create_user(
             username = username,
             firstName = firstName,
             lastName = lastName,
             email = email,
             password = Command.PASSWORD,
+            house = house,
         )
-        Points.objects.create(
+        points = Points.objects.create(
             user = user,
             pointsNum = 50,
         )
+        house.points += points.pointsNum
+        house.memberCount += 1
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
         return user
 
@@ -96,17 +98,21 @@ class Command(BaseCommand):
             lastName = self.faker.unique.last_name()
             email = self._email(firstName, lastName)
             username = self._username(firstName, lastName)
+            house = random.choice(list(House.objects.all()))
             user = User.objects.create_user(
                 username = username,
                 firstName = firstName,
                 lastName = lastName,
                 email = email,
                 password = Command.PASSWORD,
+                house = house,
             )
-            Points.objects.create(
+            points = Points.objects.create(
                 user = user,
                 pointsNum = 50,
             )
+            house.points += points.pointsNum
+            house.memberCount += 1
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
