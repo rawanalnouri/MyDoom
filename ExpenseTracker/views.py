@@ -395,68 +395,7 @@ class ScoresView(LoginRequiredMixin, ListView):
     def handle_no_permission(self):
         return redirect('logIn')
     
-
-def createArraysData(categories, timePeriod, filter='', divisions=''):
-    today = datetime.now()
-    names = []
-    data =[]
-    filteredCategories=''
-    for selected in categories:
-        category = Category.objects.get(id=selected)
-        if filter!='':
-            filteredCategories = category.expenditures.filter(date__gte=filter)
-        budgetCalculated = category.spendingLimit.getNumber()
-        # total spend per catagory
-        categorySpend = 0.00
-        if filter!='':
-            for expence in filteredCategories:
-                categorySpend += float(expence.amount)
-        else:
-            names.append(category.name)
-
-        if timePeriod == 'day':
-            budgetCalculated = convertBudgetToDaily(category)
-            if filter!='':
-                categorySpend = categorySpend/divisions[0]
-            else:
-                yesterday = today - timedelta(days=1)
-                filteredCategories = category.expenditures.filter(date__gte=yesterday)
-
-        if timePeriod == 'week':
-            budgetCalculated = convertBudgetToWeekly(category)
-            if filter!='':
-                categorySpend = categorySpend/divisions[1]
-            else:
-                week_start = today
-                week_start -= timedelta(days=week_start.weekday())
-                week_end = today + timedelta(days = 1)
-                startOfWeek = today - timedelta(days=today.weekday())
-                filteredCategories = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
-
-        if timePeriod == 'month':
-            budgetCalculated = convertBudgetToMonthly(category)
-            if filter!='':
-                categorySpend = categorySpend/divisions[2]
-            else:
-                filteredCategories = category.expenditures.filter(date__month=today.month, date__year=today.year)
-
-        if filter=='':
-            for expence in filteredCategories:
-                categorySpend += float(expence.amount)
-
-        amount = categorySpend/float(budgetCalculated)*100
-        if amount < 100:
-            data.append(amount)
-        else:
-            data.append(100)
-    if filter!='':
-        return data
-    else:
-        returnedArrays = []
-        returnedArrays.append(names)
-        returnedArrays.append(data)
-        return returnedArrays
-
+    
 class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         form = ReportForm(user=request.user)
