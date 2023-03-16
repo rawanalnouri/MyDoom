@@ -48,7 +48,10 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             # append total spent in category to date
             cur = float(category.totalSpent())
             spendingData.append(cur)
-            spendingData.append(round(float(category.spendingLimit.amount) - cur, 2))
+            remainingBudget = round(float(category.spendingLimit.amount) - cur, 2)
+            if remainingBudget < 0:
+                remainingBudget = 0
+            spendingData.append(remainingBudget)
 
         graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
@@ -356,62 +359,63 @@ class HomeView(LoginRequiredMixin, View):
 
 def createArraysData(categories, timePeriod, filter='', divisions=''):
     today = datetime.now()
-    returnedArrays =[]
     names = []
-    values =[]
-    data1 =[]
-    last12months=''
+    data =[]
+    filteredCategories=''
     for selected in categories:
         category = Category.objects.get(id=selected)
         if filter!='':
-            last12months = category.expenditures.filter(date__gte=filter)
+            filteredCategories = category.expenditures.filter(date__gte=filter)
         budgetCalculated = category.spendingLimit.getNumber()
         # total spend per catagory
         categorySpend = 0.00
         if filter!='':
-            for expence in last12months:
+            for expence in filteredCategories:
                 categorySpend += float(expence.amount)
         else:
             names.append(category.name)
-        if timePeriod == 'daily':
+
+        if timePeriod == 'day':
             budgetCalculated = convertBudgetToDaily(category)
             if filter!='':
                 categorySpend = categorySpend/divisions[0]
             else:
                 yesterday = today - timedelta(days=1)
-                last12months = category.expenditures.filter(date__gte=yesterday)
-            timePeriodText = "day"
-        if timePeriod == 'weekly':
+                filteredCategories = category.expenditures.filter(date__gte=yesterday)
+
+        if timePeriod == 'week':
             budgetCalculated = convertBudgetToWeekly(category)
             if filter!='':
                 categorySpend = categorySpend/divisions[1]
             else:
                 week_start = today
                 week_start -= timedelta(days=week_start.weekday())
-                week_end = week_start + timedelta(days=7)
+                week_end = today + timedelta(days = 1)
                 startOfWeek = today - timedelta(days=today.weekday())
-                last12months = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
-            timePeriodText = "week"
-        if timePeriod == 'monthly':
+                filteredCategories = category.expenditures.filter(date__gte=week_start, date__lt=week_end)
+
+        if timePeriod == 'month':
             budgetCalculated = convertBudgetToMonthly(category)
             if filter!='':
                 categorySpend = categorySpend/divisions[2]
             else:
-                last12months = category.expenditures.filter(date__month=today.month)
-            timePeriodText = "month"
+                filteredCategories = category.expenditures.filter(date__month=today.month, date__year=today.year)
+
         if filter=='':
-            for expence in last12months:
+            for expence in filteredCategories:
                 categorySpend += float(expence.amount)
+
         amount = categorySpend/float(budgetCalculated)*100
         if amount < 100:
-            data1.append(amount)
+            data.append(amount)
         else:
-            data1.append(100)
+            data.append(100)
     if filter!='':
-        return data1
+        return data
     else:
+        returnedArrays = []
         returnedArrays.append(names)
-        returnedArrays.append(data1)
+        returnedArrays.append(data)
         return returnedArrays
 
 class ReportsView(LoginRequiredMixin, View):
@@ -429,7 +433,6 @@ class ReportsView(LoginRequiredMixin, View):
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
-            timePeriodText = ""
 
             createdArrays = createArraysData(selectedCategories, timePeriod)
             #createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
@@ -437,7 +440,7 @@ class ReportsView(LoginRequiredMixin, View):
             totalSpent = createdArrays[1]
 
             dict = generateGraph(categories, totalSpent, 'bar')
-            dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriodText}."})
+            dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriod}."})
 
             # generate a graph for historical data
             first_day_this_month = today.replace(day=1)
@@ -453,13 +456,13 @@ class ReportsView(LoginRequiredMixin, View):
             data2 = createArraysData(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
 
             dict.update({'data2':data2})
-            dict.update({'text2':f"Compare your average {timePeriod} spendings in the past"})
+            dict.update({'text2':f"Compare your average spendings per {timePeriod} in the past"})
 
             three_months_ago = today + relativedelta(months=-3)
             data3 = createArraysData(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
 
             dict.update({'data3':data3})
-            dict.update({'text3':f"Your average {timePeriod} spending"})
+            dict.update({'text3':f"Your average spending per {timePeriod}"})
 
             return render(request, "reports.html", dict)
         else:
