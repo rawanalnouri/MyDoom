@@ -3,6 +3,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, Points, Notification
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
+from ExpenseTracker.tests.helpers import *
 
 class CreateExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -66,9 +67,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
         # Check if user received points notification
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Won!")
-        self.assertEqual(notification.message, "5 points for staying within target for " + self.category.name)
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points gained!", titles)
+        self.assertIn(str(self.user.house.name) + " has gained 5 points", messages)
+        self.assertIn("Points Won!", titles)
+        self.assertIn("5 points for staying within target for " + self.category.name, messages)
         
     def testUserRecievesNotificationForNearingSpendingLimit(self):
         self.data['amount'] = 17
@@ -77,14 +82,18 @@ class CreateExpenditureViewTest(TestCase):
         userPointsAfter = Points.objects.get(user=self.user).pointsNum
         # Check if user points have increased, as still within limit
         self.assertEqual(userPointsAfter, userPointsBefore+5)
-        notificationsReceived = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
-       # Check if user received points notification
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notificationsReceived[0].title, "Points Won!")
-        self.assertEqual(notificationsReceived[0].message, "5 points for staying within target for " + self.category.name)
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:3]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
         # Check if user receives notification for nearing limit
-        self.assertEqual(notificationsReceived[1].title, "Watch out!")
-        self.assertEqual(notificationsReceived[1].message, "You are nearing your spending limit for " + self.category.name)
+        self.assertIn("You are nearing your spending limit for " + self.category.name, messages)
+        self.assertIn("Watch out!", titles )
+        # Check if user gets house points notifications
+        self.assertIn("House points gained!", titles)
+        self.assertIn(str(self.user.house.name) + " has gained 5 points", messages)
+    #    # Check if user received points notification
+        self.assertIn("Points Won!", titles)
+        self.assertIn("5 points for staying within target for " + self.category.name, messages)
      
     def testUserDoesnntLosePointsIfAtLimit(self):
         self.data['amount'] = 20
@@ -102,9 +111,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 10% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-3)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "3 points lost for going over target")
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 3 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("3 points lost for going over target", messages) 
 
     
     def testUserLosesFivePointsIfTenToThirtyPercentOver(self):
@@ -115,9 +128,14 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 30% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-5)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "5 points lost for going over target")  
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 5 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("5 points lost for going over target", messages) 
+
         
     def testUserLosesTenPointsIfThirtyToFiftyPercentOver(self):
         self.data['amount'] = 30
@@ -127,9 +145,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-10)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "10 points lost for going over target") 
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 10 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("10 points lost for going over target", messages) 
 
     def testUserLosesFifteenPointsIfFiftyToSeventyPercentOver(self):
         self.data['amount'] = 34
@@ -139,9 +161,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-15)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "15 points lost for going over target") 
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 15 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("15 points lost for going over target", messages) 
 
     def testUserLosesTwentyPointsIfSeventyToHundredPercentOver(self):
         self.data['amount'] = 40
@@ -151,9 +177,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-20)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "20 points lost for going over target") 
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 20 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("20 points lost for going over target", messages) 
 
     def testUserLosesTwentyFivePointsIfOverHundredPercent(self):
         self.data['amount'] = 41
@@ -163,9 +193,13 @@ class CreateExpenditureViewTest(TestCase):
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-25)
        # Check if user receives notification for losing points
-        notification = Notification.objects.filter(toUser=self.user).latest('createdAt')
-        self.assertEqual(notification.title, "Points Lost!")
-        self.assertEqual(notification.message, "25 points lost for going over target") 
+        notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
+        titles=getNotificationTitles(notifications)
+        messages=getNotificationMessages(notifications)
+        self.assertIn("House points lost!", titles)
+        self.assertIn(str(self.user.house.name) + " has lost 25 points", messages)
+        self.assertIn("Points Lost!", titles)
+        self.assertIn("25 points lost for going over target", messages) 
 
     def testUserLosesCorrectPointsIfAlreadyOverLimit(self):
         previousExpenditure = Expenditure.objects.get(id=1)
