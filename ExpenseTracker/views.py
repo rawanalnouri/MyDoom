@@ -227,8 +227,11 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.add_message(request, messages.ERROR, "Failed to Update Expenditure")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Failed to update expenditure - {field}: {error}')
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+                                
     
     def handle_no_permission(self):
         return redirect('logIn')

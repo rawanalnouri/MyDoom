@@ -3,6 +3,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
+from django.contrib import messages
 
 class ExpenditureUpdateViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -44,12 +45,14 @@ class ExpenditureUpdateViewTest(TestCase):
             'description': '',
             'amount': '',
             'date': '',
-        })
+        }, follow=True) 
+        userRedirect =  reverse('category', args=[self.category.id])
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
-        self.assertIsInstance(response.context['form'], ExpenditureForm)
-        self.assertFalse(response.context['form'].is_valid())
-        self.assertContains(response, 'This field is required')
+        self.assertRedirects(response, userRedirect)
+        self.assertTemplateUsed(response, 'category.html')
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 3)
+
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
