@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
+from django.forms import ValidationError
 from libgravatar import Gravatar
 from .helpers.modelUtils import computeTotalSpent
 from datetime import datetime
@@ -18,7 +19,7 @@ class SpendingLimit(models.Model):
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly')
     ]
-    timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=True)
+    timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=False)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
@@ -54,8 +55,8 @@ class Category(models.Model):
 
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
-    spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True)
-    expenditures = models.ManyToManyField(Expenditure, related_name='expenditures')
+    spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE)
+    expenditures = models.ManyToManyField(Expenditure, related_name='expenditures', blank=True)
     description = models.TextField(blank=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
@@ -73,6 +74,14 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
+class House(models.Model):
+    ''' model for the different houses '''
+    # image= models.ImageField(upload_to='images/') 
+    points = models.IntegerField(default=0)
+    # HOUSE_CHOICES = {'one','two','three','four'}
+    name = models.CharField(max_length=20, blank=False)
+    memberCount = models.IntegerField(default=0)
 
 class User(AbstractUser):
     '''model for user authentication.'''
@@ -93,6 +102,8 @@ class User(AbstractUser):
         'self', symmetrical=False, related_name='followees'
     )
     lastLogin = models.DateTimeField(default=timezone.now)
+    house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
+    
 
     class Meta:
         ordering = ['username']
@@ -126,9 +137,10 @@ class User(AbstractUser):
         return self.followees.count()
 
     def getHouse(self):
-        houses = ['RED', 'BLUE', 'YELLOW', 'GREEN']
+        n = self.id % 4
+        house=House.get(id=n+1)
+        return house
 
-        return houses[self.id % len(houses)]
 
     def totalProgress(self):
         total = 0.0
@@ -183,4 +195,9 @@ class Points(models.Model):
     ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pointsNum = models.IntegerField(default=0)
+
+
+
+
+
     

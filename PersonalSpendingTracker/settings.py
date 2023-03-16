@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_auto_logout.middleware.auto_logout',
 ]
 
 ROOT_URLCONF = 'PersonalSpendingTracker.urls'
@@ -68,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'ExpenseTracker.notificationContextProcessor.getNotifications',
                 'ExpenseTracker.pointsContextProcessor.getPoints',
+                'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
     },
@@ -145,5 +147,12 @@ MESSAGE_TAGS = {
     message_constants.DEBUG: 'dark',
     message_constants.ERROR: 'danger',
 }
+
+AUTO_LOGOUT = {
+    'IDLE_TIME':1800,
+    # 1800 seconds in 30 minutes 
+    'MESSAGE':'This session has expired',
+    'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
+    }
 
 

@@ -97,14 +97,18 @@ class EditCategoryView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
-        if category and form.is_valid():
+        if form.is_valid():
+            category = form.save()
             messages.success(self.request, "Category updated successfully.")
-            form.save(category)
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
+            # add points
+            updatePoints(self.request,5)
+            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+            return redirect(reverse('category', args=[category.id]))
         else:
-            messages.error(self.request, "Failed to update category.")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
-
+            errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
+            messages.error(self.request, "\n".join(errorMessages))
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -122,22 +126,27 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        category = form.save()
-        messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
-        # add points
-        updatePoints(self.request,5)
-        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
-        return redirect(reverse('category', args=[category.id]))
+        try:
+            category = form.save()
+            messages.success(self.request, "Successfully Created Category")
+            # add points
+            updatePoints(self.request,5)
+            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+            category.save()
+            return redirect(reverse('category', args=[category.id]))
+        except ValidationError as e:
+            messages.error(self.request, e.message_dict) 
+            return self.form_invalid(form)
 
     def form_invalid(self, form):
         for error in form.non_field_errors():
-            messages.add_message(self.request, messages.ERROR, error)
+            messages.error(self.request, error)
         return super().form_invalid(form)
 
     def handle_no_permission(self):
         return redirect('logIn')
-
-
+    
+        
 class CategoryDeleteView(LoginRequiredMixin, View):
     '''Implements a view for deleting an expenditure'''
 
@@ -272,6 +281,19 @@ class SignUpView(View):
             login(request, user)
             createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
+            
+            n = user.id % 4
+            house=House.objects.get(id=n+1)
+            user.house=house
+            user.save()
+            house.memberCount=house.memberCount+1
+            house.save()
+            housePointsUpdate(request,50)
+           
+    
+            # assign house
+
+        
 
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -356,6 +378,24 @@ class HomeView(LoginRequiredMixin, View):
     def handle_no_permission(self):
         return redirect('logIn')
 
+class ScoresView(LoginRequiredMixin, ListView):
+    '''Implements a view for handling requests to the scores page'''
+    model = Points
+    template_name = "scores.html"
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
+        pageNumber = self.request.GET.get('page')
+        context['houses'] = House.objects.order_by('-points')
+        context['users'] = paginator.get_page(pageNumber)
+        return context
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+    
+    
 class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         form = ReportForm(user=request.user)
@@ -627,3 +667,5 @@ def searchUsers(request):
             Q(username__istartswith=query)
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
+
+

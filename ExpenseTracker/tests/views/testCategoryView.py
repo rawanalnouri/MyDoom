@@ -1,3 +1,5 @@
+# Tests for the category view
+
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure
@@ -15,7 +17,8 @@ class CategoryViewTest(TestCase):
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
 
-    def test_category_view_get(self):
+    # This test ensures that the category view returns a 200 status code and uses the correct template.
+    def testCategoryViewGet(self):
         url = reverse('category', args=[self.category.id])
         response = self.client.get(url)
 
@@ -27,6 +30,7 @@ class CategoryViewTest(TestCase):
         self.assertEqual(len(context['expenditures']), 1)
         self.assertEqual(context['expenditures'][0], self.expenditure)
     
+    # This test ensures that if a user is not logged in and tries to access the category view, they will be redirected to the login page.
     def testCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('category', kwargs={'categoryId': self.category.id})
@@ -34,3 +38,15 @@ class CategoryViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
+
+    # This test ensures that only a maximum of 10 expenditures are displayed per page and the rest are displayed on the next
+    def testCategoryViewPagination(self):
+        for i in range(15):
+            expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
+            self.category.expenditures.add(expenditure)
+        # Check only 15 expenditures are displayed per page.
+        response = self.client.get(reverse('category', args=[self.category.id]))
+        self.assertEqual(len(response.context['expenditures']), 10)
+        # Check the next page displays the remaining 5 expenditures.
+        response = self.client.get(reverse('category', args=[self.category.id]) + '?page=2')
+        self.assertEqual(len(response.context['expenditures']), 6)
