@@ -6,7 +6,18 @@
         "fields": {
             "name": "Test1",
             "memberCount": 2,
-            "points": 10
+            "points": 50
+        }
+
+    },
+
+    {
+        "model": "ExpenseTracker.house",
+        "pk": 2,
+        "fields": {
+            "name": "Test2",
+            "memberCount": 1,
+            "points": 75
         }
 
     },
