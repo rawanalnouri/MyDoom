@@ -46,29 +46,29 @@
                 <div class="card-body">
                     <div class="podium gold">
                       <h6>1st Place</h6>
-                      <p>{{houses.0.title}}</p>
+                      <p>{{houses.0.name}}</p>
                       <p>{{houses.0.points}}</p>
                     </div>
                     <div class="podium silver">
                       <h6>2nd Place</h6>
-                      <p>{{houses.1.title}}</p>
+                      <p>{{houses.1.name}}</p>
                       <p>{{houses.1.points}}</p>
                     </div>
                     <div class="podium bronze">
                       <h6>3rd Place</h6>
-                      <p>{{houses.2.title}}</p>
+                      <p>{{houses.2.name}}</p>
                       <p>{{houses.2.points}}</p>
                     </div>
                     <div class="podium fourth">
                       <h6>4th Place</h6>
-                      <p>{{houses.3.title}}</p>
+                      <p>{{houses.3.name}}</p>
                       <p>{{houses.3.points}}</p>
                     </div>
                     <br>
                     <p style="text-align: center;">
                         We have a winner!
                         <br>
-                        <span class="text-muted">Congratulations to {{houses.0.title}} for leading with </span> 
+                        <span class="text-muted">Congratulations to {{houses.0.name}} for leading with </span> 
                         {{houses.0.points}} PTS,
                         <span class="text-muted"> you're doing great!</span>
                     </p>
@@ -100,14 +100,16 @@
                         <th class="text-muted th-normal">Rank</th>
                         <th class="text-muted th-normal">House</th>
                         <th class="text-muted th-normal">Score</th>
+                        <th class="text-muted th-normal">Members</th>
                       </tr>
                     </thead>
                     <tbody>
                         {% for house in houses %}
                         <tr>
                           <td>{{forloop.counter}}</td>
-                          <td>{{house.title}}</td>
+                          <td>{{house.name}}</td>
                           <td>{{house.points}}</td>
+                          <td>{{house.memberCount}}</td>
                         </tr>   
                         {%endfor%}
                     </tbody>
