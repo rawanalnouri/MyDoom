@@ -1,0 +1,121 @@
+<style>
+  .podium {
+    height: 20%;
+    width: 20%;
+    text-align: center;
+    margin: 0px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    display: inline-block;
+    vertical-align: bottom;
+  }
+
+  .gold {
+    background-color: gold;
+    height: 300px;
+  }
+
+  .silver {
+    background-color: silver;
+    height: 250px;
+  }
+
+  .bronze {
+    background-color: #cd7f32;
+    height: 200px;
+  }
+  
+  .fourth {
+    background-color: #999;
+    height: 150px;
+  }
+  
+</style>
+
+  <div class="leaderboard">
+    
+    
+  </div>
+
+
+  <div class="container mt-2">
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card border">
+                <div class="card-body">
+                    <div class="podium gold">
+                      <h6>1st Place</h6>
+                      <p>{{houses.0.title}}</p>
+                      <p>{{houses.0.points}}</p>
+                    </div>
+                    <div class="podium silver">
+                      <h6>2nd Place</h6>
+                      <p>{{houses.1.title}}</p>
+                      <p>{{houses.1.points}}</p>
+                    </div>
+                    <div class="podium bronze">
+                      <h6>3rd Place</h6>
+                      <p>{{houses.2.title}}</p>
+                      <p>{{houses.2.points}}</p>
+                    </div>
+                    <div class="podium fourth">
+                      <h6>4th Place</h6>
+                      <p>{{houses.3.title}}</p>
+                      <p>{{houses.3.points}}</p>
+                    </div>
+                    <br>
+                    <p style="text-align: center;">
+                        We have a winner!
+                        <br>
+                        <span class="text-muted">Congratulations to {{houses.0.title}} for leading with </span> 
+                        {{houses.0.points}} PTS,
+                        <span class="text-muted"> you're doing great!</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    Second card
+                    <br>
+                    Personal house data/charts
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card" style="width: 100%;">
+                <div class="card-body">
+                  <h5>House rankings</h5>
+                  <div class="table">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th class="text-muted th-normal">Rank</th>
+                        <th class="text-muted th-normal">House</th>
+                        <th class="text-muted th-normal">Score</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for house in houses %}
+                        <tr>
+                          <td>{{forloop.counter}}</td>
+                          <td>{{house.title}}</td>
+                          <td>{{house.points}}</td>
+                        </tr>   
+                        {%endfor%}
+                    </tbody>
+                  </table>
+                  </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
