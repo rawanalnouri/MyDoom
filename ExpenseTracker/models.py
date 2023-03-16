@@ -183,4 +183,3 @@ class Points(models.Model):
     ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     pointsNum = models.IntegerField(default=0)
-    

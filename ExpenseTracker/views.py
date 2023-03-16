@@ -13,7 +13,7 @@ from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from .helpers.pointsHelper import updatePoints
+from .helpers.pointsHelper import updatePoints, createPoints
 from django.utils.timezone import datetime
 from .helpers.utils import *
 from .notificationContextProcessor import getNotifications
@@ -71,7 +71,7 @@ class CreateExpenditureView(LoginRequiredMixin, View):
             currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
             form.save(category)
-            trackPoints(request,category,currentCategoryInfo[0],currentCategoryInfo[1])
+            trackPoints(self.request.user, category,currentCategoryInfo[0], currentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
@@ -120,8 +120,9 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.add_message(self.request, messages.SUCCESS, "Successfully Created Category")
         # add points
-        updatePoints(self.request,5)
-        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+        user = self.request.user
+        updatePoints(user, 5)
+        createBasicNotification(user, "New Points Earned!", "5 points earned for creating a new category")
         return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
@@ -264,13 +265,9 @@ class SignUpView(View):
         signUpForm = SignUpForm(request.POST)
         if signUpForm.is_valid():
             user = signUpForm.save()
-            pointsObject = Points()
-            pointsObject.user=user
-            pointsObject.pointsNum=50
-            pointsObject.save()
-    
+            points = createPoints(user)
             login(request, user)
-            createBasicNotification(self.request.user, "New Points Earned!", str(pointsObject.pointsNum) + " points earned for signing up!")
+            createBasicNotification(self.request.user, "New Points Earned!", str(points) + " points earned for signing up!")
             createBasicNotification(self.request.user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
 
             return redirect('home')
@@ -295,7 +292,7 @@ class LogInView(View):
                 login(request, user)
                 if user.lastLogin.date() != datetime.now().date():
                     # if this is the first login of the day, add 5 points
-                    updatePoints(request, 5)
+                    updatePoints(user, 5)
                     createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for daily login")
                 # Update user lastLogin after checking if this is is first login of the day
                 user.lastLogin = timezone.now()
