@@ -136,12 +136,6 @@ class User(AbstractUser):
 
         return self.followees.count()
 
-    def getHouse(self):
-        n = self.id % 4
-        house=House.get(id=n+1)
-        return house
-
-
     def totalProgress(self):
         total = 0.0
         limit = 0.0

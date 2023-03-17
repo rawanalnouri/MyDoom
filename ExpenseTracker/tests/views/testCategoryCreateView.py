@@ -17,7 +17,6 @@ class CategoryCreateViewTest(TestCase):
             'timePeriod':'daily',
         }
 
-
     # This test checks if the view redirects to the category view on successful creation of a category with valid data.
     def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
         response = self.client.post(reverse('createCategory'), self.data)

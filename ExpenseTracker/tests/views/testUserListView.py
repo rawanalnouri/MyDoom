@@ -5,7 +5,6 @@ from django.urls import reverse
 from ExpenseTracker.models import User
 from ExpenseTracker.tests.helpers import createUsers
 
-
 class usersViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

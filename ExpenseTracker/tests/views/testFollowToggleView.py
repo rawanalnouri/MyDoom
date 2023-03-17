@@ -6,7 +6,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from ExpenseTracker.models import User, Category, Notification
 from ExpenseTracker.helpers.utils import toggleFollow
 
-
 class FollowToggleViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 

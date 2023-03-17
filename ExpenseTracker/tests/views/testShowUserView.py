@@ -11,7 +11,6 @@ class ShowUserViewTest(TestCase):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
 
-
     # This test case checks if the "show user" view is working correctly for a logged-in user. 
     def testShowUserViewLoggedInUser(self):
         """Test show user view with a logged in user."""

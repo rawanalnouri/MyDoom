@@ -242,9 +242,3 @@ class CreateExpenditureViewTest(TestCase):
         self.client.post(self.url, self.data)
         userPointsAfter = Points.objects.get(user=self.user).pointsNum
         self.assertEqual(userPointsAfter, 0)
-
-
-
-
-
-
