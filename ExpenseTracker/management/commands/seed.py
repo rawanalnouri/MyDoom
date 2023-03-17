@@ -64,10 +64,13 @@ class Command(BaseCommand):
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
         admin.categories.add(category)
-        Points.objects.create(
+        points=Points.objects.create(
             user = admin,
             pointsNum = 50,
         )
+        adminHouse.points += points.pointsNum
+        adminHouse.memberCount += 1
+        adminHouse.save()
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
         return [admin, category]
 
@@ -91,6 +94,7 @@ class Command(BaseCommand):
         )
         house.points += points.pointsNum
         house.memberCount += 1
+        house.save()
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
         return user
 
@@ -116,6 +120,7 @@ class Command(BaseCommand):
             )
             house.points += points.pointsNum
             house.memberCount += 1
+            house.save()
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
