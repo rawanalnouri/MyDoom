@@ -86,7 +86,6 @@ class ExpenditureForm(forms.ModelForm):
             # Handling extra categories
             otherCategoryId = self.cleaned_data.get("otherCategory")
                 
-            print("Other category id " + otherCategoryId)
             if (int(otherCategoryId) >= 0):
                 otherCategory = Category.objects.get(id = int(otherCategoryId))
                 otherCategory.expenditures.add(expenditure)
