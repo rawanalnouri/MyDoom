@@ -26,7 +26,7 @@ class ShareCategoryFormTest(TestCase):
         # submit 'share category' form
         formData = {'user': validUser.id}
         form = ShareCategoryForm(fromUser=self.user, category=self.category, data=formData)
-        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(form.is_valid())
         form.save()
         # accept 'share category' request
         notification = Notification.objects.filter(toUser=validUser).latest('createdAt')
