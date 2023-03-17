@@ -60,9 +60,9 @@ class ExpenditureForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user')
-        self.category = kwargs.pop('category')
+    def __init__(self, user, category, *args, **kwargs):
+        self.user = user
+        self.category = category
         super(ExpenditureForm, self).__init__(*args, **kwargs)
         self.initialReceipt = None
         if kwargs:

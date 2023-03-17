@@ -211,12 +211,12 @@ class CreateExpenditureView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ExpenditureForm(user=request.user, category=category)
+        form = ExpenditureForm(request.user, category)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = ExpenditureForm(request.POST, request.FILES, user=request.user, category=category)
+        form = ExpenditureForm(request.user, category, request.POST, request.FILES)
         if category and form.is_valid():
             currentCategoryInfo = checkIfOver(category)
             messages.success(self.request, "Expenditure created successfully.")
@@ -237,13 +237,13 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])     
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(user=request.user, instance=expenditure, category=category)
+        form = ExpenditureForm(request.user, category, instance=expenditure)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])     
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(request.POST, request.FILES, user=request.user ,instance=expenditure, category=category)
+        form = ExpenditureForm(request.user, category, request.POST, request.FILES, instance=expenditure)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
