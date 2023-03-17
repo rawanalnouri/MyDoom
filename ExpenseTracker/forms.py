@@ -5,7 +5,6 @@ from django.core.validators import RegexValidator
 from ExpenseTracker.helpers.utils import *
 import os
 
-
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
 
@@ -52,24 +51,45 @@ class LogInForm(forms.Form):
 
 
 class ExpenditureForm(forms.ModelForm):
+    otherCategory = forms.ChoiceField(label = "Select other category to share with",)
+
     class Meta:
         model = Expenditure
-        fields = ['title', 'description', 'amount', 'date', 'receipt']
+        fields = ['title', 'description', 'amount', 'date','receipt']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, user, category, *args, **kwargs):
+        self.user = user
+        self.category = category
         super(ExpenditureForm, self).__init__(*args, **kwargs)
         self.initialReceipt = None
         if kwargs:
             self.initialReceipt = kwargs["instance"].receipt
+        self.fields['otherCategory'].choices = self.getCategoryChoices()
+
         
-    def save(self, category, commit=True):
+    def getCategoryChoices(self):
+        categoryArray = [(-1, "None")]
+        for x in Category.objects.filter(users__in=[self.user]).exclude(id=self.category.id):
+            categoryArray.append((x.id, x))
+        return categoryArray
+
+        
+    def save(self, commit=True):
         expenditure = super().save()
         if commit:
-            category.expenditures.add(expenditure)
-            category.save()
+            self.category.expenditures.add(expenditure)
+            self.category.save()
+
+            # Handling extra categories
+            otherCategoryId = self.cleaned_data.get("otherCategory")
+                
+            if (int(otherCategoryId) >= 0):
+                otherCategory = Category.objects.get(id = int(otherCategoryId))
+                otherCategory.expenditures.add(expenditure)
+                otherCategory.save()
 
             # Removing old file from media folder
             newReceipt = self.cleaned_data.get("receipt")
