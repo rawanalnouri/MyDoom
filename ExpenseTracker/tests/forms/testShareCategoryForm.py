@@ -44,13 +44,7 @@ class ShareCategoryFormTest(TestCase):
         self.assertTrue('user' in form.errors)
 
     def testFormWithNonFollowerUser(self):
-        nonFollowerUser = User.objects.create_user(
-            username='bethjones', 
-            email='bethjones@example.org', 
-            firstName='Beth',
-            lastName='Jones',
-            password='Password123',
-        )
+        nonFollowerUser = self.secondUser
         formData = {'user': nonFollowerUser.id}
         form = ShareCategoryForm(fromUser=self.user, category=self.category, data=formData)
         self.assertFalse(form.is_valid())
