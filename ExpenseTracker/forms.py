@@ -51,7 +51,7 @@ class LogInForm(forms.Form):
 
 
 class ExpenditureForm(forms.ModelForm):
-    otherCategory = forms.ChoiceField(label = "Select other category to share with",)
+    otherCategory = forms.ChoiceField(label = "Select category to share expenditure with",)
 
     class Meta:
         model = Expenditure
