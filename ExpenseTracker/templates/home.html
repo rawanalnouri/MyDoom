@@ -36,7 +36,7 @@
                 <div class="card-body">
                   <div class="card-text">
                     <h5>Houses progress</h5>
-                    <p>Your house: {{user.house.name}}</p>
+                    <p>Your house: {{user.house.name}}: {{user.house.points}} points</p>
                     {% include 'partials/chart.html' with type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
                     <br>
                     <p>{{user.firstName}}'s Points:</p>
