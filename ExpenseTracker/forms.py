@@ -166,6 +166,17 @@ class ShareCategoryForm(forms.ModelForm):
         message = self.fromUser.username + " wants to share a category '"+ self.category.name +"' with you"
         createShareCategoryNotification(toUser, title, message, self.category, self.fromUser)
         return toUser
+    
+    def clean(self):
+        cleanedData = super().clean()
+        name = self.category.name
+        toUser = cleanedData.get('user')
+        if toUser is not None:
+            existingCategory = toUser.categories.filter(name__iexact=name)
+            if existingCategory.exists():
+                raise forms.ValidationError('The user you want to share this category with already has a category with the same name.\n'
+                                            + 'Change the name of the category before sharing.', code='invalid')
+        return cleanedData
 
 
 TIME_PERIOD_CHOICES = [
