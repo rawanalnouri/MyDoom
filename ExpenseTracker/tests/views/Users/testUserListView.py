@@ -1,10 +1,9 @@
-#tests for the user list view
+# Tests for the user list view
 
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User
 from ExpenseTracker.tests.helpers import createUsers
-
 
 class usersViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

@@ -25,7 +25,6 @@ class CategroyShareViewTest(TestCase):
         self.user.followers.add(self.userToShareCategoryWith)
         self.userToShareCategoryWith.followers.add(self.user)
 
-
     # Tests whether the URL for sharing a category is correct.
     def testUrl(self):
         self.assertEqual('/shareCategory/1/', self.url)
@@ -45,7 +44,7 @@ class CategroyShareViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
-        expectedMessage = "Failed to send share category request "
+        expectedMessage = "Failed to send share category request."
         self.assertEqual(str(messages[0]), expectedMessage)
 
     # Tests whether a successful attempt to share a category results in the correct success message being displayed and whether the user is taken to the correct page.
@@ -59,7 +58,6 @@ class CategroyShareViewTest(TestCase):
         expectedMessage = "Successfully sent request to share '"+ self.category.name +"' with "+ self.userToShareCategoryWith.username
         self.assertEqual(str(messages[0]), expectedMessage)
 
-
     # Tests whether a user who is not logged in is redirected to the login page when attempting to share a category.
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
@@ -68,12 +66,3 @@ class CategroyShareViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
-
-
-    
-
-        
-
-
-
-

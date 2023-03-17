@@ -15,16 +15,18 @@
               <th></th>
               <th>Name</th>
               <th>Username</th>
+              <th>House</th>
           </tr>
           </thead>
           <tbody>
           {% for user in users %}
               <tr>
-              <td>
-                  <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
-              </td>
-              <td>{{ user.fullName }}</td>
-              <td><a class="btn-purple" href="{% url 'showUser' user.id %}">@{{ user.username }}</a></td>
+                <td>
+                    <img src="{{ user.miniGravatar }}" alt="Gravatar of {{ user.username }}" class="rounded-circle" width="50" height="50">
+                </td>
+                <td>{{ user.fullName }}</td>
+                <td><a class="btn-purple" href="{% url 'showUser' user.id %}">@{{ user.username }}</a></td>
+                <td>{{user.house.name}}</td>
               </tr>
           {% endfor %}
           </tbody>

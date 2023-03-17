@@ -1,4 +1,4 @@
-#tests for the profile view
+# Tests for the profile view
 
 from django.contrib import messages
 from django.test import TestCase

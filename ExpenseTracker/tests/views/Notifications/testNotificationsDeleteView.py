@@ -4,7 +4,6 @@ from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from django.urls import reverse
 
-
 class DeleteNotificationViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
@@ -14,7 +13,6 @@ class DeleteNotificationViewTest(TestCase):
 
         self.unreadNotification = Notification.objects.get(id=1)
         self.readNotification = Notification.objects.get(id=2)
-
 
     #  Tests that a read notification can be successfully deleted.
     def testReadNotificationIsSuccessfullyDeleted(self):

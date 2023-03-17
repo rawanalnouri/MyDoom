@@ -45,6 +45,3 @@ class AcceptFollowRequestViewTest(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, reverse('logIn'))
-
-
-
