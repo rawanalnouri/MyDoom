@@ -374,7 +374,7 @@ class HomeView(LoginRequiredMixin, View):
         context = {**generateGraph(categories, totalSpent,'pie'), **{
             'month': datetime.now().strftime('%B'),
             'year': datetime.now().strftime('%Y'),
-            'points': Points.objects.get(user=request.user).pointsNum,
+            'points': Points.objects.get(user=request.user),
         }}
 
         return render(request, "home.html", context)
