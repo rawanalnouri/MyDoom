@@ -181,8 +181,12 @@ class CategoryShareView(LoginRequiredMixin, View):
             messages.add_message(request, messages.SUCCESS, "Successfully sent request to share '"+ category.name +"' with "+ toUser.username)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            for error in form.errors.get('__all__', []):
-                messages.error(request, error)
+            validationErrors = form.errors.get('__all__', [])
+            if validationErrors:
+                for error in validationErrors:
+                    messages.error(request, error)
+            else:
+                messages.error(request, 'Failed to send share category request.')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
 
     def handle_no_permission(self):
