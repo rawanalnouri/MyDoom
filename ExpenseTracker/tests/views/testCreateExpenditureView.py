@@ -20,7 +20,8 @@ class CreateExpenditureViewTest(TestCase):
         self.data = {
             'title': 'testexpenditure2', 
             'date': datetime.date.today(), 
-            'amount': 10
+            'amount': 10,
+            'otherCategory': -1,
         }
 
     # This test checks whether the correct template and form are being used when creating a new expenditure.
