@@ -1,4 +1,4 @@
-#tests for the search user view
+# Tests for the search user view
 
 from django.test import TestCase
 from django.urls import reverse
