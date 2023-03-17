@@ -294,7 +294,8 @@ class SignUpView(View):
 
             createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
             createBasicNotification(user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
-            
+
+            # assign house
             n = user.id % 4
             house=House.objects.get(id=n+1)
             user.house=house
@@ -303,9 +304,6 @@ class SignUpView(View):
             house.save()
             housePointsUpdate(user, 50)
            
-    
-            # assign house
-
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
 
