@@ -2,6 +2,9 @@ from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import Points, House, User
 
+# ests the functionality of the scores page in the ExpenseTracker application,
+# ensuring that it is displaying the correct data and redirecting unauthenticated users to the login page.
+
 class ScoresViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
@@ -21,6 +24,7 @@ class ScoresViewTest(TestCase):
         self.points1 = Points.objects.get(id=1)
         self.points2 = Points.objects.create(user = self.user2, pointsNum = 75)
 
+#  test to see if scores page is accessible and if the correct template is used.
     def testGetScoresPage(self):
         response = self.client.get(reverse('scores'))
         self.assertEqual(response.status_code, 200)
