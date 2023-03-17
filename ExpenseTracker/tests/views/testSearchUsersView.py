@@ -20,7 +20,6 @@ class SearchUsersViewTest(TestCase):
         )
         self.url = reverse('searchUsers')
 
-
     #  This test checks whether the search function returns no results for an invalid username query. 
     def testSearchUsersWithInvalidUsernameQuery(self):
         response = self.client.get(self.url, {'q': 'invalidusername'})

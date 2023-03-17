@@ -65,13 +65,11 @@ def losePoints(user, limit, spent):
         updatePoints(user, -25)
         createBasicNotification(user, "Points Lost!", "25 points lost for going over target")
 
-
 """ 
 Checks if the user is already over their spending limit.
 Returns boolean for if over over and the total amount the user has spent within their 
 current spending limit.
 """
-
 
 def checkIfOver(category):
     currentCategory = Category.objects.get(id=category.id)
@@ -81,7 +79,6 @@ def checkIfOver(category):
         return (False, totalSpent)
     else:
         return (True, totalSpent)
-
 
 '''
 Handles the user gaining and losing points.
@@ -109,40 +106,3 @@ def trackPoints(user, category, isOver, totalSpent):
     else:
         #if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft 
         losePoints(user, Decimal(currentCategory.spendingLimit.amount), currentCategory.spendingLimit.amount + newExpenditureAmount)
-
-
-
-
-    
- 
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
