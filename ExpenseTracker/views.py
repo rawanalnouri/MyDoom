@@ -345,8 +345,8 @@ class IndexView(View):
             return render(request, 'index.html')
 
 
-def generateGraph(categories, spentInCategories, type):
-    dict = {'labels': categories, 'data': spentInCategories, 'type':type}
+def generateGraph(categories, spentInCategories, type, graphNum = ''):
+    dict = {f'labels{graphNum}': categories, f'data{graphNum}': spentInCategories, f'type{graphNum}':type}
     return dict
 
 
@@ -367,7 +367,15 @@ class HomeView(LoginRequiredMixin, View):
                     categoryExpenseThisMonth += float(expense.amount)
             totalSpent.append(round(categoryExpenseThisMonth, 2))
 
-        context = {**generateGraph(categories, totalSpent,'pie'), **{
+        houses =[]
+        pointTotals = []
+        for house in House.objects.all():
+            houses.append(house.name)
+            pointTotals.append(house.points)
+        dict = generateGraph(categories, totalSpent,'pie')
+        dict.update(generateGraph(houses, pointTotals,'doughnut', 2))
+
+        context = {**dict, **{
             'month': datetime.now().strftime('%B'),
             'year': datetime.now().strftime('%Y'),
             'points': Points.objects.get(user=request.user).pointsNum,
@@ -405,15 +413,12 @@ class ReportsView(LoginRequiredMixin, View):
 
     def post(self, request):
         today = datetime.now()
-        categories = []
-        totalSpent = []
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
 
             createdArrays = createArraysData(selectedCategories, timePeriod)
-            #createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
             categories = createdArrays[0]
             totalSpent = createdArrays[1]
 

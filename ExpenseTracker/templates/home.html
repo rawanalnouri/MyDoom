@@ -27,7 +27,7 @@
               </div>
             </div>
             <div class="padding-hr"></div>
-          
+
             <hr style="width: 75%;">
 
             <h6 class="card-title m-t-40 m-l-120 m-b-15">House Progress:</h6>
@@ -35,8 +35,9 @@
               <div class="card card-border mb-3 shadow-sm">
                 <div class="card-body">
                   <div class="card-text">
-                    <p>{{user.house.name}}</p>
-                    <h4>"general data on users house"</h4>
+                    <h5>Houses progress</h5>
+                    <p>Your house: {{user.house.name}}</p>
+                    {% include 'partials/chart.html' with type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
                     <br>
                     <p>{{user.firstName}}'s Points:</p>
                     <h4>{{points}}</h4>
@@ -60,7 +61,7 @@
                 <div class="card-text">
                   <p>{{month}} {{year}}</p>
                   <h3 class="m-b-25">£{{user.totalSpentThisMonth}}</h3>
-    
+
                 </div>
               </div>
             </div>
@@ -70,7 +71,7 @@
           <hr style="width: 75%;">
 
           <h6 class="card-text m-t-40 m-l-70">Category Spending this Month:</h6>
-        </div>  
+        </div>
       </div>
       <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 95%">
         {% include 'partials/chart.html' %}
@@ -91,7 +92,7 @@
             </div>
 
             <hr style="width: 100%;">
-            
+
             {% load mathfilters %}
             <p class="card-texts">Category Progress: </p>
             <div class="scrollable-container" style="width: 100%; overflow-y: auto; max-height: 400px;">
@@ -108,12 +109,12 @@
                       <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" data-category="{{ category.progress }}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                   </div>
-                </div>                
+                </div>
               {% endfor %}
             </div>
         </div>
       </div>
-      
+
     </div>
   </div>
 </div>
@@ -121,7 +122,7 @@
 <script>
 
   $(document).ready(function() {
-  
+
       // Progress bar width
       $(".progress-bar").each(function() {
         var categoryProgress = $(this).data('category');
