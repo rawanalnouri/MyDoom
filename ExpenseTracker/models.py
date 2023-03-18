@@ -106,7 +106,7 @@ class User(AbstractUser):
     )
     lastLogin = models.DateTimeField(default=timezone.now)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
-    overallSpendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True, null = True)
+    overallSpendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True, null=True)
     
 
     class Meta:

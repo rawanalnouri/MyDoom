@@ -319,7 +319,7 @@ class OverallSpendingForm(forms.Form):
         self.user = kwargs.pop('user')
         super(OverallSpendingForm, self).__init__(*args, **kwargs)
 
-    def save(self, commit=True):
+    def save(self):
         timePeriod = self.cleaned_data['timePeriod']
         amount = self.cleaned_data['amount']
         if self.user.overallSpendingLimit:
@@ -332,9 +332,9 @@ class OverallSpendingForm(forms.Form):
                 timePeriod=timePeriod,
                 amount=amount
             )
+            newLimit.save()
             self.user.overallSpendingLimit = newLimit
-        if commit:
-            self.user.save()
+        self.user.save()
         return self.user.overallSpendingLimit
     
     def validateSpendingLimits(self, timePeriod, amount):
