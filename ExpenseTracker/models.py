@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
 from django.forms import ValidationError
 from libgravatar import Gravatar
-from .helpers.modelUtils import computeTotalSpent
+from .helpers.modelUtils import *
 from datetime import datetime
 from django.utils import timezone
 from decimal import Decimal
@@ -71,6 +71,9 @@ class Category(models.Model):
     def totalSpent(self):
         return Decimal(round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2))
 
+    def totalSpendingLimitByMonth(self):
+        return Decimal(round(computeTotalSpendingLimitByMonth(self.spendingLimit.timePeriod, self.spendingLimit.amount), 2))
+
     def __str__(self):
         return self.name
 
@@ -103,6 +106,7 @@ class User(AbstractUser):
     )
     lastLogin = models.DateTimeField(default=timezone.now)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
+    overallSpendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True, null=True)
     
 
     class Meta:
@@ -184,7 +188,6 @@ class ShareCategoryNotification(Notification):
 class FollowRequestNotification(Notification):
     fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
 class Points(models.Model):
     ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -192,9 +195,3 @@ class Points(models.Model):
     
     class Meta:
         ordering = ['-pointsNum']
-
-
-
-
-
-    

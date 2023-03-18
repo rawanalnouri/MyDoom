@@ -5,7 +5,13 @@
 {% block content %}
 
 
-<h3 id="category-header">{{user.fullName}}'s Profile</h3>
+<h3 id="category-header">{{user.fullName}}'s Profile
+  <div class="text-end">
+    <button id="open-overall-spending-limit-modal" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-plus-lg"></i> Set Overall Spending Limit
+    </button>
+  </div>
+</h3>
 <hr>
 
 <div class="container mt-2">
@@ -54,25 +60,24 @@
         <div class="card-body">
           <h5 class="card-title m-l-80">General Information</h5>
           <h5 class="user-card-full"></h5>
-          <div class="d-flex justify-content-between align-items-center" style="width: 75%;">
+          <div class="d-flex justify-content-between align-items-center" style="width: 72%;">
             <div class="card card-border shadow-sm">
               <div class="card-body">
                 <div class="card-text">
                   <p>{{month}} {{year}}</p>
                   <h3 class="m-b-25">£{{user.totalSpentThisMonth}}</h3>
-    
                 </div>
               </div>
             </div>
           </div>
           <div class="padding"></div>
 
-          <hr style="width: 75%;">
+          <hr style="width: 72%;">
 
           <h6 class="card-text m-t-40 m-l-70">Category Spending this Month:</h6>
         </div>  
       </div>
-      <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 95%">
+      <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 92%">
         {% include 'partials/chart.html' %}
       </div>
 
@@ -83,6 +88,7 @@
       <h5 class="card-title m-l-80 m-b-40 m-t-40">Category Information</h5>
       <div class="card card-border" style="width: 23rem;height: 36rem;">
         <div class="card-body">
+          <div class="text-muted small">Overall spending limit: {{ user.overallSpendingLimit }}</div>
             <p class="card-text">Total progress:</p>
             <div class="card p-2 shadow-sm" style="width: 330px;">
                 <div class="progress">
@@ -117,6 +123,7 @@
     </div>
   </div>
 </div>
+{% include 'modals/overallSpendingLimit.html' %} 
 
 <script>
 
@@ -138,6 +145,19 @@
         $(this).width(totalProgress + "%");
         $(this).html(totalProgress + "%");
 
+      });
+
+      // Overall spending limit modals
+
+      $("#open-overall-spending-limit-modal").on("click", function() {
+          $.ajax({
+              url: "/home/setOverallSpendingLimit/",
+              success: function(data) {
+                  $("form").attr("action", "/home/setOverallSpendingLimit/");
+                  $("#overall-spending-limit-modal .update-form").html(data);
+                  $("#overall-spending-limit-modal").modal("show");
+              }
+          });
       });
 
   });
