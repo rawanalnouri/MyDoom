@@ -1,4 +1,4 @@
-#tests for the sign up view
+# Tests for the sign up view
 
 from ExpenseTracker.models import User 
 from ExpenseTracker.forms import SignUpForm

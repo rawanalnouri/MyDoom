@@ -1,4 +1,4 @@
-# tests for the notification view
+# Tests for the notification view
 
 from ExpenseTracker.models import User, Notification
 from django.test import TestCase

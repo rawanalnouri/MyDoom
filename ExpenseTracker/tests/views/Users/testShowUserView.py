@@ -1,4 +1,4 @@
-#tests for the show user view
+# Tests for the show user view
 
 from ExpenseTracker.models import User
 from django.test import TestCase
@@ -10,7 +10,6 @@ class ShowUserViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-
 
     # This test case checks if the "show user" view is working correctly for a logged-in user. 
     def testShowUserViewLoggedInUser(self):
