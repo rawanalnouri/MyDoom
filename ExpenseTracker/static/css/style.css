@@ -633,3 +633,15 @@ p {
     -o-transition: background 1s cubic-bezier(0,.72,.21,1);
     transition: background 1s cubic-bezier(0,.72,.21,1);
 }
+
+.button-purple{
+    color: var(--primary-color-light);
+    text-decoration: none;
+}
+
+.button-purple:hover{
+    background-color: var(--primary-color-light);
+    color: white;
+    text-decoration: underline;
+
+}
