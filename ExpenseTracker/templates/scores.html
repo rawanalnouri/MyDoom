@@ -3,6 +3,8 @@
 {% block title %}Scores{% endblock %}
 
 {% block content %}
+{% load static %}
+  <link href="{% static 'css/scores-style.css' %}" rel="stylesheet">
 <ul class="nav nav-tabs">
   <li class="nav-item">
     <a class="nav-link active" data-toggle="tab" href="#user-leaderboard">Users</a>
@@ -15,13 +17,13 @@
 <div class="tab-content">
   <div id="user-leaderboard" class="tab-pane fade show active">
     <br>
-    <h3>User leaderboard</h3>
+    <h3 class="text-center">User leaderboard</h3>
     <br>
     {% include 'partials/userLeaderboard.html' %}
   </div>
   <div id="house-leaderboard" class="tab-pane fade">
     <br>
-    <h3>House leaderboard</h3>
+    <h3 class="text-center">House leaderboard</h3>
     {% include 'partials/houseLeaderboard.html' %}
   </div>
 </div>
