@@ -167,6 +167,6 @@
     font-weight: normal;
 }
 
-.colorfy{
-    background: #CEE8F0 !important;
+.table tr.colorfy{
+    background: #CEE8F0;
 }
