@@ -3,8 +3,9 @@ from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
 from ExpenseTracker.helpers.utils import *
+from ExpenseTracker.helpers.modelUtils import *
 import os
-
+from decimal import Decimal
 
 class SignUpForm(forms.ModelForm):
     '''Form to allow a user to sign up to the system'''
@@ -110,14 +111,46 @@ class CategorySpendingLimitForm(forms.ModelForm):
             category.users.add(self.user)
             self.user.categories.add(category)
         return category
+
+    def validateName(self, name):
+        existingCategories = Category.objects.filter(
+            name__iexact=name, users__in=[self.user]
+        ).exclude(id=self.instance.id)
+
+        if existingCategories.exists():
+            raise forms.ValidationError(
+                'Category with this name already exists for this user.', code='invalid'
+            )
     
+    def validateSpendingLimits(self, timePeriod, amount):
+        categoriesTotal = Decimal(0)
+        for category in Category.objects.all():
+            categoriesTotal += category.totalSpendingLimitByMonth()
+
+        categoriesTotal += computeTotalSpendingLimitByMonth(timePeriod, amount)
+        overallTimePeriod = self.user.overallSpendingLimit.timePeriod
+        overallAmount = self.user.overallSpendingLimit.amount
+        overallTotal = computeTotalSpendingLimitByMonth(
+            overallTimePeriod, overallAmount
+        )
+
+        if categoriesTotal > overallTotal:
+            raise forms.ValidationError(
+                'The amount you\'ve chosen for this category\'s spending limit is too high'
+                ' compared to your overall spending limit.', code='invalid'
+            )
+
     def clean(self):
         cleanedData = super().clean()
+        amount = cleanedData.get('amount')
+        if amount:
+            timePeriod = cleanedData.get('timePeriod')
+            amount = Decimal(amount)
+            self.validateSpendingLimits(timePeriod, amount)
         name = cleanedData.get('name')
-        existingCategories = Category.objects.filter(name__iexact=name, users__in=[self.user]).exclude(id=self.instance.id)
-        if existingCategories.exists():
-            raise forms.ValidationError('Category with this name already exists for this user.', code='invalid')
+        self.validateName(name)
         return cleanedData
+
 
 class EditProfile(forms.ModelForm):
     firstName = forms.CharField(label='First name')
@@ -277,3 +310,49 @@ class ReportForm(forms.Form):
         for x in Category.objects.filter(users__in=[self.user]):
             categoryArray.append((x.id, x))
         return categoryArray
+
+class OverallSpendingForm(forms.Form):
+    timePeriod = forms.ChoiceField(label="Time period", choices=SpendingLimit.TIME_CHOICES)
+    amount = forms.DecimalField(label="Amount [GBP]", min_value=0.01)
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(OverallSpendingForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        timePeriod = self.cleaned_data['timePeriod']
+        amount = self.cleaned_data['amount']
+        if self.user.overallSpendingLimit:
+            currentLimit = self.user.overallSpendingLimit
+            currentLimit.timePeriod = timePeriod
+            currentLimit.amount = amount
+            currentLimit.save()
+        else:
+            newLimit = SpendingLimit.objects.create(
+                timePeriod=timePeriod,
+                amount=amount
+            )
+            self.user.overallSpendingLimit = newLimit
+        if commit:
+            self.user.save()
+        return self.user.overallSpendingLimit
+    
+    def validateSpendingLimits(self, timePeriod, amount):
+        categoriesTotal = Decimal(0)
+        for category in Category.objects.all():
+            categoriesTotal += category.totalSpendingLimitByMonth()
+
+        amount = Decimal(amount)
+        overallTotal = computeTotalSpendingLimitByMonth(timePeriod, amount)
+
+        if categoriesTotal > overallTotal:
+            raise forms.ValidationError('Your overall spending limit is too low compared to the spending '
+                                    +'limits set in your categories.', code='invalid')
+
+    def clean(self):
+        cleanedData = super().clean()
+        amount = cleanedData.get('amount')
+        timePeriod = cleanedData.get('timePeriod')
+        if amount:
+            self.validateSpendingLimits(timePeriod, amount)
+        return cleanedData
