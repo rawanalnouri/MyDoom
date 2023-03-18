@@ -56,6 +56,8 @@ urlpatterns = [
     path('users/', UserListView.as_view(), name='users'),
     path('followToggle/<int:userId>/', FollowToggleView.as_view(), name='followToggle'),
     path('searchUsers/', searchUsers, name='searchUsers'),
+
+    path('home/setOverallSpendingLimit/', SetOverallSpendingLimitView.as_view(), name='setOverallSpendingLimit')
 ]
 
 # Hanlding adding urls for user added media
