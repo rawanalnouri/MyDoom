@@ -217,7 +217,7 @@ body{
 }
   
 .base .side-menu .menu .item .sub-menu a:hover{
-    background: var(--secondary-color)
+    background: var(--primary-color-light)
 }
   
 .base .side-menu .menu .item .sub-menu a:not(last-child){

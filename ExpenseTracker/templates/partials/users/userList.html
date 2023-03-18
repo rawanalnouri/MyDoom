@@ -1,26 +1,30 @@
-<table class="table">
+{% load static %}
+  <link href="{% static 'css/user-leaderboard-style.css' %}" rel="stylesheet">
+  <table class="table rounded rounded-3 overflow-hidden">
     <thead>
-        <tr>
-            <th scope="col" class="text-muted th-normal">Place</th>
-            <th scope="col" class="text-muted th-normal"></th>
-            <th scope="col" class="text-muted th-normal">Username</th>
-            <th scope="col" class="text-muted th-normal">Full Name</th>
-            <th scope="col" class="text-muted th-normal">House</th>
-            <th scope="col" class="text-muted th-normal">Points</th>
-            <th scope="col" class="text-muted th-normal">View</th>
+        <tr class="colorfy">
+            <th scope="col" class="th-normal">#</th>
+            <th scope="col" class="th-normal"></th>
+            <th scope="col" class="th-normal">Username</th>
+            <th scope="col" class="th-normal">Full Name</th>
+            <th scope="col" class="th-normal">House</th>
+            <th scope="col" class="th-normal">Points</th>
+            <th scope="col" class="th-normal">View</th>
         </tr>
     </thead>
     <tbody>
         {% for user in users %}
         <tr>
-            <th scope="row" class="text-black-50">{{ forloop.counter }}</th>
+            <th scrope="row"><div{% if forloop.counter0 < 1 %} class="circle-first" {% elif forloop.counter0 < 2 %} class="circle-second"
+                {% elif forloop.counter0 < 3 %} class="circle-third" {% elif forloop.counter0 < 4 %} class="circle-fourth"
+                {% else %} class="circle-users" {% endif %}>{{ forloop.counter }}</th>
             <td>
-                <img src="{{ user.user.miniGravatar }}" alt="Gravatar of {{ user.user.username }}" class="rounded-circle" width="45" height="45">
+                <img src="{{ user.user.miniGravatar }}" alt="Gravatar of {{ user.user.username }}" class="rounded-circle" width="35" height="35">
             </td>
             <td>@{{ user.user.username }}</td>
             <td>{{ user.user.fullName }}</td>
             <td>{{user.user.house.name}}</td>
-            <td>{{ user.pointsNum }}</td>
+            <td><div class="rounded text-center p-2 points-rectangle">{{ user.pointsNum }}</td>
             <td>
                 <a role="button" href="{% url 'showUser' user.id %}">
                     <i class="bi bi-eye btn-purple"></i>

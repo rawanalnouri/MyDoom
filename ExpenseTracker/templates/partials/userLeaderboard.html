@@ -1,79 +1,46 @@
-<style>
-    .bar-chart {
-        display: flex;
-        align-items: flex-end;
-        height: 200px;
-    }
-    .bar {
-        width: 30%;
-        text-align: center;
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        position: relative;
-    }
-    .bar-label {
-        position: absolute;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .bar-number {
-        position: absolute;
-        bottom: 5px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: x-small;
-        
-    /* Add a rounded border */
-        border-radius: 10px;
-        border: 1px solid black;
-        padding: 1px 3px;
-    }
-    .first { background-color: #F2F2F0 }
-    .second { background-color: #FFE6B3; }
-    .third { background-color: #E6E6E6; }
-    .fourth { background-color: #E6C2A2; }
-    .th-normal {
-    font-weight: normal;
-    }
-</style>
 {% load static %}
-  <link href="{% static 'css/leaderboard-style.css' %}" rel="stylesheet">
+  <link href="{% static 'css/user-leaderboard-style.css' %}" rel="stylesheet">
 <div class="container mt-2">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-sm-6">
-            <div class="card border">
+            <div class="card mx-auto" style="width: 500px;">
                     <div class="card-body">
                         <div class="bar-chart">
                             <div class="bar second" style="height: 75%;">
+                                <p class="place-label">2nd</p>
                                 <div class="bar-label">{{users.1.user.username}}</div>
                                 <div class="bar-number">{{users.1.pointsNum}}</div>
                             </div> 
                             <div class="bar first" style="height: 100%;">
+                                <p class="place-label">1st</p>
                                 <div class="bar-label">{{users.0.user.username}}</div>
                                 <div class="bar-number">{{users.0.pointsNum}}</div>
                             </div>
                             <div class="bar third" style="height: 50%;">
+                                <p class="place-label">3rd</p>
                                 <div class="bar-label">{{users.2.user.username}}</div>
                                 <div class="bar-number">{{users.2.pointsNum}}</div>
                             </div>
-                            <div class="bar fourth" style="height: 30%;">
+                            <div class="bar four" style="height: 35%;">
+                                <p class="place-label">4th</p>
                                 <div class="bar-label">{{users.3.user.username}}</div>
                                 <div class="bar-number">{{users.3.pointsNum}}</div>
                             </div>
                         </div>
                         <br>
-                        <p style="text-align: center;">
+                        <p class="leaderboard-text">
                             We have a winner!
-                            <br>
-                            <span class="text-muted">{{users.0.user.username}} is in the lead with </span> 
-                            {{users.0.pointsNum}} PTS,
-                            <span class="text-muted"> congratulations!</span>
+                        </p>
+                       
+                         <p class="user-text">
+                            <span class="black-text">@{{users.0.user.username}} is in the lead with </span> 
+                                {{users.0.pointsNum}} points,
+                            <span class="black-text"> congrats!</span>
                         </p>
                     </div>
             </div>
         </div>
-        <div class="col-sm-6">
+        <!--<div class="col-sm-6">
             <div class="card">
                 <div class="card-body">
                     Second card
@@ -81,7 +48,7 @@
                     Personal house data/charts
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 
     <br>
@@ -94,11 +61,11 @@
                     {% include 'partials/users/userList.html' %}
                     <div class="pagination m-l-460">
                         {% if users.has_previous %}
-                            <a id="pagination-button" href="?page={{ users.previous_page_number }}"><i class="bi bi-arrow-left btn-purple"></i></a>
+                            <a id="pagination-button" href="?page={{ users.previous_page_number }}" class="m-r-5"><i class="bi bi-arrow-left btn-purple"></i></a>
                         {% endif %}
                         page {{ users.number }} of {{ users.paginator.num_pages }}
                         {% if users.has_next %}
-                            <a id="pagination-button" href="?page={{ users.next_page_number }}"><i class="bi bi-arrow-right btn-purple"></i></a>
+                            <a id="pagination-button" href="?page={{ users.next_page_number }}" class="m-l-5"><i class="bi bi-arrow-right btn-purple"></i></a>
                         {% endif %}
                     </div>
                 </div>
