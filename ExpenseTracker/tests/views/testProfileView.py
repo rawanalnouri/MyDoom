@@ -28,7 +28,6 @@ class ProfileViewTest(TestCase):
     def testProfileUrl(self):
         self.assertEqual(self.url, '/profile/')
 
-
     # This test checks that a logged-in user can access their own profile page. 
     def testGetProfile(self):
         response = self.client.get(self.url)

@@ -45,10 +45,3 @@ class ScoresViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
-        
-
-          
-
-
-
-

@@ -677,7 +677,7 @@ def searchUsers(request):
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
 
-class SetOverallSpendingLimitView(View, LoginRequiredMixin):
+class SetOverallSpendingLimitView(LoginRequiredMixin, View):
     '''Implements a view for updating or setting the overall spending limit for the user.'''
 
     def get(self, request, *args, **kwargs):

@@ -14,7 +14,6 @@ class TestLogOut(TestCase, LogInTester):
         self.url = reverse('logOut')
         self.user = User.objects.get(id=1)
 
-    # This test checks if the URL for the log out view is correct.
     def testUrl(self):
         self.assertEqual(self.url,'/logOut/')
 
@@ -22,8 +21,6 @@ class TestLogOut(TestCase, LogInTester):
     def testLogOutAndRedirect(self):
         self.client.login(username='bob123', password='Password123')
         self.assertTrue(self.isUserLoggedIn())
-
-        # Get log out view and check if user has been succesfully logged out.
         response = self.client.get(self.url, follow=True)
         response_url = reverse('index')
         self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
