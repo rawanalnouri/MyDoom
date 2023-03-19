@@ -72,9 +72,9 @@ class TestLoginView(TestCase, LogInTester):
     def testUserEarnsPointsIfFirstLogin(self):
         self.user.lastLogin = timezone.make_aware(datetime.now() - timedelta(days=1))
         self.user.save()
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.input)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
 

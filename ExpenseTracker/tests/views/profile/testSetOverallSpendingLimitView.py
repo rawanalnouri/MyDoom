@@ -33,7 +33,7 @@ class SetOverallSpendingLimitViewTest(TestCase):
             password='Password123',
         )
         Points.objects.create(
-            pointsNum = 50,
+            count = 50,
             user = secondUser
         )
         category = Category.objects.get(id=1)

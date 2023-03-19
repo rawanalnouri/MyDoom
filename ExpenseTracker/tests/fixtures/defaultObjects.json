@@ -54,7 +54,7 @@
         "pk": 1,
         "fields": {
             "user": 1,
-            "pointsNum": 50
+            "count": 50
         }
     },
 

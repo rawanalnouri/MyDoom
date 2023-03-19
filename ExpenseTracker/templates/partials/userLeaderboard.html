@@ -44,29 +44,29 @@
             <div class="card border">
                     <div class="card-body">
                         <div class="bar-chart">
-                            <div class="bar second" style="height: 75%;">
-                                <div class="bar-label"><span style="font-weight: 600;">1st</span><br>{{users.1.user.username}}</div>
-                                <div class="bar-number">{{users.1.pointsNum}}</div>
+                            <div class="bar second" id="first-user-bar">
+                              <div class="bar-label"><span style="font-weight: 600;">2nd</span><br>{{topPoints.1.user.username}}</div>
+                              <div class="bar-number" id="first-user-points">{{topPoints.1.count}}</div>
                             </div> 
-                            <div class="bar first" style="height: 100%;">
-                                <div class="bar-label"><span style="font-weight: 600;">2nd</span><br>{{users.0.user.username}}</div>
-                                <div class="bar-number">{{users.0.pointsNum}}</div>
+                            <div class="bar first" id="second-user-bar">
+                              <div class="bar-label"><span style="font-weight: 600;">1st</span><br>{{topPoints.0.user.username}}</div>
+                              <div class="bar-number" id="second-user-points">{{topPoints.0.count}}</div>
                             </div>
-                            <div class="bar third" style="height: 60%;">
-                                <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{users.2.user.username}}</div>
-                                <div class="bar-number">{{users.2.pointsNum}}</div>
+                            <div class="bar third" id="third-user-bar">
+                              <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{topPoints.2.user.username}}</div>
+                              <div class="bar-number" id="third-user-points">{{topPoints.2.count}}</div>
                             </div>
-                            <div class="bar fourth" style="height: 40%;">
-                                <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{users.3.user.username}}</div>
-                                <div class="bar-number">{{users.3.pointsNum}}</div>
+                            <div class="bar fourth" id="fourth-user-bar">
+                              <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{topPoints.3.user.username}}</div>
+                              <div class="bar-number" id="fourth-user-points">{{topPoints.3.count}}</div>
                             </div>
-                        </div>
+                        </div>                          
                         <br>
                         <p style="text-align: center;">
                             We have a winner!
                             <br>
-                            <span class="text-muted">{{users.0.user.username}} is in the lead with </span> 
-                            {{users.0.pointsNum}} PTS,
+                            <span class="text-muted">{{topPoints.0.user.username}} is in the lead with </span> 
+                            {{topPoints.0.count}} PTS,
                             <span class="text-muted"> congratulations!</span>
                         </p>
                     </div>
@@ -90,14 +90,19 @@
             <div class="card" style="width: 100%;">
                 <div class="card-body">
                     <h5>User rankings</h5>
-                    {% include 'partials/users/userList.html' %}
+                    {% load mathfilters %}
+                    {% with pointsNumber=points.number|sub:1 %}
+                        {% with startingNumber=points.paginator.per_page|mul:pointsNumber %}
+                            {% include 'partials/users/userList.html' with points=points %}
+                        {% endwith %}
+                    {% endwith %}
                     <div class="pagination">
-                        {% if users.has_previous %}
-                            <a id="pagination-button" href="?page={{ users.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
+                        {% if points.has_previous %}
+                            <a id="pagination-button" href="?page={{ points.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
                         {% endif %}
-                        page {{ users.number }} of {{ users.paginator.num_pages }}
-                        {% if users.has_next %}
-                            <a id="pagination-button" href="?page={{ users.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
+                        page {{ points.number }} of {{ points.paginator.num_pages }}
+                        {% if points.has_next %}
+                            <a id="pagination-button" href="?page={{ points.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
                         {% endif %}
                     </div>
                 </div>
@@ -106,3 +111,38 @@
     </div>
 
 </div>
+
+<script>
+    $(document).ready(function() {
+    function max(a, b) {
+        return a > b ? a : b;
+    }
+    
+    const barList = [
+        {id: '#first-user-bar', points: $('#first-user-points').text()},
+        {id: '#second-user-bar', points: $('#second-user-points').text()},
+        {id: '#third-user-bar', points: $('#third-user-points').text()},
+        {id: '#fourth-user-bar', points: $('#fourth-user-points').text()}
+    ];
+
+    const totalPoints = barList.reduce((total, bar) => total + parseInt(bar.points), 0);
+    const minHeight = 30;
+    const scalingFactors = [3, 2.5, 2, 1.5, 1, 0.5];
+
+    for (let factor of scalingFactors) {
+        let allBarsFit = true;
+        for (let bar of barList) {
+            const barHeight = max(bar.points / totalPoints * 100 * factor, minHeight);
+            if (barHeight > 100) {
+                allBarsFit = false;
+                break;
+            }
+            $(bar.id).css('height', `${barHeight}%`);
+        }
+        if (allBarsFit) {
+            break;
+        }
+    }
+});
+
+</script>

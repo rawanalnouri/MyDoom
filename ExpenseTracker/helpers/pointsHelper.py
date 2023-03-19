@@ -9,17 +9,17 @@ If amount is negative the user loses points otherwise they gain points.
 '''
 def updatePoints(requestUser, amount):
     points = Points.objects.get(user=requestUser)
-    if points.pointsNum + amount < 0:
-        points.pointsNum = 0
+    if points.count + amount < 0:
+        points.count = 0
     else:
-        points.pointsNum = points.pointsNum + amount
+        points.count = points.count + amount
     points.save()
     housePointsUpdate(requestUser, amount)
 
 def createPoints(requestUser):
-    points = Points.objects.create(user=requestUser, pointsNum=50)
+    points = Points.objects.create(user=requestUser, count=50)
     points.save()
-    return points.pointsNum
+    return points.count
 
 def housePointsUpdate(user, amount):
     currentHouse = user.house
