@@ -30,7 +30,15 @@
     background-color: #999;
     height: 150px;
   }
-  
+
+  .bar-house {
+        width: 30%;
+        text-align: center;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
+        position: relative;
+        margin-right: 10px;
+  }
 </style>
 
   <div class="leaderboard">
@@ -45,19 +53,19 @@
             <div class="card border">
                 <div class="card-body">
                     <div class="bar-chart">
-                      <div class="bar second" id="first-house-bar">
+                      <div class="bar-house second" id="first-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">2nd</span><br>{{houses.1.name}}</div>
                           <div class="bar-number" id="first-house-points">{{houses.1.points}}</div>
                       </div> 
-                      <div class="bar first" id="second-house-bar">
+                      <div class="bar-house first" id="second-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">1st</span><br>{{houses.0.name}}</div>
                           <div class="bar-number" id="second-house-points">{{houses.0.points}}</div>
                       </div>
-                      <div class="bar third" id="third-house-bar">
+                      <div class="bar-house third" id="third-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{houses.2.name}}</div>
                           <div class="bar-number" id="third-house-points">{{houses.2.points}}</div>
                       </div>
-                      <div class="bar fourth" id="fourth-house-bar">
+                      <div class="bar-house fourth" id="fourth-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{houses.3.name}}</div>
                           <div class="bar-number" id="fourth-house-points">{{houses.3.points}}</div>
                       </div>
