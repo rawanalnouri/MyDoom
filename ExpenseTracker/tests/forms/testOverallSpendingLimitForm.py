@@ -1,3 +1,5 @@
+''' Tests for form handling the user setting their overall spending limit'''
+
 from django.test import TestCase
 from django import forms
 from ExpenseTracker.forms import OverallSpendingForm

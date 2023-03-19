@@ -1,4 +1,5 @@
 ''''Tests for creating differnt types of notifcations functions'''
+
 from ExpenseTracker.models import User, Notification
 from django.test import TestCase
 from ExpenseTracker.helpers.notificationsHelpers import *

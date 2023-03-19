@@ -1,7 +1,8 @@
+''' Tests for the Category model'''
+
 from ExpenseTracker.models import Category, SpendingLimit, Expenditure, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class CategoryModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

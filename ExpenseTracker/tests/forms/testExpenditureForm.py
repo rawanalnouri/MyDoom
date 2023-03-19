@@ -1,3 +1,5 @@
+''' Tests for form handling the creation of expenditures'''
+
 from django.test import TestCase
 from django import forms
 from ExpenseTracker.forms import ExpenditureForm

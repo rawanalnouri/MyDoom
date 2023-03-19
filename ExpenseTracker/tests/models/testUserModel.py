@@ -1,7 +1,8 @@
+''' Tests for the User model'''
+
 from ExpenseTracker.models import User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class UserModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

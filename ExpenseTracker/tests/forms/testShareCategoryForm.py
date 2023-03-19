@@ -1,3 +1,5 @@
+''' Tests for form handling categories being shared'''
+
 from django.test import TestCase
 from ExpenseTracker.models import User, Category, Notification
 from ExpenseTracker.forms import ShareCategoryForm

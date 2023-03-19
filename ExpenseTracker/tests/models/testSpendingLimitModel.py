@@ -1,7 +1,8 @@
+''' Tests for the SpendingLimit model'''
+
 from ExpenseTracker.models import SpendingLimit
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class SpendingLimitModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

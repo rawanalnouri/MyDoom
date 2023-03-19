@@ -1,8 +1,9 @@
+''' Tests for the Notification models'''
+
 from ExpenseTracker.models import Notification, User, ShareCategoryNotification, FollowRequestNotification, Category
 from django.test import TestCase
 from datetime import date
 from django.core.exceptions import ValidationError
-
 
 class NotificationModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
