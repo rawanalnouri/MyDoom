@@ -43,11 +43,6 @@ class FollowToggleViewTest(TestCase):
         followResponse = self.client.get(reverse('followToggle', kwargs={'userId': self.user.id}))
         followersAfter = self.user.followeeCount()
         self.assertEqual(followersAfter, followersBefore)
-
-        # self.assertEqual(followResponse.status_code, 302)
-        # acceptResponse = self._acceptFollowRequest()
-        # self.assertEqual(acceptResponse.status_code, 302)
-        # self.assertIn(self.user, self.secondUser.followers.all())
     
     #  Tests if a user can successfully unfollow another user. 
     def testFollowToggleViewUnfollowUser(self):
