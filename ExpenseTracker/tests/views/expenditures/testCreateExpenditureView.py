@@ -5,7 +5,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, Points, Notification
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
-from ExpenseTracker.tests.helpers import *
+from ExpenseTracker.tests.testHelpers import *
 
 class CreateExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

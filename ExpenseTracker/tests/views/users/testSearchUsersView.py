@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User
-from ExpenseTracker.tests.helpers import createUsers
+from ExpenseTracker.tests.testHelpers import createUsers
 
 class SearchUsersViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

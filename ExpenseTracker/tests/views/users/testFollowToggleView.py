@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from ExpenseTracker.models import User, Category, Notification
+from ExpenseTracker.models import User, Category, FollowRequestNotification
 from ExpenseTracker.helpers.followHelpers import toggleFollow
 
 class FollowToggleViewTest(TestCase):
@@ -25,7 +25,7 @@ class FollowToggleViewTest(TestCase):
 
     #  Helper method that accepts a follow request notification.
     def _acceptFollowRequest(self, user):
-        notification = Notification.objects.filter(toUser=user).latest('createdAt')
+        notification = FollowRequestNotification.objects.filter(toUser=user).latest('createdAt')
         acceptUrl = reverse('acceptFollowRequest', args=[notification.id])
         return self.client.get(acceptUrl)
 
@@ -40,7 +40,7 @@ class FollowToggleViewTest(TestCase):
     # Tests if a a user cannot follow themself
     def testUserCannotFollowThemselves(self):
         followersBefore = self.user.followeeCount()
-        followResponse = self.client.get(reverse('followToggle', kwargs={'userId': self.user.id}))
+        self.client.get(reverse('followToggle', kwargs={'userId': self.user.id}))
         followersAfter = self.user.followeeCount()
         self.assertEqual(followersAfter, followersBefore)
     
@@ -69,3 +69,10 @@ class FollowToggleViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
+
+    def testUserRecievesFollowRequestNotification(self):
+        self.client.get(reverse('followToggle', kwargs={'userId': self.secondUser.id}))
+        notificationReceived = FollowRequestNotification.objects.filter(toUser=self.secondUser).latest('createdAt')
+        self.assertEqual(notificationReceived.title, "New follow request!")
+        self.assertEqual(notificationReceived.message, self.user.username + " wants to follow you")
+        self.assertEqual(notificationReceived.fromUser, self.user)

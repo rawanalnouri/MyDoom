@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib import auth
 from django.contrib import messages
-from ExpenseTracker.tests.helpers import LogInTester
+from ExpenseTracker.tests.testHelpers import LogInTester
 
 class TestLogOut(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
