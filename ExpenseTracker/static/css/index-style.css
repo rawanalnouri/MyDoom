@@ -6,6 +6,14 @@
     padding-top: 20px;
 }
 
+.b-padding{
+    padding-bottom: 20px;
+}
+
+.t-padding{
+    padding-top: 10px;
+}
+
 .home-button{
     background: var(--primary-color);
     color: white;
@@ -22,6 +30,73 @@
     font-weight: medium;
 }
 
+.base .button-clear{
+    background: transparent;
+    color: #2b275c;
+    width: 100px;
+    border: none;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--primary-color);
+    padding: .5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    min-width: 10rem;
+    margin-left: 20px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.base .button-clear:hover{
+    color: var(--primary-color-light);
+    border-color: var(--primary-color-light);
+}
+
+.base .button{
+    background: var(--primary-color);
+    color: white;
+    width: 100px;
+    border: none;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--primary-color);
+    padding: .5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    min-width: 10rem;
+    margin-left: 20px;
+    text-decoration: none;
+    -webkit-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.base .button:hover{
+    background: var(--primary-color-light);
+    color: white;
+    width: 100px;
+    border: none;
+    border-radius: 7px;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--primary-color-light);
+    padding: .5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    min-width: 10rem;
+    margin-left: 20px;
+    -webkit-transition: background 1s cubic-bezier(0,.72,.21,1);
+    -o-transition: background 1s cubic-bezier(0,.72,.21,1);
+    transition: background 1s cubic-bezier(0,.72,.21,1);
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
 .top-section{
     padding: 20px 0 50px 0;
 
@@ -30,6 +105,10 @@
 .page-title{
     font-size: 60px;
     font-family: 'RobotoBold', sans-serif;
+}
+
+.sizing{
+    font-size: 1vw;;
 }
 
 .page-title span{
@@ -109,6 +188,10 @@
     padding: 40px;
 }
 
+.testimonial-position{
+    position: relative;
+}
+
 .bg-beige{
     background-color: #f6efe7;
 }
@@ -140,7 +223,7 @@
 }
 
 .final-section{
-    padding: 175px 200px 75px 200px;
+    padding: 175px 55px 75px 55px;
 }
 
 .colourful-block{
@@ -151,6 +234,7 @@
 
 .cta-block-title{
     padding-bottom: 35px;
+    font-size: 30px;
 }
 
 .card{

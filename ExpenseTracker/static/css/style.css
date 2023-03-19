@@ -17,7 +17,7 @@
 
 }
 
-body{
+html,body{
     background: var(--body-color);
     margin-top: 70px;
 }
@@ -111,7 +111,7 @@ body{
 	border-radius: 7px;
 	font-weight: 400;
 	text-decoration: none;
-	padding: .5rem 1rem;
+	padding: .4rem 0.8rem;
 	line-height: 2.3;
 }
 
@@ -125,7 +125,7 @@ body{
 	border-radius: 7px;
 	font-weight: 400;
 	text-decoration: none;
-	padding: .5rem 1rem;
+	padding: .4rem 0.8rem;
 	line-height: 2.3;
 }
 
@@ -305,21 +305,26 @@ body{
     box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
   }
 
-  .base .button-clear{
+.base .button-clear{
     background: transparent;
-    color: var(--primary-color);
+    color: #2b275c;
+    width: 100px;
+    border: none;
+    border-radius: 7px;
     border-style: solid;
     border-width: 2px;
     border-color: var(--primary-color);
-	margin-left: 30px;
-	border-radius: 7px;
-	font-weight: 400;
-	text-decoration: none;
-	padding: .5rem 1rem;
-	line-height: 2.3;
+    padding: .5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    min-width: 10rem;
+    margin-left: 20px;
+    text-decoration: none;
+    display: inline-block;
+    margin-bottom: 20px;
   }
 
-  .base .button:hover{
+.base .button:hover{
     background: var(--primary-color-light);
     color: white;
     width: 100px;
@@ -338,7 +343,7 @@ body{
     transition: background 1s cubic-bezier(0,.72,.21,1);
   }
 
-  .base .button-clear:hover{
+.base .button-clear:hover{
     color: var(--primary-color-light);
     border-color: var(--primary-color-light);
 }
