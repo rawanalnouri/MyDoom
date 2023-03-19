@@ -9,7 +9,6 @@ class NotificationModelTestCase(TestCase):
 
     def setUp(self):
 
-
         #For basic notification model
         firstName = 'John'
         lastName = 'Doe'
@@ -149,3 +148,6 @@ class NotificationModelTestCase(TestCase):
         self.category.save()
         category = Category.objects.get(name = self.shareCategoryNotification.sharedCategory.name)
         self.assertEqual(category, self.shareCategoryNotification.sharedCategory)
+
+    def testCorrectStringReturned(self):
+        self.assertEqual(self.notification.message, str(self.notification))

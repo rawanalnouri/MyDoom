@@ -50,6 +50,9 @@ class SpendingLimitModelTestCase(TestCase):
         self.spendingLimit.amount = -0.01
         with self.assertRaises(ValidationError):
             self.spendingLimit.full_clean()
+
+    def testCorrectAmountReturned(self):
+        self.assertEqual(self.spendingLimit.amount, self.spendingLimit.getNumber())
     
 
     

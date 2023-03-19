@@ -50,3 +50,6 @@ class ExpenditureModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.expenditure.full_clean()
 
+    def testCorrectStringReturned(self):
+        self.assertEqual(self.expenditure.title, str(self.expenditure))
+

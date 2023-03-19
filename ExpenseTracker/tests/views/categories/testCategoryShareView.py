@@ -47,6 +47,18 @@ class CategroyShareViewTest(TestCase):
         expectedMessage = "Failed to send share category request."
         self.assertEqual(str(messages[0]), expectedMessage)
 
+    # Tests whether an unsuccessful attempt to share a category with the same name results in the correct error message being displayed to the user.
+    def testUnsuccessfulShareOfCategoryWithSameName(self):
+        self.userToShareCategoryWith.categories.add(self.category)
+        self.userToShareCategoryWith.save()
+        data = {'user': self.userToShareCategoryWith.pk}
+        response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        expectedMessage = 'The user you want to share this category with already has a category with the same name.\nChange the name of the category before sharing.'
+        self.assertEqual(str(messages[0]), expectedMessage)
+
     # Tests whether a successful attempt to share a category results in the correct success message being displayed and whether the user is taken to the correct page.
     def testSuccessfulShareCategory(self):
         data = {'user': self.userToShareCategoryWith.pk}

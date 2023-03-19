@@ -51,9 +51,6 @@ class ShareCategoryFormTest(TestCase):
             ):
             form.clean()
 
-
-
-
     def testFormWithInvalidUser(self):
         invalidUserId = 3
         formData = {'user': invalidUserId}
