@@ -24,8 +24,8 @@ class FollowToggleViewTest(TestCase):
         self.category.users.add(self.user)
 
     #  Helper method that accepts a follow request notification.
-    def _acceptFollowRequest(self):
-        notification = Notification.objects.filter(toUser=self.secondUser).latest('createdAt')
+    def _acceptFollowRequest(self, user):
+        notification = Notification.objects.filter(toUser=user).latest('createdAt')
         acceptUrl = reverse('acceptFollowRequest', args=[notification.id])
         return self.client.get(acceptUrl)
 
@@ -33,14 +33,26 @@ class FollowToggleViewTest(TestCase):
     def testFollowToggleViewFollowUser(self):
         followResponse = self.client.get(reverse('followToggle', kwargs={'userId': self.secondUser.id}))
         self.assertEqual(followResponse.status_code, 302)
-        acceptResponse = self._acceptFollowRequest()
+        acceptResponse = self._acceptFollowRequest(self.secondUser)
         self.assertEqual(acceptResponse.status_code, 302)
         self.assertIn(self.user, self.secondUser.followers.all())
+
+    # Tests if a a user cannot follow themself
+    def testUserCannotFollowThemselves(self):
+        followersBefore = self.user.followeeCount()
+        followResponse = self.client.get(reverse('followToggle', kwargs={'userId': self.user.id}))
+        followersAfter = self.user.followeeCount()
+        self.assertEqual(followersAfter, followersBefore)
+
+        # self.assertEqual(followResponse.status_code, 302)
+        # acceptResponse = self._acceptFollowRequest()
+        # self.assertEqual(acceptResponse.status_code, 302)
+        # self.assertIn(self.user, self.secondUser.followers.all())
     
     #  Tests if a user can successfully unfollow another user. 
     def testFollowToggleViewUnfollowUser(self):
         toggleFollow(self.user, self.secondUser)
-        acceptResponse = self._acceptFollowRequest()
+        acceptResponse = self._acceptFollowRequest(self.secondUser)
         self.assertEqual(acceptResponse.status_code, 302)
         self.assertIn(self.user, self.secondUser.followers.all())
         response = self.client.get(reverse('followToggle', kwargs={'userId': self.secondUser.id}))
