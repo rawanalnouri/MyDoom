@@ -30,9 +30,7 @@ class Command(BaseCommand):
         for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
             user.followers.add(followee)
         adminStuff = self.seedAdminUser()
-
         self.seedNotifications()
-
         # Create dummy share notifcation for base user
         ShareCategoryNotification.objects.create(
             toUser=user,
@@ -63,7 +61,7 @@ class Command(BaseCommand):
         admin.categories.add(category)
         Points.objects.create(
             user = admin,
-            pointsNum = 50,
+            count = random.randrange(1, 500),
         )
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
         return [admin, category]
@@ -84,10 +82,11 @@ class Command(BaseCommand):
         )
         points = Points.objects.create(
             user = user,
-            pointsNum = 50,
+            count = random.randrange(1, 500),
         )
-        house.points += points.pointsNum
+        house.points += points.count
         house.memberCount += 1
+        house.save()
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
         return user
 
@@ -109,10 +108,11 @@ class Command(BaseCommand):
             )
             points = Points.objects.create(
                 user = user,
-                pointsNum = 50,
+                count = random.randrange(5, 500),
             )
-            house.points += points.pointsNum
+            house.points += points.count
             house.memberCount += 1
+            house.save()
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
