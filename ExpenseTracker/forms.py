@@ -2,8 +2,8 @@ from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
-from ExpenseTracker.helpers.utils import *
-from ExpenseTracker.helpers.modelUtils import *
+from ExpenseTracker.helpers.notificationsHelpers import *
+from ExpenseTracker.helpers.modelHelpers import *
 import os
 from decimal import Decimal
 

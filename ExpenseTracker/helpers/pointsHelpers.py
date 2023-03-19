@@ -1,6 +1,6 @@
 from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
 from django.utils.timezone import datetime, timedelta
-from .utils import createBasicNotification
+from .notificationsHelpers import createBasicNotification
 from decimal import Decimal
 
 '''
