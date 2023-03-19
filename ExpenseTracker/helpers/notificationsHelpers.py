@@ -1,3 +1,5 @@
+'''' Helper file to create different types of notifications '''
+
 from ExpenseTracker.models import *
 
 # Function to create a basic notifcation for a user 

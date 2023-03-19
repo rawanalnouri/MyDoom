@@ -1,3 +1,5 @@
+''' Helper file handling points functionality '''
+
 from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
 from django.utils.timezone import datetime, timedelta
 from .notificationsHelpers import createBasicNotification
@@ -16,11 +18,13 @@ def updatePoints(requestUser, amount):
     points.save()
     housePointsUpdate(requestUser, amount)
 
+# Create the points for a user when they sign up
 def createPoints(requestUser):
     points = Points.objects.create(user=requestUser, count=50)
     points.save()
     return points.count
 
+# Updates the user's house points whenever they gain or lost points
 def housePointsUpdate(user, amount):
     currentHouse = user.house
     housePoints = currentHouse.points
@@ -70,7 +74,6 @@ Checks if the user is already over their spending limit.
 Returns boolean for if over over and the total amount the user has spent within their 
 current spending limit.
 """
-
 def checkIfOver(category):
     currentCategory = Category.objects.get(id=category.id)
 

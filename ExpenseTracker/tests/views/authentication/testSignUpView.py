@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib import auth
 from django.contrib.auth.hashers import check_password
-from ExpenseTracker.tests.helpers import LogInTester
+from ExpenseTracker.tests.testHelpers import LogInTester
 
 class SignUpViewTest(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

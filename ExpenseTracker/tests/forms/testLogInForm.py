@@ -1,3 +1,5 @@
+''' Tests for form handling user login'''
+
 from django import forms
 from django.test import TestCase
 from ExpenseTracker.forms import LogInForm

@@ -1,7 +1,10 @@
+''' Tests for form handling the user setting their overall spending limit'''
+
 from django.test import TestCase
 from django import forms
 from ExpenseTracker.forms import OverallSpendingForm
-from ExpenseTracker.models import User, Category, SpendingLimit
+from ExpenseTracker.models import User, Category, SpendingLimit, Expenditure
+from decimal import Decimal
 
 class OverallSpendingLimitFormTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -56,3 +59,17 @@ class OverallSpendingLimitFormTest(TestCase):
                 code='invalid'
             ):
             form.clean()
+
+    def testSpendingLimitIsConvertedToMonthlyLimit(self):
+        category = Category.objects.get(id=1)
+        expenditure = Expenditure.objects.get(id=1)
+        category.expenditures.add(expenditure)
+        category.users.add(self.user)
+        category.spendingLimit.timePeriod = 'yearly'
+        category.save()
+        self.user.categories.add(category)
+        monthlyLimit = category.totalSpendingLimitByMonth()
+        actualMonthlyLimit = Decimal(round((category.spendingLimit.amount/12), 2))
+        self.assertEqual(monthlyLimit, actualMonthlyLimit)
+        
+

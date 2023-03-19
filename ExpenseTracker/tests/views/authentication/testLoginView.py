@@ -5,10 +5,9 @@ from ExpenseTracker.forms import LogInForm
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib import messages
-from ExpenseTracker.tests.helpers import LogInTester
 from datetime import datetime, timedelta
 from django.utils import timezone
-from ExpenseTracker.tests.helpers import *
+from ExpenseTracker.tests.testHelpers import *
 
 class TestLoginView(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']

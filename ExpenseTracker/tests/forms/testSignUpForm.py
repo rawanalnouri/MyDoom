@@ -1,3 +1,5 @@
+''' Tests for form handling user sign up'''
+
 from django import forms
 from django.test import TestCase
 from ExpenseTracker.forms import SignUpForm

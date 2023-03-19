@@ -78,7 +78,12 @@
         </div>  
       </div>
       <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 92%">
-        {% include 'partials/chart.html' %}
+        <div class="card-body">
+          {% if not user.categories.all %}
+            <p class="card-text">No expenditures made yet!</p>
+          {%endif%}
+          {% include 'partials/chart.html' %}
+        </div>
       </div>
 
     </div>
@@ -99,6 +104,12 @@
             <hr style="width: 100%;">
             
             {% load mathfilters %}
+            {% if not user.categories.all %}
+              <p class="card-text">No categories made yet!</p>
+              <a role="button" href="{% url 'createCategory' %}" class="btn btn-outline-dark btn-sm" >
+                <i class="bi bi-plus-lg"></i> Add Category
+              </a>
+            {% else %}
             <p class="card-texts">Category Progress: </p>
             <div class="scrollable-container" style="width: 100%; overflow-y: auto; max-height: 400px;">
               {% for category in user.categories.all %}
@@ -119,6 +130,7 @@
             </div>
         </div>
       </div>
+      {% endif %}
       
     </div>
   </div>
