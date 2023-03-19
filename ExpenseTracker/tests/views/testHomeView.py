@@ -42,24 +42,42 @@ class HomeViewTest(TestCase):
         self.assertEqual(totalSpentThisMonth, self.user.totalSpentThisMonth())
         self.assertEqual(categorySpentThisMonth, response.context['data'][0])
 
-    
-    # def testCorrectDailyLimitTotalSpentDataIsGenerated(self):
-    #     totalSpentThisDay = self.expenditure.amount
-    #     categorySpentThisDay = self.expenditure.amount
-    #     response = self.client.get(reverse('home'))
-    #     self.assertEqual(totalSpentThisDay, self.category.totalSpent())
-    #     self.assertEqual(categorySpentThisDay, response.context['data'][0])
+    # Test for calculating the correct total spent in current day
+    def testCorrectDailyLimitTotalSpentDataIsGenerated(self):
+        self.category.spendingLimit.timePeriod = 'daily'
+        self.category.save()
+        totalSpentThisDay = self.expenditure.amount
+        categorySpentThisDay = self.expenditure.amount
+        response = self.client.get(reverse('home'))
+        self.assertEqual(totalSpentThisDay, self.category.totalSpent())
+        self.assertEqual(categorySpentThisDay, response.context['data'][0])
 
-    # def testCorrectWeeklyLimitTotalSpentDataIsGenerated(self):
-    #     totalSpentThisDay = self.expenditure.amount
-    #     categorySpentThisWeek = self.expenditure.amount
-    #     response = self.client.get(reverse('home'))
-    #     self.assertEqual(totalSpentThisDay, self.category.totalSpent())
-    #     self.assertEqual(categorySpentThisWeek, response.context['data'][0])
+    # Test for calculating the correct total spent in current week
+    def testCorrectWeeklyLimitTotalSpentDataIsGenerated(self):
+        self.category.spendingLimit.timePeriod = 'weekly'
+        self.category.save()
+        totalSpentThisDay = self.expenditure.amount
+        categorySpentThisWeek = self.expenditure.amount
+        response = self.client.get(reverse('home'))
+        self.assertEqual(totalSpentThisDay, self.category.totalSpent())
+        self.assertEqual(categorySpentThisWeek, response.context['data'][0])
 
-    # def testCorrectMonthlyLimitTotalSpentDataIsGenerated(self):
-    #     totalSpentThisMonth = self.expenditure.amount
-    #     categorySpentThisMonth = self.expenditure.amount
-    #     response = self.client.get(reverse('home'))
-    #     self.assertEqual(totalSpentThisMonth, self.category.totalSpent())
-    #     self.assertEqual(categorySpentThisMonth, response.context['data'][0])
+    # Test for calculating the correct total spent in current month
+    def testCorrectMonthlyLimitTotalSpentDataIsGenerated(self):
+        self.category.spendingLimit.timePeriod = 'monthly'
+        self.category.save()
+        totalSpentThisMonth = self.expenditure.amount
+        categorySpentThisMonth = self.expenditure.amount
+        response = self.client.get(reverse('home'))
+        self.assertEqual(totalSpentThisMonth, self.category.totalSpent())
+        self.assertEqual(categorySpentThisMonth, response.context['data'][0])
+
+    # Test for calculating the correct total spent in current year
+    def testCorrectYearlyLimitTotalSpentDataIsGenerated(self):
+        self.category.spendingLimit.timePeriod = 'yearly'
+        self.category.save()
+        totalSpentThisYear = self.expenditure.amount
+        categorySpentThisYear = self.expenditure.amount
+        response = self.client.get(reverse('home'))
+        self.assertEqual(totalSpentThisYear, self.category.totalSpent())
+        self.assertEqual(categorySpentThisYear, response.context['data'][0])        
