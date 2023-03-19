@@ -86,6 +86,7 @@ class Migration(migrations.Migration):
                 ('followers', models.ManyToManyField(related_name='followees', to=settings.AUTH_USER_MODEL)),
                 ('groups', models.ManyToManyField(blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.', related_name='user_set', related_query_name='user', to='auth.Group', verbose_name='groups')),
                 ('house', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='ExpenseTracker.house')),
+                ('overallSpendingLimit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='ExpenseTracker.spendinglimit')),
                 ('user_permissions', models.ManyToManyField(blank=True, help_text='Specific permissions for this user.', related_name='user_set', related_query_name='user', to='auth.Permission', verbose_name='user permissions')),
             ],
             options={

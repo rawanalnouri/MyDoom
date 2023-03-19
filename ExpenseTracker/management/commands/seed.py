@@ -13,7 +13,6 @@ class Command(BaseCommand):
     USER_COUNT = 10
     NOTIFICATION_COUNT = 5
 
-
     help = "Seeds the database for testing and development."
 
     def __init__(self):
@@ -210,4 +209,3 @@ class Command(BaseCommand):
             isSeen = isSeen,
             type='basic'
         )
-

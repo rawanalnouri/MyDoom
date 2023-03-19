@@ -63,30 +63,6 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         return redirect("logIn")
 
 
-class CreateExpenditureView(LoginRequiredMixin, View):
-    '''Implements a view for creating expenditures'''
-
-    def get(self, request, *args, **kwargs):
-        form = ExpenditureForm()
-        return render(request, 'partials/bootstrapForm.html', {'form': form})
-
-    def post(self, request, *args, **kwargs):
-        category = Category.objects.get(id=kwargs['categoryId'])
-        form = ExpenditureForm(request.POST, request.FILES)
-        if category and form.is_valid():
-            currentCategoryInfo = checkIfOver(category)
-            messages.success(self.request, "Expenditure created successfully.")
-            form.save(category)
-            trackPoints(self.request.user, category,currentCategoryInfo[0], currentCategoryInfo[1])
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
-        else:
-            messages.error(self.request, "Failed to create expenditure.")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
-
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-
 class EditCategoryView(LoginRequiredMixin, View):
     '''Implements a view for editing categories'''
 
@@ -230,20 +206,46 @@ class DeclineRequestView(LoginRequiredMixin, View):
         return redirect('logIn')
 
 
+class CreateExpenditureView(LoginRequiredMixin, View):
+    '''Implements a view for creating expenditures'''
+
+    def get(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = ExpenditureForm(request.user, category)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])
+        form = ExpenditureForm(request.user, category, request.POST, request.FILES)
+        if category and form.is_valid():
+            currentCategoryInfo = checkIfOver(category)
+            messages.success(self.request, "Expenditure created successfully.")
+            form.save()
+            trackPoints(self.request.user, category,currentCategoryInfo[0], currentCategoryInfo[1])
+            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        else:
+            messages.error(self.request, "Failed to create expenditure.")
+            return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def handle_no_permission(self):
+        return redirect('logIn')
+
+
 class ExpenditureUpdateView(LoginRequiredMixin, View):
     '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
 
     def get(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])     
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(instance=expenditure)
+        form = ExpenditureForm(request.user, category, instance=expenditure)
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
+        category = Category.objects.get(id=kwargs['categoryId'])     
         expenditure = Expenditure.objects.filter(id=kwargs['expenditureId']).first()
-        form = ExpenditureForm(request.POST, request.FILES, instance=expenditure)
+        form = ExpenditureForm(request.user, category, request.POST, request.FILES, instance=expenditure)
         if form.is_valid():
-            category = Category.objects.get(id=kwargs['categoryId'])     
-            form.save(category)
+            form.save()
             messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
@@ -292,7 +294,8 @@ class SignUpView(View):
 
             createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
             createBasicNotification(user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
-            
+
+            # assign house
             n = user.id % 4
             house=House.objects.get(id=n+1)
             user.house=house
@@ -301,9 +304,6 @@ class SignUpView(View):
             house.save()
             housePointsUpdate(user, 50)
            
-    
-            # assign house
-
             return redirect('home')
         return render(request, 'signUp.html', {'form': signUpForm})
 
@@ -679,4 +679,27 @@ def searchUsers(request):
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
 
+class SetOverallSpendingLimitView(LoginRequiredMixin, View):
+    '''Implements a view for updating or setting the overall spending limit for the user.'''
 
+    def get(self, request, *args, **kwargs):
+        form = OverallSpendingForm(user=request.user)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = OverallSpendingForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated overall spending limit.")
+            return redirect('home')
+        else:
+            validationErrors = form.errors.get('__all__', [])
+            if validationErrors:
+                for error in validationErrors:
+                    messages.error(request, error)
+            else:
+                messages.error(request, 'Failed to update overall spending limit.')
+            return redirect('home')
+
+    def handle_no_permission(self):
+        return redirect('logIn')

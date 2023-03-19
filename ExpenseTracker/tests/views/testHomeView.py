@@ -40,6 +40,3 @@ class HomeViewTest(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(totalSpentThisMonth, self.user.totalSpentThisMonth())
         self.assertEqual(categorySpentThisMonth, response.context['data'][0])
-
-
-

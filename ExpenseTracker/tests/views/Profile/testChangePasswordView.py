@@ -44,5 +44,3 @@ class ChangeProfileViewTest(TestCase):
         self.client.logout()
         response = self.client.get(reverse('changePassword'))
         self.assertRedirects(response, reverse('logIn'))
-
-

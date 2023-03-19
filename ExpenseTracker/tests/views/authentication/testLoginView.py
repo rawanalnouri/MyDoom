@@ -21,7 +21,6 @@ class TestLoginView(TestCase, LogInTester):
         }
         self.url = reverse('logIn')
 
-
     # This test checks if the URL for the log in page is correct.
     def testLogInUrl(self):
         self.assertEqual(self.url, '/logIn/')
@@ -88,14 +87,3 @@ class TestLoginView(TestCase, LogInTester):
         self.assertIn(str(self.user.house.name) + " has gained 5 points", messages)
         self.assertIn("New Points Earned!", titles)
         self.assertIn("5 points earned for daily login", messages)
-
-
-
-
-
-
-
-
-
-
-

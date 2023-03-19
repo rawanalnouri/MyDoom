@@ -75,6 +75,3 @@ class EditProfileViewTest(TestCase):
         self.assertEqual(self.user.firstName, 'John2')
         self.assertEqual(self.user.lastName, 'Doe2')
         self.assertEqual(self.user.email, 'johndoe2@example.org')
-
-    
-

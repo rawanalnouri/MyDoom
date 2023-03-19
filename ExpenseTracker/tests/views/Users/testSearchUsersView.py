@@ -1,4 +1,4 @@
-#tests for the search user view
+# Tests for the search user view
 
 from django.test import TestCase
 from django.urls import reverse
@@ -19,7 +19,6 @@ class SearchUsersViewTest(TestCase):
             password='Password123',
         )
         self.url = reverse('searchUsers')
-
 
     #  This test checks whether the search function returns no results for an invalid username query. 
     def testSearchUsersWithInvalidUsernameQuery(self):
