@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 from django.urls import reverse
-from ExpenseTracker.models import User, Category, Expenditure
+from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 import datetime
 
 class HomeViewTest(TestCase):
@@ -20,6 +20,7 @@ class HomeViewTest(TestCase):
         self.category.save()
         self.user.categories.add(self.category)
         self.user.save()
+        self.spendingLimit = SpendingLimit.objects.get(id=1)
 
     #  This test ensures that the home view is using the correct HTML template, which should be home.html.
     def testHomeViewUsesCorrectTemplate(self):
@@ -40,3 +41,25 @@ class HomeViewTest(TestCase):
         response = self.client.get(reverse('home'))
         self.assertEqual(totalSpentThisMonth, self.user.totalSpentThisMonth())
         self.assertEqual(categorySpentThisMonth, response.context['data'][0])
+
+    
+    # def testCorrectDailyLimitTotalSpentDataIsGenerated(self):
+    #     totalSpentThisDay = self.expenditure.amount
+    #     categorySpentThisDay = self.expenditure.amount
+    #     response = self.client.get(reverse('home'))
+    #     self.assertEqual(totalSpentThisDay, self.category.totalSpent())
+    #     self.assertEqual(categorySpentThisDay, response.context['data'][0])
+
+    # def testCorrectWeeklyLimitTotalSpentDataIsGenerated(self):
+    #     totalSpentThisDay = self.expenditure.amount
+    #     categorySpentThisWeek = self.expenditure.amount
+    #     response = self.client.get(reverse('home'))
+    #     self.assertEqual(totalSpentThisDay, self.category.totalSpent())
+    #     self.assertEqual(categorySpentThisWeek, response.context['data'][0])
+
+    # def testCorrectMonthlyLimitTotalSpentDataIsGenerated(self):
+    #     totalSpentThisMonth = self.expenditure.amount
+    #     categorySpentThisMonth = self.expenditure.amount
+    #     response = self.client.get(reverse('home'))
+    #     self.assertEqual(totalSpentThisMonth, self.category.totalSpent())
+    #     self.assertEqual(categorySpentThisMonth, response.context['data'][0])
