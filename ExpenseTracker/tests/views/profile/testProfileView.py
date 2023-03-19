@@ -1,4 +1,4 @@
-#tests for the profile view
+# Tests for the profile view
 
 from django.contrib import messages
 from django.test import TestCase
@@ -27,7 +27,6 @@ class ProfileViewTest(TestCase):
     #  This test checks that the url attribute of the ProfileView class is set to '/profile/'.
     def testProfileUrl(self):
         self.assertEqual(self.url, '/profile/')
-
 
     # This test checks that a logged-in user can access their own profile page. 
     def testGetProfile(self):

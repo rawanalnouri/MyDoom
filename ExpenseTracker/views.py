@@ -395,10 +395,12 @@ class ScoresView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
+        orderedPoints = Points.objects.all().order_by('-count')
+        paginator = Paginator(orderedPoints, self.paginate_by)
         pageNumber = self.request.GET.get('page')
         context['houses'] = House.objects.order_by('-points')
-        context['users'] = paginator.get_page(pageNumber)
+        context['points'] = paginator.get_page(pageNumber)
+        context['topPoints'] = orderedPoints[:4]
         return context
 
     def handle_no_permission(self):
@@ -677,4 +679,27 @@ def searchUsers(request):
         )
     return render(request, 'partials/users/searchResults.html', {'users': users})
 
+class SetOverallSpendingLimitView(LoginRequiredMixin, View):
+    '''Implements a view for updating or setting the overall spending limit for the user.'''
 
+    def get(self, request, *args, **kwargs):
+        form = OverallSpendingForm(user=request.user)
+        return render(request, 'partials/bootstrapForm.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = OverallSpendingForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.SUCCESS, "Successfully updated overall spending limit.")
+            return redirect('home')
+        else:
+            validationErrors = form.errors.get('__all__', [])
+            if validationErrors:
+                for error in validationErrors:
+                    messages.error(request, error)
+            else:
+                messages.error(request, 'Failed to update overall spending limit.')
+            return redirect('home')
+
+    def handle_no_permission(self):
+        return redirect('logIn')

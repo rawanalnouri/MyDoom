@@ -1,4 +1,4 @@
-#tests for the user list view
+# Tests for the user list view
 
 from django.test import TestCase
 from django.urls import reverse

@@ -1,4 +1,4 @@
-#tests for the show user view
+# Tests for the show user view
 
 from ExpenseTracker.models import User
 from django.test import TestCase
