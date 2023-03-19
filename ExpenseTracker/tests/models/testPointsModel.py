@@ -10,7 +10,7 @@ class PointsModelTestCase(TestCase):
         self.user = User.objects.get(id=1)
         self.points = Points.objects.create(
             user = self.user,
-            pointsNum = 10
+            count = 10
         )
 
     def testNoBlankTitle(self):
@@ -19,7 +19,7 @@ class PointsModelTestCase(TestCase):
             self.points.full_clean()
 
     def testNoBlankPoints(self):
-        self.points.pointsNum = None
+        self.points.count = None
         with self.assertRaises(ValidationError):
             self.points.full_clean()
 
