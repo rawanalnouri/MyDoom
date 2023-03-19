@@ -44,26 +44,24 @@
         <div class="col-sm-6">
             <div class="card border">
                 <div class="card-body">
-                    <div class="podium gold">
-                      <h6>1st Place</h6>
-                      <p>{{houses.0.name}}</p>
-                      <p>{{houses.0.points}}</p>
-                    </div>
-                    <div class="podium silver">
-                      <h6>2nd Place</h6>
-                      <p>{{houses.1.name}}</p>
-                      <p>{{houses.1.points}}</p>
-                    </div>
-                    <div class="podium bronze">
-                      <h6>3rd Place</h6>
-                      <p>{{houses.2.name}}</p>
-                      <p>{{houses.2.points}}</p>
-                    </div>
-                    <div class="podium fourth">
-                      <h6>4th Place</h6>
-                      <p>{{houses.3.name}}</p>
-                      <p>{{houses.3.points}}</p>
-                    </div>
+                    <div class="bar-chart">
+                      <div class="bar second" id="first-house-bar">
+                          <div class="bar-label"><span style="font-weight: 600;">2nd</span><br>{{houses.1.name}}</div>
+                          <div class="bar-number" id="first-house-points">{{houses.1.points}}</div>
+                      </div> 
+                      <div class="bar first" id="second-house-bar">
+                          <div class="bar-label"><span style="font-weight: 600;">1st</span><br>{{houses.0.name}}</div>
+                          <div class="bar-number" id="second-house-points">{{houses.0.points}}</div>
+                      </div>
+                      <div class="bar third" id="third-house-bar">
+                          <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{houses.2.name}}</div>
+                          <div class="bar-number" id="third-house-points">{{houses.2.points}}</div>
+                      </div>
+                      <div class="bar fourth" id="fourth-house-bar">
+                          <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{houses.3.name}}</div>
+                          <div class="bar-number" id="fourth-house-points">{{houses.3.points}}</div>
+                      </div>
+                  </div>
                     <br>
                     <p style="text-align: center;">
                         We have a winner!
@@ -106,7 +104,7 @@
                     <tbody>
                         {% for house in houses %}
                         <tr>
-                          <td>{{forloop.counter}}</td>
+                          <td class="text-black-50">{{forloop.counter}}</td>
                           <td>{{house.name}}</td>
                           <td>{{house.points}}</td>
                           <td>{{house.memberCount}}</td>
@@ -121,3 +119,39 @@
     </div>
 
 </div>
+
+<script>
+
+  $(document).ready(function() {  
+    function max(a, b) {
+        return a > b ? a : b;
+    }
+    
+    const barList = [
+        {id: '#first-house-bar', points: $('#first-house-points').text()},
+        {id: '#second-house-bar', points: $('#second-house-points').text()},
+        {id: '#third-house-bar', points: $('#third-house-points').text()},
+        {id: '#fourth-house-bar', points: $('#fourth-house-points').text()}
+    ];
+    
+    const totalPoints = barList.reduce((total, bar) => total + parseInt(bar.points), 0);
+    const minHeight = 30;
+    const scalingFactors = [3, 2.5, 2, 1.5, 1, 0.5];
+
+    for (let factor of scalingFactors) {
+        let allBarsFit = true;
+        for (let bar of barList) {
+            const barHeight = max(bar.points / totalPoints * 100 * factor, minHeight);
+            if (barHeight > 100) {
+                allBarsFit = false;
+                break;
+            }
+            $(bar.id).css('height', `${barHeight}%`);
+        }
+        if (allBarsFit) {
+            break;
+        }
+    }
+});
+
+</script>

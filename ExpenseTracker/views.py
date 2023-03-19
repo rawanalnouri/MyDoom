@@ -395,10 +395,12 @@ class ScoresView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        paginator = Paginator(Points.objects.all().order_by('-pointsNum'), self.paginate_by)
+        orderedPoints = Points.objects.all().order_by('-count')
+        paginator = Paginator(orderedPoints, self.paginate_by)
         pageNumber = self.request.GET.get('page')
         context['houses'] = House.objects.order_by('-points')
-        context['users'] = paginator.get_page(pageNumber)
+        context['points'] = paginator.get_page(pageNumber)
+        context['topPoints'] = orderedPoints[:4]
         return context
 
     def handle_no_permission(self):
