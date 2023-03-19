@@ -78,7 +78,12 @@
         </div>  
       </div>
       <div class="card card-border padding-chart mb-3 shadow-sm m-l-20" style="width: 92%">
-        {% include 'partials/chart.html' %}
+        <div class="card-body">
+          {% if not user.categories.all %}
+            <p class="card-text">No expenditures made yet!</p>
+          {%endif%}
+          {% include 'partials/chart.html' %}
+        </div>
       </div>
 
     </div>
