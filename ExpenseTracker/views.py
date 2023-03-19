@@ -7,21 +7,20 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import authenticate,login,logout
 from django.http import Http404
 from django.core.paginator import Paginator
-from .helpers.pointsHelper import *
-from django.utils.timezone import datetime
 from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
-from .helpers.pointsHelper import updatePoints, createPoints
-from django.utils.timezone import datetime
-from .helpers.utils import *
+from .helpers.pointsHelpers import *
+from .helpers.notificationsHelpers import *
+from .helpers.followHelpers import *
 from .helpers.reportsHelpers import *
 from .notificationContextProcessor import getNotifications
+from django.utils import timezone
+from django.utils.timezone import datetime
 from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
-from django.utils import timezone
 import os
 
 class CategoryView(LoginRequiredMixin, TemplateView):

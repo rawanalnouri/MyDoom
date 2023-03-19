@@ -1,7 +1,7 @@
 ''''Tests for utility functions'''
 from ExpenseTracker.models import User, Notification
 from django.test import TestCase
-from ExpenseTracker.helpers.utils import *
+from ExpenseTracker.helpers.notificationsHelpers import *
 
 class Test(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defualt_objects.json']
