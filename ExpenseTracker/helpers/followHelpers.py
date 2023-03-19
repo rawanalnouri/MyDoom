@@ -1,3 +1,4 @@
+''' Helpers file contiang methods handling following functionality'''
 
 from ExpenseTracker.models import *
 
@@ -11,9 +12,8 @@ def createFollowRequestNotification(toUser, title, message, fromUser):
     type='follow'
     )
 
-''' Function ot handle following functionality'''
+# Function to handle following functionality - sends a a follow request to the followee
 def toggleFollow(user, followee):
-    """Toggles when self follows a different user."""
     sentFollowRequest = False
 
     if followee==user:
@@ -29,8 +29,6 @@ def toggleFollow(user, followee):
         createFollowRequestNotification(toUser, title, message, fromUser)
         sentFollowRequest = True
         return sentFollowRequest
-
-        # follow(user, followee)
 
 def follow(currentUser, userToFollow):
     userToFollow.followers.add(currentUser)
