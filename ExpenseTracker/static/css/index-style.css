@@ -30,7 +30,7 @@
     font-weight: medium;
 }
 
-.base .button-clear{
+.base .button-clear-big{
     background: transparent;
     color: #2b275c;
     width: 100px;
@@ -43,13 +43,12 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
     min-width: 10rem;
-    margin-left: 20px;
     text-decoration: none;
     display: inline-block;
     margin-bottom: 20px;
 }
 
-.base .button-clear:hover{
+.base .button-clear-big:hover{
     color: var(--primary-color-light);
     border-color: var(--primary-color-light);
 }
@@ -67,7 +66,6 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
     min-width: 10rem;
-    margin-left: 20px;
     text-decoration: none;
     -webkit-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
     -moz-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
@@ -89,7 +87,6 @@
     font-family: 'Montserrat', sans-serif;
     font-size: 15px;
     min-width: 10rem;
-    margin-left: 20px;
     -webkit-transition: background 1s cubic-bezier(0,.72,.21,1);
     -o-transition: background 1s cubic-bezier(0,.72,.21,1);
     transition: background 1s cubic-bezier(0,.72,.21,1);
