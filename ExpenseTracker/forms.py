@@ -167,7 +167,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
         if amount:
             timePeriod = cleanedData.get('timePeriod')
             amount = Decimal(amount)
-            self.validateSpendingLimits(timePeriod, amount)
+            if (self.user.overallSpendingLimit):
+                self.validateSpendingLimits(timePeriod, amount)
         name = cleanedData.get('name')
         self.validateName(name)
         return cleanedData
