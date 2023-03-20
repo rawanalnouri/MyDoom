@@ -66,14 +66,14 @@ html,body{
 }
 
 .base header .top-menu .title{
-    color: black;
+    color: var(--primary-color);
     font-size: 20px;
     text-transform: uppercase;
     font-weight: 900;
 }
   
 .base header .top-menu .title span{
-    color: var(--primary-color);
+    color: var(--primary-color-light);
 }
   
 .base header .top-menu ul{
