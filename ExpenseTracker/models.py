@@ -33,7 +33,6 @@ class SpendingLimit(models.Model):
     def getNumber(self):
         return self.amount
 
-
 class Expenditure(models.Model):
     '''model for storing and tracking user expenditures.'''
     title = models.CharField(max_length=255)
@@ -76,7 +75,6 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class House(models.Model):
     ''' model for the different houses '''
@@ -158,7 +156,6 @@ class User(AbstractUser):
             for expense in category.expenditures.filter(date__month=today.month):
                 total += float(expense.amount)
         return round(total, 2)
-
 
 class Notification(models.Model):
     '''model for storing and managing user notifications.'''
