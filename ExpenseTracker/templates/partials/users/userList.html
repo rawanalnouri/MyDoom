@@ -1,19 +1,26 @@
-<table class="table">
+{% load static %}
+  <link href="{% static 'css/user-leaderboard-style.css' %}" rel="stylesheet">
+  <table class="table rounded rounded-3 overflow-hidden">
     <thead>
-        <tr>
-            <th scope="col" class="text-muted th-normal">Place</th>
-            <th scope="col" class="text-muted th-normal"></th>
-            <th scope="col" class="text-muted th-normal">Username</th>
-            <th scope="col" class="text-muted th-normal">Full Name</th>
-            <th scope="col" class="text-muted th-normal">House</th>
-            <th scope="col" class="text-muted th-normal">Points</th>
-            <th scope="col" class="text-muted th-normal">View</th>
+        <tr class="colorfy">
+            <th scope="col" class="th-normal">Rank</th>
+            <th scope="col" class="th-normal"></th>
+            <th scope="col" class="th-normal">Username</th>
+            <th scope="col" class="th-normal">Full Name</th>
+            <th scope="col" class="th-normal">House</th>
+            <th scope="col" class="th-normal">Points</th>
+            <th scope="col" class="th-normal">View</th>
         </tr>
     </thead>
     <tbody>
         {% for i in points %}
         <tr>
-            <th scope="row" class="text-black-50">{{ startingNumber|add:forloop.counter }}</th>
+            <!-- <th scope="row" class="text-black-50">{{ startingNumber|add:forloop.counter }}</th> -->
+            
+            <th scrope="row"><div{% if i.user == topPoints.0.user %} class="circle-first" {% elif i.user == topPoints.1.user %} class="circle-second"
+                {% elif i.user == topPoints.2.user %} class="circle-third" {% elif i.user == topPoints.3.user %} class="circle-fourth"
+                {% else %} class="circle-users" {% endif %}>{{ startingNumber|add:forloop.counter }}</th>
+                
             <td>
                 <img src="{{i.user.miniGravatar }}" alt="Gravatar of {{ i.user.username }}" class="rounded-circle" width="45" height="45">
             </td>

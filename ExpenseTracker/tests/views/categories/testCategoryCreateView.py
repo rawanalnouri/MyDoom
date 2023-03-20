@@ -55,3 +55,14 @@ class CategoryCreateViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Category with this name already exists for this user.")
         self.assertEqual(messages[0].level_tag, "danger")
+
+    def testPostInvalidFormWithAmountTooHigh(self):
+        self.user.overallSpendingLimit = None
+        data = {'timePeriod': 'daily', 'amount': 200}
+        response = self.client.post(reverse('createCategory'), data=data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.user.overallSpendingLimit, None)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'The amount you\'ve chosen for this category\'s spending limit is too high compared to your overall spending limit.')
+    

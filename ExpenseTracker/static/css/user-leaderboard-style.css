@@ -1,0 +1,172 @@
+.nav-link{
+    color:#8282dc;
+}
+
+.nav-link:hover{
+    color:#2b275c;
+}
+
+.m-l-460{
+    margin-left: 460px;
+}
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    height: 200px;
+}
+
+.bar {
+    width: 30%;
+    text-align: center;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+    position: relative;
+}
+
+.place-label {
+    font-weight: bold;
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bar-label {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: small;
+}
+
+.bar-number {
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: x-small;
+    
+/* Add a rounded border */
+    border-radius: 10px;
+    border: 1px solid black;
+    padding: 1px 3px;
+}
+
+.first { 
+    background-color: #F69F98; 
+}
+
+.second { 
+    background-color: #FDD5C8; 
+}
+
+.third { 
+    background-color: #FAF2E8;
+}
+
+.four { 
+    background-color: #CEE8F0; 
+}
+
+.th-normal {
+    font-weight: bold;
+    font-size: small;
+    color: black;
+}
+
+.m-r-5{
+    margin-right: 5px;
+}
+
+.m-l-5{
+    margin-left: 5px;
+}
+
+.circle-first {
+    display: inline-block;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    background: #F69F98;
+    font-weight: bold;
+    font-size: small;
+  }
+
+.circle-second {
+    display: inline-block;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    background: #FDD5C8;
+    font-weight: bold;
+    font-size: small;
+}
+
+.circle-third {
+    display: inline-block;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    background: #FAF2E8;
+    font-weight: bold;
+    font-size: small;
+}
+
+.circle-fourth {
+    display: inline-block;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    background: #CEE8F0;
+    font-weight: bold;
+    font-size: small;
+}
+
+.circle-users {
+    display: inline-block;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    line-height: 35px;
+    background: #fff;
+    font-weight: bold;
+    font-size: small;
+}
+
+.points-rectangle{
+    width: 50px;
+    background-color: #FAF2E8;
+    font-size: small;
+}
+
+.leaderboard-text{
+    text-align: center;
+    font-weight: bold;
+    font-size: large;
+    color: #2b275c;
+}
+
+.user-text{
+    text-align: center;
+    color:#8282dc;
+    font-weight: bold;
+}
+
+.black-text{
+    color: black;
+    font-weight: normal;
+}
+
+.table tr.colorfy{
+    background: #CEE8F0;
+}

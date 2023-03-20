@@ -122,8 +122,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
     def save(self, commit=True):
         category = super().save(commit=False)
         spendingLimit = SpendingLimit.objects.create(
-            timePeriod=self.cleaned_data['timePeriod'],
-            amount=self.cleaned_data['amount']
+            timePeriod = self.cleaned_data['timePeriod'],
+            amount = self.cleaned_data['amount']
         )
         category.spendingLimit = spendingLimit
         if commit:
