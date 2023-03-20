@@ -84,7 +84,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
             messages.error(self.request, "\n".join(errorMessages))
             return redirect(reverse('category', args=[kwargs['categoryId']]))
-        
+
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -349,8 +349,8 @@ class IndexView(View):
             return render(request, 'index.html')
 
 
-def generateGraph(categories, spentInCategories, type):
-    dict = {'labels': categories, 'data': spentInCategories, 'type':type}
+def generateGraph(categories, spentInCategories, type, graphNum = ''):
+    dict = {f'labels{graphNum}': categories, f'data{graphNum}': spentInCategories, f'type{graphNum}':type}
     return dict
 
 
@@ -371,7 +371,15 @@ class HomeView(LoginRequiredMixin, View):
                     categoryExpenseThisMonth += float(expense.amount)
             totalSpent.append(round(categoryExpenseThisMonth, 2))
 
-        context = {**generateGraph(categories, totalSpent,'pie'), **{
+        houses =[]
+        pointTotals = []
+        for house in House.objects.all():
+            houses.append(house.name)
+            pointTotals.append(house.points)
+        dict = generateGraph(categories, totalSpent,'pie')
+        dict.update(generateGraph(houses, pointTotals,'doughnut', 2))
+
+        context = {**dict, **{
             'month': datetime.now().strftime('%B'),
             'year': datetime.now().strftime('%Y'),
             'points': Points.objects.get(user=request.user),
@@ -400,8 +408,8 @@ class ScoresView(LoginRequiredMixin, ListView):
 
     def handle_no_permission(self):
         return redirect('logIn')
-    
-    
+
+
 class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         form = ReportForm(user=request.user)
@@ -411,15 +419,12 @@ class ReportsView(LoginRequiredMixin, View):
 
     def post(self, request):
         today = datetime.now()
-        categories = []
-        totalSpent = []
         form = ReportForm(request.POST, user=request.user)
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
 
             createdArrays = createArraysData(selectedCategories, timePeriod)
-            #createdArrays = createNameAndValueLists(selectedCategories, timePeriod)
             categories = createdArrays[0]
             totalSpent = createdArrays[1]
 

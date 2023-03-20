@@ -33,8 +33,8 @@ def convertBudgetToMonthly(category):
     currentTimePeriod = category.spendingLimit.timePeriod
     if currentTimePeriod == 'daily':
         return category.spendingLimit.getNumber()*30
-    elif currentTimePeriod == 'monthly':
-        return category.spendingLimit.getNumber()/4
+    elif currentTimePeriod == 'weekly':
+        return category.spendingLimit.getNumber()*4
     elif currentTimePeriod == 'yearly':
         return category.spendingLimit.getNumber()/54
     else:
