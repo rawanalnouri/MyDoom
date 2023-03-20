@@ -1,7 +1,8 @@
+''' Tests for the SpendingLimit model'''
+
 from ExpenseTracker.models import SpendingLimit
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class SpendingLimitModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -50,6 +51,9 @@ class SpendingLimitModelTestCase(TestCase):
         self.spendingLimit.amount = -0.01
         with self.assertRaises(ValidationError):
             self.spendingLimit.full_clean()
+
+    def testCorrectAmountReturned(self):
+        self.assertEqual(self.spendingLimit.amount, self.spendingLimit.getNumber())
     
 
     

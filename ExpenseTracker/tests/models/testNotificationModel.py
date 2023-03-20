@@ -1,14 +1,14 @@
+''' Tests for the Notification models'''
+
 from ExpenseTracker.models import Notification, User, ShareCategoryNotification, FollowRequestNotification, Category
 from django.test import TestCase
 from datetime import date
 from django.core.exceptions import ValidationError
 
-
 class NotificationModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-
 
         #For basic notification model
         firstName = 'John'
@@ -149,3 +149,6 @@ class NotificationModelTestCase(TestCase):
         self.category.save()
         category = Category.objects.get(name = self.shareCategoryNotification.sharedCategory.name)
         self.assertEqual(category, self.shareCategoryNotification.sharedCategory)
+
+    def testCorrectStringReturned(self):
+        self.assertEqual(self.notification.message, str(self.notification))

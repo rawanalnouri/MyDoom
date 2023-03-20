@@ -1,7 +1,10 @@
+''' Helper file containg method to generate data for graphs '''
+
 from datetime import datetime
 from datetime import timedelta
 from ExpenseTracker.models import *
 
+# Converts the user's spending limit into a daily spending limit
 def convertBudgetToDaily(category):
     currentTimePeriod = category.spendingLimit.timePeriod
     if currentTimePeriod == 'weekly':
@@ -13,6 +16,7 @@ def convertBudgetToDaily(category):
     else:
         return category.spendingLimit.getNumber()
 
+# Converts the user's spending limit into a weekly spending limit
 def convertBudgetToWeekly(category):
     currentTimePeriod = category.spendingLimit.timePeriod
     if currentTimePeriod == 'daily':
@@ -24,6 +28,7 @@ def convertBudgetToWeekly(category):
     else:
         return category.spendingLimit.getNumber()
 
+# Converts the user's spending limit into a monthly spending limit
 def convertBudgetToMonthly(category):
     currentTimePeriod = category.spendingLimit.timePeriod
     if currentTimePeriod == 'daily':
@@ -35,6 +40,7 @@ def convertBudgetToMonthly(category):
     else:
         return category.spendingLimit.getNumber()
 
+# Genrates data for the graphs on the reports page
 def createArraysData(categories, timePeriod, filter='', divisions=''):
     today = datetime.now()
     names = []

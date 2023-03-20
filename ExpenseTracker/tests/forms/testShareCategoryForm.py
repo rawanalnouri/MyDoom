@@ -1,7 +1,10 @@
+''' Tests for form handling categories being shared'''
+
 from django.test import TestCase
 from ExpenseTracker.models import User, Category, Notification
 from ExpenseTracker.forms import ShareCategoryForm
 from django.urls import reverse
+from django import forms
 
 class ShareCategoryFormTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -26,7 +29,7 @@ class ShareCategoryFormTest(TestCase):
         # submit 'share category' form
         formData = {'user': validUser.id}
         form = ShareCategoryForm(fromUser=self.user, category=self.category, data=formData)
-        self.assertTrue(form.is_valid(), form.errors)
+        self.assertTrue(form.is_valid())
         form.save()
         # accept 'share category' request
         notification = Notification.objects.filter(toUser=validUser).latest('createdAt')
@@ -35,6 +38,20 @@ class ShareCategoryFormTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertTrue(validUser in self.category.users.all())
         self.assertTrue(self.category in validUser.categories.all())
+
+    def testFromWithUserThatHasSameCategoryName(self):
+        validUser = self.secondUser
+        validUser.categories.add(self.category)
+        validUser.save()
+        self.user.followers.add(validUser)
+        formData = {'user': validUser.id}
+        form = ShareCategoryForm(fromUser=self.user, category=self.category, data=formData)
+        self.assertFalse(form.is_valid())
+        with self.assertRaisesMessage(forms.ValidationError, 
+                'The user you want to share this category with already has a category with the same name.\\n'
+                +'Change the name of the category before sharing.', code='invalid'
+            ):
+            form.clean()
 
     def testFormWithInvalidUser(self):
         invalidUserId = 3

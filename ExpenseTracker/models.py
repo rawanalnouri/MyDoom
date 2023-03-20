@@ -5,7 +5,7 @@ from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
 from django.forms import ValidationError
 from libgravatar import Gravatar
-from .helpers.modelUtils import computeTotalSpent
+from .helpers.modelHelpers import *
 from datetime import datetime
 from django.utils import timezone
 from decimal import Decimal
@@ -40,7 +40,7 @@ class Expenditure(models.Model):
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
-    receipt = models.ImageField(upload_to='receipts/', blank=True)
+    receipt = models.ImageField(upload_to='receipts/', blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -70,6 +70,9 @@ class Category(models.Model):
     
     def totalSpent(self):
         return Decimal(round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2))
+
+    def totalSpendingLimitByMonth(self):
+        return Decimal(round(computeTotalSpendingLimitByMonth(self.spendingLimit.timePeriod, self.spendingLimit.amount), 2))
 
     def __str__(self):
         return self.name
@@ -103,6 +106,7 @@ class User(AbstractUser):
     )
     lastLogin = models.DateTimeField(default=timezone.now)
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
+    overallSpendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True, null=True)
     
 
     class Meta:
@@ -135,12 +139,6 @@ class User(AbstractUser):
         """Returns the number of followees of self."""
 
         return self.followees.count()
-
-    def getHouse(self):
-        n = self.id % 4
-        house=House.get(id=n+1)
-        return house
-
 
     def totalProgress(self):
         total = 0.0
@@ -190,14 +188,10 @@ class ShareCategoryNotification(Notification):
 class FollowRequestNotification(Notification):
     fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
-
 class Points(models.Model):
     ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    pointsNum = models.IntegerField(default=0)
-
-
-
-
-
+    count = models.IntegerField(default=0)
     
+    class Meta:
+        ordering = ['-count']

@@ -1,11 +1,11 @@
+''' Tests for form handling user changing their password'''
+
 from django import forms
 from django.test import TestCase
 from ExpenseTracker.forms import ChangePasswordForm
 from ExpenseTracker.models import *
 
-
 class ChangePasswordFormTest(TestCase):
-
     fixtures = [
         'ExpenseTracker/tests/fixtures/defaultObjects.json'
     ]

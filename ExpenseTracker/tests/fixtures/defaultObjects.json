@@ -4,9 +4,20 @@
         "model": "ExpenseTracker.house",
         "pk": 1,
         "fields": {
-            "name": "Test1",
+            "name": "testhouse1",
             "memberCount": 2,
-            "points": 10
+            "points": 50
+        }
+
+    },
+
+    {
+        "model": "ExpenseTracker.house",
+        "pk": 2,
+        "fields": {
+            "name": "testhouse2",
+            "memberCount": 1,
+            "points": 75
         }
 
     },
@@ -20,7 +31,8 @@
             "lastName": "white",
             "email": "test@email.com", 
             "password": "pbkdf2_sha256$390000$U2BlKwX3h6XYKKj6BS41PQ$4BhZbyjwVRSLm6F0iLmoz8BG4ru0xkw/7R9TPMxVKQA=",
-            "house": 1
+            "house": 1,
+            "overallSpendingLimit": 2
         }
 
     },
@@ -33,7 +45,8 @@
             "date": "2023-01-01",
             "amount": 10,
             "createdAt": "2023-01-16T17:41:28+00:00",
-            "updatedAt": "2023-01-16T17:41:28+00:00"
+            "updatedAt": "2023-01-16T17:41:28+00:00",
+            "receipt": null
         }
     },
     {
@@ -41,7 +54,7 @@
         "pk": 1,
         "fields": {
             "user": 1,
-            "pointsNum": 50
+            "count": 50
         }
     },
 
@@ -50,6 +63,18 @@
         "pk": 1,
         "fields": {
             "amount": 20,
+            "timePeriod": "daily",
+            "createdAt": "2023-01-16T17:41:28+00:00",
+            "updatedAt": "2023-01-16T17:41:28+00:00"
+
+        }
+    },
+
+    {
+        "model": "ExpenseTracker.spendingLimit",
+        "pk": 2,
+        "fields": {
+            "amount": 100,
             "timePeriod": "daily",
             "createdAt": "2023-01-16T17:41:28+00:00",
             "updatedAt": "2023-01-16T17:41:28+00:00"
