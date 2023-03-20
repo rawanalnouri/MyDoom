@@ -50,13 +50,13 @@
                             {% include 'partials/users/userList.html' with points=points %}
                         {% endwith %}
                     {% endwith %}
-                    <div class="pagination">
+                    <div class="pagination m-l-460">
                         {% if points.has_previous %}
-                            <a id="pagination-button" href="?page={{ points.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
+                            <a id="pagination-button" href="?page={{ points.previous_page_number }}" class="m-r-5"><i class="bi bi-arrow-left btn-purple"></i></a>
                         {% endif %}
                         page {{ points.number }} of {{ points.paginator.num_pages }}
                         {% if points.has_next %}
-                            <a id="pagination-button" href="?page={{ points.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
+                            <a id="pagination-button" href="?page={{ points.next_page_number }}" class="m-l-5"><i class="bi bi-arrow-right btn-purple"></i></a>
                         {% endif %}
                     </div>
                 </div>

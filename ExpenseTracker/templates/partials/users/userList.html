@@ -14,9 +14,7 @@
     </thead>
     <tbody>
         {% for i in points %}
-        <tr>
-            <!-- <th scope="row" class="text-black-50">{{ startingNumber|add:forloop.counter }}</th> -->
-            
+        <tr>            
             <th scrope="row"><div{% if i.user == topPoints.0.user %} class="circle-first" {% elif i.user == topPoints.1.user %} class="circle-second"
                 {% elif i.user == topPoints.2.user %} class="circle-third" {% elif i.user == topPoints.3.user %} class="circle-fourth"
                 {% else %} class="circle-users" {% endif %}>{{ startingNumber|add:forloop.counter }}</th>
@@ -27,10 +25,10 @@
             <td>@{{ i.user.username }}</td>
             <td>{{ i.user.fullName }}</td>
             <td>{{ i.user.house.name}}</td>
-            <td>{{ i.count }}</td>
+            <td><div class="rounded text-center p-2 points-rectangle">{{ i.count }}</div></td>
             <td>
                 <a role="button" href="{% url 'showUser' i.user.id %}">
-                    <i class="bi bi-eye"></i>
+                    <i class="bi bi-eye btn-purple"></i>
                 </a>
             </td>
         </tr>
