@@ -1,6 +1,6 @@
+'''' Helper file to create different types of notifications '''
+
 from ExpenseTracker.models import *
-from datetime import datetime
-from datetime import timedelta
 
 # Function to create a basic notifcation for a user 
 def createBasicNotification(toUser, title, message):
@@ -31,30 +31,3 @@ def createFollowRequestNotification(toUser, title, message, fromUser):
     message=message,
     type='follow'
     )
-
-''' Function ot handle following functionality'''
-def toggleFollow(user, followee):
-    """Toggles when self follows a different user."""
-    sentFollowRequest = False
-
-    if followee==user:
-        return
-    if user.isFollowing(followee):
-        unfollow(user, followee)
-        return sentFollowRequest
-    else:
-        toUser = followee
-        fromUser = user
-        title = "New follow request!"
-        message = fromUser.username + " wants to follow you"
-        createFollowRequestNotification(toUser, title, message, fromUser)
-        sentFollowRequest = True
-        return sentFollowRequest
-
-        # follow(user, followee)
-
-def follow(currentUser, userToFollow):
-    userToFollow.followers.add(currentUser)
-
-def unfollow(currentUser, userToUnfollow):
-    userToUnfollow.followers.remove(currentUser)

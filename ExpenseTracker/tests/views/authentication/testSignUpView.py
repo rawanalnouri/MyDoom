@@ -7,7 +7,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib import auth
 from django.contrib.auth.hashers import check_password
-from ExpenseTracker.tests.helpers import LogInTester
+from ExpenseTracker.tests.testHelpers import LogInTester
 
 class SignUpViewTest(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -38,7 +38,6 @@ class SignUpViewTest(TestCase, LogInTester):
 
     # This test checks if a user is logged in, they will be taken to home page if they try to access the sign-up page.
     def testRedirectToHomeIfUserAuthenticated(self):
-        # User should be taken to the home page if logged in
         user = User.objects.get(id=1)
         self.client.force_login(user)
         response = self.client.get(self.url)
@@ -66,14 +65,12 @@ class SignUpViewTest(TestCase, LogInTester):
         totalUsersAfter = User.objects.count()
         self.assertEqual(totalUsersBefore+1, totalUsersAfter)
 
-        #Check data saved correctly
         newSignedUpUser = User.objects.get(email='janedoe@test.org')
         self.assertEqual(newSignedUpUser.firstName, 'Jane')
         self.assertEqual(newSignedUpUser.lastName,'Doe')
         self.assertTrue(check_password('Password123',newSignedUpUser.password))
         self.assertTrue(self.isUserLoggedIn())
 
-        #Check Redirects
         userHomePage = reverse('home')
         self.assertRedirects(response, userHomePage, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, "home.html")

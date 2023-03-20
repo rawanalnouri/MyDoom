@@ -5,6 +5,7 @@ from faker import Faker
 from django.core.management.base import BaseCommand
 from dateutil.relativedelta import relativedelta
 from ExpenseTracker.models import *
+from ExpenseTracker.helpers.seedingHelper import *
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
@@ -29,9 +30,7 @@ class Command(BaseCommand):
         for followee in random.sample(list(User.objects.all()), random.randint(0, 10)):
             user.followers.add(followee)
         adminStuff = self.seedAdminUser()
-
         self.seedNotifications()
-
         # Create dummy share notifcation for base user
         ShareCategoryNotification.objects.create(
             toUser=user,
@@ -47,12 +46,14 @@ class Command(BaseCommand):
         lastName = 'admin'
         email = self._email(firstName, lastName)
         username = 'admin'
+        adminHouse=random.choice(list(House.objects.all()))
         admin = User.objects.create_superuser(
             username = username,
             firstName = firstName,
             lastName = lastName,
             email = email,
             password = Command.PASSWORD,
+            house=adminHouse
         )
         category = Category.objects.create (
             name = "test",
@@ -60,10 +61,13 @@ class Command(BaseCommand):
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
         admin.categories.add(category)
-        Points.objects.create(
+        points=Points.objects.create(
             user = admin,
-            pointsNum = 50,
+            count = random.randrange(1, 500),
         )
+        adminHouse.points += points.pointsNum
+        adminHouse.memberCount += 1
+        adminHouse.save()
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
         return [admin, category]
 
@@ -83,10 +87,11 @@ class Command(BaseCommand):
         )
         points = Points.objects.create(
             user = user,
-            pointsNum = 50,
+            count = random.randrange(1, 500),
         )
-        house.points += points.pointsNum
+        house.points += points.count
         house.memberCount += 1
+        house.save()
         self.stdout.write(self.style.SUCCESS(f"Created base user: username {username}, password {Command.PASSWORD}"))
         return user
 
@@ -108,10 +113,11 @@ class Command(BaseCommand):
             )
             points = Points.objects.create(
                 user = user,
-                pointsNum = 50,
+                count = random.randrange(5, 500),
             )
-            house.points += points.pointsNum
+            house.points += points.count
             house.memberCount += 1
+            house.save()
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
                 user.followers.add(followee)
@@ -146,12 +152,13 @@ class Command(BaseCommand):
     def seedCategories(self, *args, **options):
         categoryCount = 0
         while categoryCount < Command.CATEGORY_COUNT:
-            self._createCategory()
+            categoryName = catergories[categoryCount] 
+            self._createCategory(categoryName)
             categoryCount += 1
         self.stdout.write(self.style.SUCCESS(f"Number of created categories: {categoryCount}"))
 
-    def _createCategory(self):
-        name = self.faker.unique.word()
+    def _createCategory(self,name):
+        name = name
         description = self.faker.sentence()
         spendingLimit = random.choice(list(SpendingLimit.objects.all()))
         user = random.choice(list(User.objects.all()))
@@ -169,13 +176,14 @@ class Command(BaseCommand):
         expenditureCount = 0
         dayDifference = 0
         while expenditureCount < Command.EXPENDITURE_COUNT:
-            self._createExpenditure(dayDifference)
+            title = expenditures[expenditureCount]
+            self._createExpenditure(dayDifference,title)
             expenditureCount += 1
             dayDifference -= 2
         self.stdout.write(self.style.SUCCESS(f"Number of created expenditures: {expenditureCount}"))
 
-    def _createExpenditure(self, dayDifference):
-        title = self.faker.word()
+    def _createExpenditure(self, dayDifference, title):
+        title = title
         description = self.faker.sentence()
         date = datetime.now() + relativedelta(days=dayDifference)
         amount = float(decimal.Decimal(random.randrange(1, 10000))/100)
@@ -191,16 +199,16 @@ class Command(BaseCommand):
         for user in User.objects.all():
             notificationCount = 0
             while notificationCount < Command.NOTIFICATION_COUNT:
-                   self._createNotifcation(user)
+                   self._createNotifcation(user, notificationCount)
                    notificationCount += 1
             notificationsCreated += Command.NOTIFICATION_COUNT
         self.stdout.write(self.style.SUCCESS(f"Number of created notifications: {notificationsCreated}"))
         
             
         
-    def _createNotifcation(self, user):
-        title = self.faker.word() + " " + self.faker.word()
-        message = self.faker.sentence()
+    def _createNotifcation(self, user, count):
+        title = notificationTitles[count]
+        message = notificationMessages[count]
         isSeen = random.choice([True, False])
         Notification.objects.create(
             toUser=user,

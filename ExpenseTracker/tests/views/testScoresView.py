@@ -4,6 +4,9 @@ from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import Points, House, User
 
+# ests the functionality of the scores page in the ExpenseTracker application,
+# ensuring that it is displaying the correct data and redirecting unauthenticated users to the login page.
+
 class ScoresViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
@@ -21,7 +24,7 @@ class ScoresViewTest(TestCase):
         )
         
         self.points1 = Points.objects.get(id=1)
-        self.points2 = Points.objects.create(user = self.user2, pointsNum = 75)
+        self.points2 = Points.objects.create(user = self.user2, count = 75)
 
     # Test that the 'scores' page can be accessed
     def testGetScoresPage(self):
@@ -39,7 +42,7 @@ class ScoresViewTest(TestCase):
     # Test that the users are displayed in the correct order on the 'scores' page
     def testUserOrder(self):    
         response = self.client.get(reverse('scores'))
-        users = response.context['users']
+        users = response.context['points']
         self.assertEqual(users[0], self.points2)
         self.assertEqual(users[1], self.points1)
 

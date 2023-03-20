@@ -13,21 +13,19 @@
         </tr>
     </thead>
     <tbody>
-        {% for user in users %}
+        {% for i in points %}
         <tr>
-            <th scrope="row"><div{% if forloop.counter0 < 1 %} class="circle-first" {% elif forloop.counter0 < 2 %} class="circle-second"
-                {% elif forloop.counter0 < 3 %} class="circle-third" {% elif forloop.counter0 < 4 %} class="circle-fourth"
-                {% else %} class="circle-users" {% endif %}>{{ forloop.counter }}</th>
+            <th scope="row" class="text-black-50">{{ startingNumber|add:forloop.counter }}</th>
             <td>
-                <img src="{{ user.user.miniGravatar }}" alt="Gravatar of {{ user.user.username }}" class="rounded-circle" width="35" height="35">
+                <img src="{{i.user.miniGravatar }}" alt="Gravatar of {{ i.user.username }}" class="rounded-circle" width="45" height="45">
             </td>
-            <td>@{{ user.user.username }}</td>
-            <td>{{ user.user.fullName }}</td>
-            <td>{{user.user.house.name}}</td>
-            <td><div class="rounded text-center p-2 points-rectangle">{{ user.pointsNum }}</td>
+            <td>@{{ i.user.username }}</td>
+            <td>{{ i.user.fullName }}</td>
+            <td>{{ i.user.house.name}}</td>
+            <td>{{ i.count }}</td>
             <td>
-                <a role="button" href="{% url 'showUser' user.id %}">
-                    <i class="bi bi-eye btn-purple"></i>
+                <a role="button" href="{% url 'showUser' i.user.id %}">
+                    <i class="bi bi-eye"></i>
                 </a>
             </td>
         </tr>

@@ -5,7 +5,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, Points, Notification
 from ExpenseTracker.forms import ExpenditureForm
 import datetime
-from ExpenseTracker.tests.helpers import *
+from ExpenseTracker.tests.testHelpers import *
 
 class CreateExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -69,9 +69,9 @@ class CreateExpenditureViewTest(TestCase):
 
     # This test checks whether a user gains five points when they create an expenditure that stays within the category's spending limit.
     def testUserGainsFivePointsForStayingWithinLimit(self):
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
         # Check if user received points notification
@@ -86,9 +86,9 @@ class CreateExpenditureViewTest(TestCase):
     # This test checks if a user recieves a notification when they near the spending limit.
     def testUserRecievesNotificationForNearingSpendingLimit(self):
         self.data['amount'] = 17
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased, as still within limit.
         self.assertEqual(userPointsAfter, userPointsBefore+5)
         notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:3]
@@ -107,18 +107,18 @@ class CreateExpenditureViewTest(TestCase):
     #  This test checks whether a user loses points when they reate an expenditure that is at the spending limit.
     def testUserDoesnntLosePointsIfAtLimit(self):
         self.data['amount'] = 20
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
 
     # This test checks whether a user loses three points when they create an expenditure that is 10% over the spending limit.
     def testUserLosesThreePointsIfTenPercentOverLimit(self):
         self.data['amount'] = 22
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 10% over limit.
         self.assertEqual(userPointsAfter, userPointsBefore-3)
        # Check if user receives notification for losing points.
@@ -133,9 +133,9 @@ class CreateExpenditureViewTest(TestCase):
     #  This test checks whether a user loses five points when they create an expenditure that is between 10% and 30% over the spending limit.
     def testUserLosesFivePointsIfTenToThirtyPercentOver(self):
         self.data['amount'] = 26
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 30% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-5)
        # Check if user receives notification for losing points
@@ -150,9 +150,9 @@ class CreateExpenditureViewTest(TestCase):
     # This test case checks if the user loses 10 points if they spend between 30% to 50% over their target expenditure limit. 
     def testUserLosesTenPointsIfThirtyToFiftyPercentOver(self):
         self.data['amount'] = 30
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-10)
        # Check if user receives notification for losing points
@@ -167,9 +167,9 @@ class CreateExpenditureViewTest(TestCase):
     # This test case checks if the user loses 15 points if they spend between 50% to 70% over their target expenditure limit. 
     def testUserLosesFifteenPointsIfFiftyToSeventyPercentOver(self):
         self.data['amount'] = 34
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 50% over limit
         self.assertEqual(userPointsAfter, userPointsBefore-15)
        # Check if user receives notification for losing points
@@ -184,9 +184,9 @@ class CreateExpenditureViewTest(TestCase):
     #  This test case checks if the user loses 20 points if they spend between 70% to 100% over their target expenditure limit.
     def testUserLosesTwentyPointsIfSeventyToHundredPercentOver(self):
         self.data['amount'] = 40
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 50% over limit.
         self.assertEqual(userPointsAfter, userPointsBefore-20)
        # Check if user receives notification for losing points.
@@ -201,9 +201,9 @@ class CreateExpenditureViewTest(TestCase):
     #  This test case checks if the user loses 25 points if they spend over 100% of their target expenditure limit.
     def testUserLosesTwentyFivePointsIfOverHundredPercent(self):
         self.data['amount'] = 41
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have decreased as 50% over limit.
         self.assertEqual(userPointsAfter, userPointsBefore-25)
        # Check if user receives notification for losing points.
@@ -226,9 +226,9 @@ class CreateExpenditureViewTest(TestCase):
 
         # Should only lose 3 points.
         self.data['amount'] = 1
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         self.assertEqual(userPointsAfter, userPointsBefore-3)
 
     #  This test case checks if the user's points cannot go below zero, even if 
@@ -236,10 +236,10 @@ class CreateExpenditureViewTest(TestCase):
     def testUserPointsCantBeNegative(self):
         # Set user points to low value
         userPoints = Points.objects.get(id=1)
-        userPoints.pointsNum = 3
+        userPoints.count = 3
         userPoints.save()
         # User should lose 25 points, but points are low - so points should be 0
         self.data['amount'] = 45
         self.client.post(self.url, self.data)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         self.assertEqual(userPointsAfter, 0)

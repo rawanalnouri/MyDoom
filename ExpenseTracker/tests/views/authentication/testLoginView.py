@@ -5,10 +5,9 @@ from ExpenseTracker.forms import LogInForm
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib import messages
-from ExpenseTracker.tests.helpers import LogInTester
 from datetime import datetime, timedelta
 from django.utils import timezone
-from ExpenseTracker.tests.helpers import *
+from ExpenseTracker.tests.testHelpers import *
 
 class TestLoginView(TestCase, LogInTester):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -72,9 +71,9 @@ class TestLoginView(TestCase, LogInTester):
     def testUserEarnsPointsIfFirstLogin(self):
         self.user.lastLogin = timezone.make_aware(datetime.now() - timedelta(days=1))
         self.user.save()
-        userPointsBefore = Points.objects.get(user=self.user).pointsNum
+        userPointsBefore = Points.objects.get(user=self.user).count
         self.client.post(self.url, self.input)
-        userPointsAfter = Points.objects.get(user=self.user).pointsNum
+        userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
 
