@@ -65,7 +65,7 @@ class Command(BaseCommand):
             user = admin,
             count = random.randrange(1, 500),
         )
-        adminHouse.points += points.pointsNum
+        adminHouse.points += points.count
         adminHouse.memberCount += 1
         adminHouse.save()
         self.stdout.write(self.style.SUCCESS(f"Created admin user: username {username}, password {Command.PASSWORD}"))
