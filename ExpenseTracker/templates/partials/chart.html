@@ -6,11 +6,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
   var config = {
-    type: "{{ type }}",
+    type:'{{type}}',
     data: {
       datasets: [
         {
-          data: {{ data|safe }},
+          data:{{data}},
           backgroundColor: [
             "#8282DC",
             "#AF82DC",
@@ -21,10 +21,10 @@
             "#F6EBE0",
 
           ],
-          label: "Percentage of budget",
+            labels: "Percentage of budget",
         },
       ],
-      labels: {{ labels|safe }}
+        labels: {{ labels|safe }},
     },
     options: {
 
@@ -32,7 +32,11 @@
       {% if type == 'doughnut' %}
 
       legend: {
-      display: false
+      {% if displayLabels %}
+        display: true,
+      {% else %}
+        display: false,
+      {% endif %}
       }
       {% endif %}
       {% if type == 'pie' %}

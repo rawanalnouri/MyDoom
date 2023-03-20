@@ -1,11 +1,11 @@
+''' Tests for form handling user editing their profile'''
+
 from django import forms
 from django.test import TestCase
 from ExpenseTracker.forms import EditProfile
 from ExpenseTracker.models import *
 
-
 class EditProfileTestCase(TestCase):
-
     fixtures = [
         'ExpenseTracker/tests/fixtures/defaultObjects.json'
     ]

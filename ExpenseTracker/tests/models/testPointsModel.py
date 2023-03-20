@@ -1,7 +1,8 @@
+''' Tests for the Points model'''
+
 from ExpenseTracker.models import User, Points
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class PointsModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -10,7 +11,7 @@ class PointsModelTestCase(TestCase):
         self.user = User.objects.get(id=1)
         self.points = Points.objects.create(
             user = self.user,
-            pointsNum = 10
+            count = 10
         )
 
     def testNoBlankTitle(self):
@@ -19,7 +20,7 @@ class PointsModelTestCase(TestCase):
             self.points.full_clean()
 
     def testNoBlankPoints(self):
-        self.points.pointsNum = None
+        self.points.count = None
         with self.assertRaises(ValidationError):
             self.points.full_clean()
 

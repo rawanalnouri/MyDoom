@@ -1,0 +1,32 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col" class="text-muted th-normal">Place</th>
+            <th scope="col" class="text-muted th-normal"></th>
+            <th scope="col" class="text-muted th-normal">Username</th>
+            <th scope="col" class="text-muted th-normal">Full Name</th>
+            <th scope="col" class="text-muted th-normal">House</th>
+            <th scope="col" class="text-muted th-normal">Points</th>
+            <th scope="col" class="text-muted th-normal">View</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in points %}
+        <tr>
+            <th scope="row" class="text-black-50">{{ startingNumber|add:forloop.counter }}</th>
+            <td>
+                <img src="{{i.user.miniGravatar }}" alt="Gravatar of {{ i.user.username }}" class="rounded-circle" width="45" height="45">
+            </td>
+            <td>@{{ i.user.username }}</td>
+            <td>{{ i.user.fullName }}</td>
+            <td>{{ i.user.house.name}}</td>
+            <td>{{ i.count }}</td>
+            <td>
+                <a role="button" href="{% url 'showUser' i.user.id %}">
+                    <i class="bi bi-eye"></i>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

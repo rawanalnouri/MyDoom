@@ -1,7 +1,8 @@
+''' Tests for the Category model'''
+
 from ExpenseTracker.models import Category, SpendingLimit, Expenditure, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-
 
 class CategoryModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
@@ -37,11 +38,6 @@ class CategoryModelTestCase(TestCase):
         except:
             self.fail('category must be valid')
 
-    # def testNoBlankUser(self):
-    #     self.category.users = None
-    #     with self.assertRaises(ValidationError):
-    #         self.category.full_clean()
-
     def testNoBlankName(self):
         self.category.name = None
         with self.assertRaises(ValidationError):
@@ -57,9 +53,8 @@ class CategoryModelTestCase(TestCase):
         with self.assertRaises(ValidationError):
             self.category.full_clean()
 
-    # def testUserExists(self):
-    #     self.user.save()
-    #     user = User.objects.get(email = self.category.toUser.email)
-    #     self.assertEqual(user, self.category.toUser)
+    def testCategoryProgressWithZeroSpendingLimit(self):
+        self.category.spendingLimit.amount = 0
+        self.assertEqual(0, self.category.progress())
 
    
