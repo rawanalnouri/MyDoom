@@ -5,7 +5,7 @@ from ExpenseTracker.forms import ReportForm
 from ExpenseTracker.models import *
 import datetime
 
-# class ReportViewTest(TestCase):  
+# class ReportViewTest(TestCase):
 
 class ReportViewTest(TestCase):
 
@@ -23,7 +23,11 @@ class ReportViewTest(TestCase):
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
 
-
+        self.input = {
+            "timePeriod": "month",
+            "selectedCategory": "testcategory"
+        }
+        self.form = ReportForm(user=self.user, data=input)
 
 #  testing if page is correctly loaded
 # with the correct form
@@ -35,7 +39,6 @@ class ReportViewTest(TestCase):
         self.assertTemplateUsed(response, 'reports.html')
         self.assertIsInstance(response.context['form'], ReportForm)
 
-
     def testReportsViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('reports')
@@ -45,6 +48,7 @@ class ReportViewTest(TestCase):
         self.assertTemplateUsed('logIn.html')
 
     def testCategoryTimeFilters(self):
+        # filter tests
         for i in range(15):
             expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
             self.category.expenditures.add(expenditure)
@@ -57,3 +61,9 @@ class ReportViewTest(TestCase):
         #     self.assertNotContains(response, f'Post__{count}')
         # for count in range(200, 203):
         #     self.assertContains(response, f'Post__{count}')
+
+    def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
+        response = self.client.post(reverse('reports'), self.data)
+        # category = Category.objects.get(id=1)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('reports')
