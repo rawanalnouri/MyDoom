@@ -35,6 +35,15 @@
     height: 200px;
 }
 
+.bar-house {
+    width: 30%;
+    text-align: center;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    position: relative;
+    margin-right: 10px;
+}
+
 .place-label {
     font-weight: bold;
     position: absolute;
