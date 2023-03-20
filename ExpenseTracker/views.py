@@ -417,13 +417,16 @@ class ScoresView(LoginRequiredMixin, ListView):
 class ReportsView(LoginRequiredMixin, View):
     def get(self, request):
         form = ReportForm(user=request.user)
-        dict = generateGraph([], [], 'bar')
-        dict.update({"form": form, "text": "Waiting for your selection..."})
-        return render(request, "reports.html", dict)
+        graphData = generateGraph([], [], 'bar')
+        graphData.update({"form": form, "text": "Waiting for your selection..."})
+        return render(request, "reports.html", graphData)
 
     def post(self, request):
         today = datetime.now()
         form = ReportForm(request.POST, user=request.user)
+        categories = []
+        totalSpent = []
+        createdArrays = []
         if form.is_valid():
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
@@ -432,8 +435,8 @@ class ReportsView(LoginRequiredMixin, View):
             categories = createdArrays[0]
             totalSpent = createdArrays[1]
 
-            dict = generateGraph(categories, totalSpent, 'bar')
-            dict.update({"form": form, "text": f"An overview of your spending within the last {timePeriod}."})
+            graphData = generateGraph(categories, totalSpent, 'bar')
+            graphData.update({"form": form, "text": f"An overview of your spending within the last {timePeriod}."})
 
             # Generate a graph for historical data
             first_day_this_month = today.replace(day=1)
@@ -442,26 +445,27 @@ class ReportsView(LoginRequiredMixin, View):
             data1 = createArraysData(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
 
 
-            dict.update({'data1':data1})
-            dict.update({'text2':"Comparison to average over last 12 months"})
+            graphData.update({'data1':data1})
+            graphData.update({'text2':"Comparison to average over last 12 months"})
 
             six_months_ago = today + relativedelta(months=-6)
             data2 = createArraysData(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
 
-            dict.update({'data2':data2})
-            dict.update({'text2':f"Compare your average spendings per {timePeriod} in the past"})
+            graphData.update({'data2':data2})
+            graphData.update({'text2':f"Compare your average spendings per {timePeriod} in the past"})
 
             three_months_ago = today + relativedelta(months=-3)
             data3 = createArraysData(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
 
-            dict.update({'data3':data3})
-            dict.update({'text3':f"Your average spending per {timePeriod}"})
+            graphData.update({'data3':data3})
+            graphData.update({'text3':f"Your average spending per {timePeriod}"})
 
-            return render(request, "reports.html", dict)
+            return render(request, "reports.html", graphData)
         else:
-            dict = generateGraph(categories, totalSpent, 'bar')
-            dict.update({"form": form, "text": "Waiting for your selection..."})
-            return render(request, "reports.html", dict)
+            graphData = generateGraph(categories, totalSpent, 'bar')
+            graphData.update({"form": form, "text": "Waiting for your selection..."})
+            return render(request, "reports.html", graphData)
+            
         # Handles what happens if it's false
 
     def handle_no_permission(self):
