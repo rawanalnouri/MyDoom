@@ -102,17 +102,13 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
         return kwargs
 
     def form_valid(self, form):
-        try:
-            category = form.save()
-            messages.success(self.request, "Successfully Created Category")
-            # add points
-            updatePoints(self.request.user,5)
-            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
-            category.save()
-            return redirect(reverse('category', args=[category.id]))
-        except ValidationError as e:
-            messages.error(self.request, e.message_dict) 
-            return self.form_invalid(form)
+        category = form.save()
+        messages.success(self.request, "Successfully Created Category")
+        # add points
+        updatePoints(self.request.user,5)
+        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+        category.save()
+        return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
         for error in form.non_field_errors():
