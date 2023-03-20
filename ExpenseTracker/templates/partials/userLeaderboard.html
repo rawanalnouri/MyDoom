@@ -18,7 +18,7 @@
                               <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{topPoints.2.user.username}}</div>
                               <div class="bar-number" id="third-user-points">{{topPoints.2.count}}</div>
                             </div>
-                            <div class="bar fourth" id="fourth-user-bar">
+                            <div class="bar four" id="fourth-user-bar">
                               <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{topPoints.3.user.username}}</div>
                               <div class="bar-number" id="fourth-user-points">{{topPoints.3.count}}</div>
                             </div>
@@ -26,23 +26,15 @@
                         <br>
                         <p class="leaderboard-text">
                             We have a winner!
-                            <br>
-                            <span class="text-muted">{{topPoints.0.user.username}} is in the lead with </span> 
-                            {{topPoints.0.count}} PTS,
-                            <span class="text-muted"> congratulations!</span>
+                        </p>
+                        <p class="user-text">
+                            <span class="black-text">@{{topPoints.0.user.username}} is in the lead with </span> 
+                            {{topPoints.0.count}} points,
+                            <span class="black-text"> congrats!</span>
                         </p>
                     </div>
             </div>
         </div>
-        <!--<div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    Second card
-                    <br>
-                    Personal house data/charts
-                </div>
-            </div>
-        </div> -->
     </div>
 
     <br>
