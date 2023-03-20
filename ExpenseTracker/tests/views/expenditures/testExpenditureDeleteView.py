@@ -5,7 +5,7 @@ from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 import datetime
 
-class ExpenditureDeleteViewTest(TestCase):
+class DeleteExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -17,7 +17,7 @@ class ExpenditureDeleteViewTest(TestCase):
         self.category.expenditures.add(self.expenditure)
         
     #  This test case tests the functionality of deleting an expenditure. 
-    def testExpenditureDeleteView(self):
+    def testDeleteExpenditureView(self):
         response = self.client.get(reverse('deleteExpenditure', args=[self.category.id, self.expenditure.id]))
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
