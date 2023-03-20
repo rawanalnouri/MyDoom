@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 
-class CategoryDeleteViewTest(TestCase):
+class DeleteCategoryViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -18,7 +18,7 @@ class CategoryDeleteViewTest(TestCase):
         self.category.expenditures.add(self.expenditure)
 
     # This test verifies that when a user deletes a category, the corresponding spending limit and expenditures are also deleted from the database.
-    def testCategoryDeleteViewRemovesCategoryAndExpendituresAndSpendingLimit(self):
+    def testDeleteCategoryViewRemovesCategoryAndExpendituresAndSpendingLimit(self):
         self.client.get(reverse('deleteCategory', args=[self.category.id]))
         self.assertFalse(SpendingLimit.objects.filter(id=self.spendingLimit.id).exists())
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())

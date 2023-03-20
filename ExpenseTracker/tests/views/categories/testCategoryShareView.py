@@ -30,7 +30,7 @@ class CategroyShareViewTest(TestCase):
         self.assertEqual('/shareCategory/1/', self.url)
 
     # Tests whether the share category form is rendered correctly and the expected form is used.
-    def testCategoryShareViewGet(self):
+    def testShareCategoryViewGet(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
