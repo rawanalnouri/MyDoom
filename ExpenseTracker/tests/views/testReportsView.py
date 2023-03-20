@@ -74,7 +74,6 @@ class ReportViewTest(TestCase):
         self.input['selectedCategory'] = ""
         response = self.client.post(reverse('reports'), self.input, follow=True)
         category = Category.objects.get(id=1)
-        # print(response.context['labels'])
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed('reports.html')
         self.assertEqual(response.context['labels'], [])

@@ -56,7 +56,6 @@ def convertBudgetToMonthly(category):
 
 # Genrates data for the graphs on the reports page
 def createArraysData(categories, timePeriod, filter='', divisions=''):
-    print("FILLETTTERRRRR " + str(filter))
     today = datetime.now()
     names = []
     data =[]

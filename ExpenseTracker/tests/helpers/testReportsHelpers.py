@@ -104,7 +104,6 @@ class ReportsHelpersTest(TestCase):
 
         # Generate a graph for historical data without filter (non-historical data)
         yearData = createArraysData([self.category.id], self.category.spendingLimit.timePeriod)
-        print(yearData)
         categorySpend = float(self.expenditure.amount/365)
         expectedYearData = round((categorySpend/float(convertBudgetToDaily(self.category))*100),2)
         self.assertEqual(yearData[0][0], self.category.name)
@@ -125,7 +124,6 @@ class ReportsHelpersTest(TestCase):
 
         # Generate a graph for historical data without filter (non-historical data)
         yearData = createArraysData([self.category.id], self.category.spendingLimit.timePeriod)
-        print(yearData)
         categorySpend = float(self.expenditure.amount/365)
         expectedYearData = round((categorySpend/float(convertBudgetToDaily(self.category))*100),2)
         self.assertEqual(yearData[0][0], self.category.name)
