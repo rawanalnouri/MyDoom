@@ -1,12 +1,12 @@
 <nav class="top-menu">
-    <div class="title">
-        <a class="navbar-brand" href="{% url 'home' %}">
-            <!--<img src="" alt="" width="50" height="50">-->
-            Wallet <span>Wizards</span>
-        </a>
-        
-    </div>
     {% if user.is_authenticated %}
+        <div class="title">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <!--<img src="" alt="" width="50" height="50">-->
+                Wallet <span>Wizards</span>
+            </a>
+            
+        </div>
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
         <p style="color: black;" >Points: {{points.pointsNum}}</p>  
         <ul>
@@ -17,6 +17,13 @@
             </li>
         </ul>
     {% else %}
+        <div class="title">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                <!--<img src="" alt="" width="50" height="50"> -->
+                Wallet <span>Wizards</span>
+            </a>
+            
+        </div> 
         <ul>
             <li>
                 <a class="logged-out-items-clear" href="{% url 'signUp' %}">Sign up</a>
