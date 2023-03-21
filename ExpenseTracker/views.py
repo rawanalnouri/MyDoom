@@ -90,7 +90,7 @@ class EditCategoryView(LoginRequiredMixin, View):
 
 
 '''Implements a view for creating a new category using a form'''
-class CategoryCreateView(LoginRequiredMixin, CreateView):
+class CreateCategoryView(LoginRequiredMixin, CreateView):
 
     model = Category
     form_class = CategorySpendingLimitForm
@@ -120,7 +120,7 @@ class CategoryCreateView(LoginRequiredMixin, CreateView):
     
 
 '''Implements a view for deleting an expenditure'''
-class CategoryDeleteView(LoginRequiredMixin, View):
+class DeleteCategoryView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id = kwargs['categoryId'])
@@ -137,7 +137,7 @@ class CategoryDeleteView(LoginRequiredMixin, View):
 
 
 '''Implements a view for sharing categories'''
-class CategoryShareView(LoginRequiredMixin, View):
+class ShareCategoryView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
@@ -165,7 +165,7 @@ class CategoryShareView(LoginRequiredMixin, View):
 
 
 '''Implements a view for accepting a share category requests'''
-class AcceptCategoryShareView(LoginRequiredMixin, View):
+class AcceptShareCategoryView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         notification = ShareCategoryNotification.objects.get(id=kwargs['notificationId'])
@@ -227,7 +227,7 @@ class CreateExpenditureView(LoginRequiredMixin, View):
 
 
 '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
-class ExpenditureUpdateView(LoginRequiredMixin, View):
+class UpdateExpenditureView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])     
@@ -249,13 +249,12 @@ class ExpenditureUpdateView(LoginRequiredMixin, View):
                     messages.error(request, f'Failed to update expenditure - {field}: {error}')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
                                 
-    
     def handle_no_permission(self):
         return redirect('logIn')
 
 
 '''Implements a view for deleting an expenditure'''
-class ExpenditureDeleteView(LoginRequiredMixin, View):
+class DeleteExpenditureView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
@@ -439,7 +438,6 @@ class ReportsView(LoginRequiredMixin, View):
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
             data1 = createArraysData(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
-
 
             graphData.update({'data1':data1})
             graphData.update({'text2':"Comparison to average over last 12 months"})

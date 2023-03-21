@@ -21,12 +21,14 @@ class ReportsFormTest(TestCase):
         }
         self.form = ReportForm(user=self.user, data=input)
 
+    # Tests that the form contains the correct field and that their field types are correct
     def testFormContainsCorrectFields(self):
         self.assertIn('timePeriod', self.form.fields)
         self.assertIn('selectedCategory', self.form.fields)
         self.assertTrue(self.form.fields['timePeriod'], forms.ChoiceField)
         self.assertTrue(self.form.fields['selectedCategory'], forms.MultipleChoiceField)
 
+    # Tests that the form's 'createCategorySelection' method returns the correct category options
     def testFormDisplaysCorrectCategoryOptions(self):
         options = self.form.createCategorySelection()
         self.assertEqual(options[0][0], self.category.id)

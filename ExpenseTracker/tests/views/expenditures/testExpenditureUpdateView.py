@@ -7,7 +7,7 @@ from ExpenseTracker.forms import ExpenditureForm
 import datetime
 from django.contrib import messages
 
-class ExpenditureUpdateViewTest(TestCase):
+class UpdateExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
     
     def setUp(self):

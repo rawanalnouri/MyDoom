@@ -20,9 +20,9 @@
                       </div>
                       <h6 class="f-w-600">{{ user.username }}</h6>
                       {% if user.followers.count == 1 %}
-                        <p>{{ user.followers.count }} Friend </p>
+                        <p>{{ user.followers.count }} Follower </p>
                       {% else %}
-                        <p>{{ user.followers.count }} Friends </p>
+                        <p>{{ user.followers.count }} Followers </p>
                       {% endif %}
                       <i class=" mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
                   </div>
@@ -44,6 +44,9 @@
                               <h6 class="text-muted f-w-400">{{ user.email }}</h6>
                           </div>
                       </div>
+                  </div>
+                  <div class="position-absolute bottom-0 end-10 b-p">
+                    <a href="{% url 'showUser' user.id %}" class="button-clear-r">View Followers</a>
                   </div>
                   <div class="position-absolute bottom-0 end-0 b-p">
                     <a href="{% url 'editProfile' %}" class="button-clear">Edit Profile</a>

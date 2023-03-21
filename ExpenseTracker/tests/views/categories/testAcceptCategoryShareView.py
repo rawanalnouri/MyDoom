@@ -4,7 +4,7 @@ from ExpenseTracker.models import User, Notification, ShareCategoryNotification
 from django.test import TestCase
 from django.urls import reverse
 
-class AcceptCategoryShareViewTest(TestCase):
+class AcceptShareCategoryViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):

@@ -54,6 +54,3 @@ class SpendingLimitModelTestCase(TestCase):
 
     def testCorrectAmountReturned(self):
         self.assertEqual(self.spendingLimit.amount, self.spendingLimit.getNumber())
-    
-
-    

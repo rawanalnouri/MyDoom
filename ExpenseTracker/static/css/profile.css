@@ -316,3 +316,22 @@ p {
 	padding: 0.37rem 0.5rem;
 	line-height: 2.3;
 }
+
+.button-clear-r{
+    background: transparent;
+    color: var(--primary-color);
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--primary-color);
+    margin-left: 200px;
+	border-radius: 7px;
+	font-weight: 400;
+	text-decoration: none;
+	padding: .5rem 1rem;
+	line-height: 2.3;
+}
+
+.button-clear-r:hover{
+    color: var(--primary-color-light);
+    border-color: var(--primary-color-light);
+}

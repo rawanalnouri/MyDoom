@@ -7,6 +7,7 @@ from ExpenseTracker.models import Expenditure, Category, SpendingLimit, User
 import datetime
 
 class ExpenditureFormTest(TestCase):
+    # Create instances of User, SpendingLimit, Category, and Expenditure models that are required for the tests
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
         self.spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
@@ -20,6 +21,7 @@ class ExpenditureFormTest(TestCase):
         )
         self.category.expenditures.add(self.expenditure)
     
+    # This tests whether the form has the correct fields and widgets
     def testFormHasCorrectFieldsAndWidgets(self):
         form = ExpenditureForm(self.user, self.category)
         self.assertIn('title', form.fields)
@@ -31,6 +33,7 @@ class ExpenditureFormTest(TestCase):
         self.assertIsInstance(form.fields['receipt'].widget, forms.FileInput)
         self.assertIsInstance(form.fields['date'].widget, forms.DateInput)
 
+    # This test checks whether the form validates correctly with valid data
     def testFormValidation(self):
         data = {
             'title': 'Grocery Shopping',
@@ -42,6 +45,7 @@ class ExpenditureFormTest(TestCase):
         form = ExpenditureForm(self.user, self.category, data)
         self.assertTrue(form.is_valid())
 
+    # This tests whether the form fails validation when required fields are missing
     def testFormValidationMissingFields(self):
         data = {
             'title': '',
@@ -53,6 +57,7 @@ class ExpenditureFormTest(TestCase):
         form = ExpenditureForm(self.user, self.category, data)
         self.assertFalse(form.is_valid())
 
+    # This test checks if the form can save the data correctly and the instance is added to the corresponding category
     def testFormSave(self):
         form = ExpenditureForm(self.user, self.category, {
             'title': 'Grocery Shopping',
@@ -66,6 +71,10 @@ class ExpenditureFormTest(TestCase):
         # Verify
         self.assertTrue(expenditure in self.category.expenditures.all())
     
+    '''
+    This test checks whether the form can successfully update an existing expenditure instance
+    and verifies that the updated fields are correct 
+    '''
     def testFormUpdate(self):
         form = ExpenditureForm(self.user, self.category, instance=self.expenditure, data={
             'title': 'Updated Title',

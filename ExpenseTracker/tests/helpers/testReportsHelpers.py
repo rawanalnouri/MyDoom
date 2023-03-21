@@ -7,8 +7,6 @@ import datetime
 from ExpenseTracker.helpers.reportsHelpers import *
 from dateutil.relativedelta import relativedelta
 
-
-
 class ReportsHelpersTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
@@ -48,7 +46,6 @@ class ReportsHelpersTest(TestCase):
         self.category.spendingLimit.timePeriod = 'daily'
         changedBudget = convertBudgetToDaily(self.category)
         self.assertEqual(changedBudget, self.category.spendingLimit.amount)
-
 
     def testWeeklyBudgetIsCovertedToWeekly(self):
         self.category.spendingLimit.timePeriod = 'daily'
@@ -108,7 +105,6 @@ class ReportsHelpersTest(TestCase):
         expectedYearData = round((categorySpend/float(convertBudgetToDaily(self.category))*100),2)
         self.assertEqual(yearData[0][0], self.category.name)
         self.assertEqual(yearData[1][0], 0)
-
 
     def testCreateArraysDataForWeeklyLimit(self):
         self.category.spendingLimit.timePeriod = 'week'
