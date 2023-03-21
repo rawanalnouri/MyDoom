@@ -7,7 +7,7 @@ from ExpenseTracker.forms import ExpenditureForm
 import datetime
 from django.contrib import messages
 
-class UpdateExpenditureViewTest(TestCase):
+class EditExpenditureViewTest(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
     
     def setUp(self):
@@ -18,11 +18,11 @@ class UpdateExpenditureViewTest(TestCase):
         self.category.users.add(self.user)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
-        self.url = reverse('updateExpenditure', args=[self.category.id, self.expenditure.id])
+        self.url = reverse('editExpenditure', args=[self.category.id, self.expenditure.id])
     
     # Tests whether the GET request to update an expenditure form returns the expected status code, template, and instance of the form. 
     def testGetMethod(self):
-        response = self.client.get(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
+        response = self.client.get(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertIsInstance(response.context['form'], ExpenditureForm)
@@ -47,7 +47,7 @@ class UpdateExpenditureViewTest(TestCase):
 
     # Tests whether the POST request with invalid data to update an expenditure returns the expected status code, template, and form. 
     def testPostMethodWithInvalidData(self):
-        response = self.client.post(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
+        response = self.client.post(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
             'title': '',
             'description': '',
             'amount': '',
@@ -65,7 +65,7 @@ class UpdateExpenditureViewTest(TestCase):
     # Tests whether a user who is not logged in is redirected to the login page when attempting to update an expenditure.
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('updateExpenditure', args=[self.category.id, self.expenditure.id]))
+        response = self.client.get(reverse('editExpenditure', args=[self.category.id, self.expenditure.id]))
         self.assertRedirects(response, reverse('logIn'))
 
     def testExpenditureIsSharedWithCorrectCategory(self):
