@@ -75,4 +75,9 @@ https://www.canva.com/en_gb/
 Testimonial:
 https://freefrontend.com/bootstrap-testimonials/
 
+Side menu styling:
+https://www.codingsnow.com/2021/01/sidebar-menu-with-sub-menu-dashboard.html
 
+Users list pagination:
+https://onaircode.com/best-html-css-pagination-templates/
+https://getbootstrap.com/docs/4.0/components/pagination/
