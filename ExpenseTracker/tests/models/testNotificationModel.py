@@ -9,7 +9,6 @@ class NotificationModelTestCase(TestCase):
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-
         #For basic notification model
         firstName = 'John'
         lastName = 'Doe'
@@ -116,7 +115,7 @@ class NotificationModelTestCase(TestCase):
         user = User.objects.get(email = self.notification.toUser.email)
         self.assertEqual(user, self.notification.toUser)
 
-    # follow request notification tests
+    # Follow request notification tests
 
     def testNoBlankFromUser(self):
         self.followRequestNotification.fromUser = None
@@ -128,7 +127,7 @@ class NotificationModelTestCase(TestCase):
         user2 = User.objects.get(email = self.followRequestNotification.fromUser.email)
         self.assertEqual(user2, self.followRequestNotification.fromUser)
 
-   # share category notification tests
+   # Share category notification tests
 
     def testNoBlankSharedFromUser(self):
         self.shareCategoryNotification.fromUser = None

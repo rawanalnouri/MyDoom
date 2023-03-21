@@ -4,6 +4,8 @@
 {% block title %}Main Page{% endblock %}
 
 {% block content %}
+{% load static %}
+  <link href="{% static 'css/index-style.css' %}" rel="stylesheet">
 
 <section class="top-section">
   <div class="container">
@@ -11,7 +13,7 @@
       <div class="col-md-6">
       <h1 class="page-title">The <span>fun</span> way<br>to manage<br>expenses</h1>
       <div class="subtitle">
-        <p>Make day-to-day spending a breeze with all things money in<br>one place!</p>
+        <p class="">Make day-to-day spending a breeze with all things money in<br>one place!</p>
       </div>
       <div class="padding">
         <a class="home-button" href="{% url 'signUp' %}">
@@ -20,7 +22,7 @@
       </div>
       </div>
       <div class="col-md-6">
-        <img src="https://www.linkpicture.com/q/IMG_1783.png" width="700" height="380" alt="">
+        <img src="https://www.linkpicture.com/q/IMG_1783.png" class="img-fluid padding" width="700" height="380" alt="">
       </div>
     </div>
   </div>
@@ -47,11 +49,16 @@
       <div class="alternating_content">
         <div class="row align-items-center justify-content-center">
           <div class="col-12 col-md-6 centered order-md-2 offset-xs-1">
-          <img src="https://www.linkpicture.com/q/IMG_1750.png"  width="768" height="714" alt="">
+          <img src="https://www.linkpicture.com/q/IMG_1750.png" class="img-fluid" width="768" height="714" alt="">
         </div>
         <div class="col-12 col-md-5 order-md-1">
-          <h2>Blah Blah</h2>
-          <p>Blah blah blah.</p>
+          <h2 class="section-title">Join Us Today</h2>
+          <p>
+            • Categorise your expenses to get a better understanding of where your<br>money is going.<br>
+            • Have your spending habits visualised as graphs and charts!<br>
+            • Set your budgets for each category and receive alerts when you have<br>exceeded your spending limit.<br>
+            • Generate reports and charts to help visualize your<br>spending habits and identify areas where they can cut back.
+          </p>
         </div>
       </div>
     </div>
@@ -67,10 +74,10 @@
         </div>
       </div>
       <div class="section-content col-12">
-        <div class="flexible_cards">
+        <div>
           <div class="row">
-            <div class="flexible_card col-12 col-md-6 col-lg-3">
-              <div class="flexible_card-container">
+            <div class="col-12 col-md-6 col-lg-3">
+              <div>
                 <div class="column-icon-list">
                   <div class="column-4">
                     <img src="https://www.linkpicture.com/q/card-30_2.png" width="210" height="140" alt="">
@@ -78,8 +85,8 @@
                 </div>
               </div>
             </div> 
-            <div class="flexible_card col-12 col-md-6 col-lg-3">
-              <div class="flexible_card-container">
+            <div class="col-12 col-md-6 col-lg-3">
+              <div>
                 <div class="column-icon-list">
                   <div class="column-4">
                     <img src="https://www.linkpicture.com/q/card-98_1.png" width="210" height="140" alt=""">
@@ -87,8 +94,8 @@
                 </div>
               </div>
             </div> 
-            <div class="flexible_card col-12 col-md-6 col-lg-3">
-              <div class="flexible_card-container">
+            <div class="col-12 col-md-6 col-lg-3">
+              <div>
                 <div class="column-icon-list">
                   <div class="column-4">
                     <img src="https://www.linkpicture.com/q/card-20_1.png" width="210" height="140" alt="">
@@ -96,8 +103,8 @@
                 </div>
               </div>
             </div>
-            <div class="flexible_card col-12 col-md-6 col-lg-3">
-              <div class="flexible_card-container">
+            <div class="col-12 col-md-6 col-lg-3">
+              <div>
                 <div class="column-icon-list">
                   <div class="column-4">
                     <img src="https://www.linkpicture.com/q/card-95_1.png" width="210" height="140" alt="">
@@ -105,6 +112,44 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-section">
+  <div class="container">
+    <div class="row">
+      <div class="section-header col-12"> </div>
+        <div class="section-content col-12">
+          <div class="cta-block colourful">
+            <div class="container colourful-block rounded-corner">
+              <div class="row">
+                <div class="col-12 text-center">
+                      <h2 class="cta-block-title">
+                        Ready to try out 
+                        <b>Wallet Wizards</b>?
+                      </h2>
+                      <div class="row">
+                        <div class="col-12 text-center">
+                          <div class="btn-container btn-block">
+                            <a id="" class="button" href="{% url 'signUp' %}">
+                            Create an account
+                            </a>
+                            <a id="" class="button-clear-big" href="{% url 'logIn' %}">
+                            Login
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                     
+                </div>
+                </div>
+              </div>
+
           </div>
         </div>
       </div>
@@ -126,7 +171,7 @@
           <div class="container testimonial-inner">
               <div class="row d-flex justify-content-center">
                   <div class="col-md-4 style-3">
-                      <div class="tour-item ">
+                      <div class="tour-item b-padding">
                           <div class="tour-desc bg-beige">
                               <div class="tour-text color-blue text-center">&ldquo;The best spending tracker I've ever used!&rdquo;</div>
                               <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-4_51.png" alt=""></div>
@@ -136,7 +181,7 @@
                       </div>
                   </div>
                   <div class="col-md-4 style-3">
-                      <div class="tour-item ">
+                      <div class="tour-item b-padding">
                           <div class="tour-desc bg-beige">
                               <div class="tour-text color-blue text-center">&ldquo;A great way to track my money!&rdquo;</div>
                               <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-3_67.png" alt=""></div>
@@ -145,8 +190,8 @@
                           </div>
                       </div>
                   </div>
-                  <div class="col-md-4 style-3">
-                      <div class="tour-item ">
+                  <div class="col-md-4 style-3 b-padding">
+                      <div class="tour-item b-padding">
                           <div class="tour-desc bg-beige">
                               <div class="tour-text color-blue text-center">&ldquo;This makes budgeting fun!&rdquo;</div>
                               <div class="d-flex justify-content-center pt-2 pb-2"><img class="tm-people" src="https://www.linkpicture.com/q/Untitled-design-5_33.png" alt=""></div>
@@ -159,42 +204,7 @@
       </section>
 </section>
 
-<section class="final-section">
-  <div class="container">
-    <div class="row">
-      <div class="section-header col-12"> </div>
-        <div class="section-content col-12">
-          <div class="cta-block colourful">
-            <div class="container colourful-block rounded-corner">
-              <div class="row">
-                <div class="col-12 text-center">
-                  <div class="card mx-auto">
-                    <img class="card-img-top" src="https://www.linkpicture.com/q/circle_2.png" width="150" height="120">
-                    <div class="card-img-overlay">
-                      <h2 class="cta-block-title">Ready to try out <b>MyDoom</b>?</h2>
-                    </div>
-                     
-                </div>
-                </div>
-              </div>
-            <div class="row">
-              <div class="col-12 text-center">
-                <div class="btn-container">
-                  <a id="" class="button" href="{% url 'signUp' %}">
-                  Create an account
-                  </a>
-                  <a id="" class="button-clear" href="{% url 'logIn' %}">
-                  Login
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+
 
 <script>
   $(window).scroll(function(){

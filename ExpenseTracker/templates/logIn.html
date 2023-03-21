@@ -3,6 +3,8 @@
 {% block title %}Login {% endblock %}
 
 {% block content %}
+{% load static %}
+  <link href="{% static 'css/login-signup-style.css' %}" rel="stylesheet">
 
     <div class="content-login">
         <div class="container container-content rounded-corner">
@@ -15,7 +17,6 @@
                 <div class="col-md-8">
                   <div class="mb-4">
                   <h3>Login</h3>
-                  <!--<p class="mb-4">Blah blah.</p>-->
                 </div>
                 <form action="{% url 'logIn' %}" method="post">
                     {% csrf_token %}

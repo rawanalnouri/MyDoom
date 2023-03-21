@@ -22,7 +22,7 @@ class HomeViewTest(TestCase):
         self.user.save()
         self.spendingLimit = SpendingLimit.objects.get(id=1)
 
-    #  This test ensures that the home view is using the correct HTML template, which should be home.html.
+    #  This test ensures that the home view is using the correct HTML template, which should be home.html
     def testHomeViewUsesCorrectTemplate(self):
         response = self.client.get(reverse('home'))
         self.assertEqual(response.status_code, 200)

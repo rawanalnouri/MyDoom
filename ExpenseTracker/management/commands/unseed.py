@@ -7,6 +7,7 @@ class Command(BaseCommand):
         self._deleteCategories()
         self._deleteUsers()
         self._deleteNotifications()
+        self._resetHouse()
     
     def _deleteExpenditures(self, *args, **options):
         deletedExpenditures = 0
@@ -35,3 +36,12 @@ class Command(BaseCommand):
                 notification.delete()
                 deletedNotifications += 1
         self.stdout.write(self.style.SUCCESS(f"Number of deleted notifications: {deletedNotifications}"))
+
+    def _resetHouse(self, *args, **options):
+        resetHouses = 0
+        for house in House.objects.all():
+                house.points=0
+                house.memberCount=0
+                house.save()
+                resetHouses += 1
+        self.stdout.write(self.style.SUCCESS(f"Number of reset houses: {resetHouses}"))

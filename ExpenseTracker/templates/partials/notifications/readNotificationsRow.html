@@ -1,3 +1,6 @@
+{% load static %}
+  <link href="{% static 'css/notifications-style.css' %}" rel="stylesheet">
+
 <tr>
     <td> 
         {% include "partials/notifications/notificationRowContent.html" with notification=notification %}

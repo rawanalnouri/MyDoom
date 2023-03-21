@@ -10,8 +10,8 @@ from datetime import datetime
 from django.utils import timezone
 from decimal import Decimal
 
+'''model for setting and monitoring user's financial goals and spending limits.'''
 class SpendingLimit(models.Model):
-    '''model for setting and monitoring user's financial goals and spending limits.'''
 
     TIME_CHOICES = [
         ('daily', 'Daily'),
@@ -20,7 +20,7 @@ class SpendingLimit(models.Model):
         ('yearly', 'Yearly')
     ]
     timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=False)
-    amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
+    amount = models.DecimalField(max_digits=50, validators=[MinValueValidator(0.01)], decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -33,9 +33,8 @@ class SpendingLimit(models.Model):
     def getNumber(self):
         return self.amount
 
-
+'''model for storing and tracking user expenditures.'''
 class Expenditure(models.Model):
-    '''model for storing and tracking user expenditures.'''
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
@@ -50,8 +49,8 @@ class Expenditure(models.Model):
     def __str__(self):
         return self.title
 
+'''model for storing and managing user expense categories.'''
 class Category(models.Model):
-    '''model for storing and managing user expense categories.'''
 
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
@@ -77,18 +76,16 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-
+''' model for the different houses '''
 class House(models.Model):
-    ''' model for the different houses '''
     # image= models.ImageField(upload_to='images/') 
     points = models.IntegerField(default=0)
     # HOUSE_CHOICES = {'one','two','three','four'}
     name = models.CharField(max_length=20, blank=False)
     memberCount = models.IntegerField(default=0)
 
+'''model for user authentication.'''
 class User(AbstractUser):
-    '''model for user authentication.'''
-
     username   = models.CharField(
         max_length=30,
         unique=True,
@@ -112,32 +109,29 @@ class User(AbstractUser):
     class Meta:
         ordering = ['username']
 
+    '''Return a URL to the user's gravatar'''
     def gravatar(self, size=120):
-        """Return a URL to the user's gravatar."""
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
 
+    '''Return a URL to a miniature version of the user's gravatar.'''
     def miniGravatar(self):
-        """Return a URL to a miniature version of the user's gravatar."""
         return self.gravatar(size=60)
 
     def fullName(self):
         return f'{self.firstName} {self.lastName}'
 
+    '''Returns whether self follows the given user.'''
     def isFollowing(self, user):
-        """Returns whether self follows the given user."""
-
         return user in self.followees.all()
 
+    '''Returns the number of followers of self.'''
     def followerCount(self):
-        """Returns the number of followers of self."""
-
         return self.followers.count()
 
+    '''Returns the number of followees of self.'''
     def followeeCount(self):
-        """Returns the number of followees of self."""
-
         return self.followees.count()
 
     def totalProgress(self):
@@ -159,9 +153,8 @@ class User(AbstractUser):
                 total += float(expense.amount)
         return round(total, 2)
 
-
+'''model for storing and managing user notifications.'''
 class Notification(models.Model):
-    '''model for storing and managing user notifications.'''
 
     toUser = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
@@ -188,8 +181,8 @@ class ShareCategoryNotification(Notification):
 class FollowRequestNotification(Notification):
     fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
+''' model for the points that the user earns '''
 class Points(models.Model):
-    ''' model for the points that the user earns '''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)
     

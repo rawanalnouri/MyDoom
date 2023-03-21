@@ -1,0 +1,23 @@
+.button-purple{
+    background: #8282dc;
+    color: white;
+    width: 100px;
+    border: none;
+    border-radius: 7px;
+    border-color: var(--primary-color);
+    padding: .5rem 1rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    min-width: 7rem;
+    text-decoration: none;
+    -webkit-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+    -moz-box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+    box-shadow: 0px 10px 41px -11px rgba(0, 0, 0, 0.7);
+}
+
+.button-purple:hover{
+    background-color: #2b275c;
+    color: white;
+    text-decoration: none;
+
+}

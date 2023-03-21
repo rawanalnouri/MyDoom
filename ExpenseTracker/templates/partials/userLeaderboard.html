@@ -1,47 +1,9 @@
-<style>
-    .bar-chart {
-        display: flex;
-        align-items: flex-end;
-        height: 200px;
-    }
-    .bar {
-        width: 30%;
-        text-align: center;
-        border-top-left-radius: 30px;
-        border-top-right-radius: 30px;
-        position: relative;
-    }
-    .bar-label {
-        position: absolute;
-        bottom: 25px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .bar-number {
-        position: absolute;
-        bottom: 5px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: x-small;
-        
-    /* Add a rounded border */
-        border-radius: 10px;
-        border: 1px solid black;
-        padding: 1px 3px;
-    }
-    .first { background-color: #F2F2F0 }
-    .second { background-color: #FFE6B3; }
-    .third { background-color: #E6E6E6; }
-    .fourth { background-color: #E6C2A2; }
-    .th-normal {
-    font-weight: normal;
-    }
-</style>
-
+{% load static %}
+  <link href="{% static 'css/user-leaderboard-style.css' %}" rel="stylesheet">
 <div class="container mt-2">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-sm-6">
-            <div class="card border">
+            <div class="card mx-auto" style="width: 500px;">
                     <div class="card-body">
                         <div class="bar-chart">
                             <div class="bar second" id="first-user-bar">
@@ -56,29 +18,21 @@
                               <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{topPoints.2.user.username}}</div>
                               <div class="bar-number" id="third-user-points">{{topPoints.2.count}}</div>
                             </div>
-                            <div class="bar fourth" id="fourth-user-bar">
+                            <div class="bar four" id="fourth-user-bar">
                               <div class="bar-label"><span style="font-weight: 600;">4th</span><br>{{topPoints.3.user.username}}</div>
                               <div class="bar-number" id="fourth-user-points">{{topPoints.3.count}}</div>
                             </div>
                         </div>                          
                         <br>
-                        <p style="text-align: center;">
+                        <p class="leaderboard-text">
                             We have a winner!
-                            <br>
-                            <span class="text-muted">{{topPoints.0.user.username}} is in the lead with </span> 
-                            {{topPoints.0.count}} PTS,
-                            <span class="text-muted"> congratulations!</span>
+                        </p>
+                        <p class="user-text">
+                            <span class="black-text">@{{topPoints.0.user.username}} is in the lead with </span> 
+                            {{topPoints.0.count}} points,
+                            <span class="black-text"> congrats!</span>
                         </p>
                     </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    Second card
-                    <br>
-                    Personal house data/charts
-                </div>
             </div>
         </div>
     </div>
@@ -96,13 +50,13 @@
                             {% include 'partials/users/userList.html' with points=points %}
                         {% endwith %}
                     {% endwith %}
-                    <div class="pagination">
+                    <div class="pagination m-l-460">
                         {% if points.has_previous %}
-                            <a id="pagination-button" href="?page={{ points.previous_page_number }}"><i class="bi bi-arrow-left"></i></a>
+                            <a id="pagination-button" href="?page={{ points.previous_page_number }}" class="m-r-5"><i class="bi bi-arrow-left btn-purple"></i></a>
                         {% endif %}
                         page {{ points.number }} of {{ points.paginator.num_pages }}
                         {% if points.has_next %}
-                            <a id="pagination-button" href="?page={{ points.next_page_number }}"><i class="bi bi-arrow-right"></i></a>
+                            <a id="pagination-button" href="?page={{ points.next_page_number }}" class="m-l-5"><i class="bi bi-arrow-right btn-purple"></i></a>
                         {% endif %}
                     </div>
                 </div>

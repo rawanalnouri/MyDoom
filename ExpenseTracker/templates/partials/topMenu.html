@@ -1,6 +1,11 @@
 <nav class="top-menu">
-    <div class="title">Spending <span>Tracker</span></div>
     {% if user.is_authenticated %}
+        <div class="title">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                Wallet <span>Wizards</span>
+            </a>
+            
+        </div>
         <div class="collapse-btn"><i class="bi bi-list"></i></div>
         <p style="color: black;" >Points: {{points.count}}</p>  
         <ul>
@@ -11,6 +16,12 @@
             </li>
         </ul>
     {% else %}
+        <div class="title">
+            <a class="navbar-brand" href="{% url 'index' %}">
+                Wallet <span>Wizards</span>
+            </a>
+            
+        </div> 
         <ul>
             <li>
                 <a class="logged-out-items-clear" href="{% url 'signUp' %}">Sign up</a>

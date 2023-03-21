@@ -9,7 +9,8 @@ class SetOverallSpendingLimitViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        
+    
+    #  This tests the HTTP GET method of the view
     def testGet(self):
         response = self.client.get(reverse('setOverallSpendingLimit'))
         self.assertEqual(response.status_code, 200)
@@ -65,6 +66,7 @@ class SetOverallSpendingLimitViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Your overall spending limit is too low compared to the spending limits set in your categories.')
     
+    # Tests that the view redirects to the login page if the user is not logged in
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
         url = reverse('setOverallSpendingLimit')

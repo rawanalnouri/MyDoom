@@ -2,6 +2,9 @@
 {% block title %}Sign Up{% endblock %}
 
 {% block content %}
+{% load static %}
+  <link href="{% static 'css/login-signup-style.css' %}" rel="stylesheet">
+
     <div class="content-signup">
         <div class="container container-content-signup rounded-corner">
           <div class="row">
@@ -13,7 +16,6 @@
                 <div class="col-md-8">
                   <div class="mb-4">
                   <h3>Sign up</h3>
-                  <!--<p class="mb-4">Blah blah.</p>-->
                 </div>
                 <form action="{% url 'signUp' %}" method="post">
                     {% csrf_token %}

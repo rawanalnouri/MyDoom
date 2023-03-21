@@ -1,45 +1,5 @@
-<style>
-  .podium {
-    height: 20%;
-    width: 20%;
-    text-align: center;
-    margin: 0px;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    display: inline-block;
-    vertical-align: bottom;
-  }
-
-  .gold {
-    background-color: gold;
-    height: 300px;
-  }
-
-  .silver {
-    background-color: silver;
-    height: 250px;
-  }
-
-  .bronze {
-    background-color: #cd7f32;
-    height: 200px;
-  }
-  
-  .fourth {
-    background-color: #999;
-    height: 150px;
-  }
-
-  .bar-house {
-        width: 30%;
-        text-align: center;
-        border-top-left-radius: 15px;
-        border-top-right-radius: 15px;
-        position: relative;
-        margin-right: 10px;
-  }
-</style>
+{% load static %}
+  <link href="{% static 'css/house-leaderboard-style.css' %}" rel="stylesheet">
 
   <div class="leaderboard">
     
@@ -48,20 +8,20 @@
 
 
   <div class="container mt-2">
-    <div class="row">
+    <div class="row justify-content-center">
         <div class="col-sm-6">
-            <div class="card border">
+            <div class="card mx-auto" style="width: 600px;">
                 <div class="card-body">
                     <div class="bar-chart">
-                      <div class="bar-house second" id="first-house-bar">
+                      <div class="bar-house silver" id="first-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">2nd</span><br>{{houses.1.name}}</div>
                           <div class="bar-number" id="first-house-points">{{houses.1.points}}</div>
                       </div> 
-                      <div class="bar-house first" id="second-house-bar">
+                      <div class="bar-house gold" id="second-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">1st</span><br>{{houses.0.name}}</div>
                           <div class="bar-number" id="second-house-points">{{houses.0.points}}</div>
                       </div>
-                      <div class="bar-house third" id="third-house-bar">
+                      <div class="bar-house bronze" id="third-house-bar">
                           <div class="bar-label"><span style="font-weight: 600;">3rd</span><br>{{houses.2.name}}</div>
                           <div class="bar-number" id="third-house-points">{{houses.2.points}}</div>
                       </div>
@@ -71,25 +31,20 @@
                       </div>
                   </div>
                     <br>
-                    <p style="text-align: center;">
+                    <p class="leaderboard-text" style="text-align: center;">
                         We have a winner!
-                        <br>
-                        <span class="text-muted">Congratulations to {{houses.0.name}} for leading with </span> 
-                        {{houses.0.points}} PTS,
-                        <span class="text-muted"> you're doing great!</span>
+                      </p>
+
+                      <p class="user-text">
+                        <span class="black-text">Congratulations to {{houses.0.name}} for leading with </span> 
+                        {{houses.0.points}} points,
+                        <span class="black-text"> you're doing great!</span>
+                        </p>
                     </p>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    Second card
-                    <br>
-                    Personal house data/charts
-                </div>
-            </div>
-        </div>
+
     </div>
 
     <br>
@@ -100,21 +55,23 @@
                 <div class="card-body">
                   <h5>House rankings</h5>
                   <div class="table">
-                  <table class="table">
+                  <table class="table rounded rounded-3 overflow-hidden">
                     <thead>
-                      <tr>
-                        <th class="text-muted th-normal">Rank</th>
-                        <th class="text-muted th-normal">House</th>
-                        <th class="text-muted th-normal">Score</th>
-                        <th class="text-muted th-normal">Members</th>
+                      <tr class="color-table">
+                        <th class="th-normal">Rank</th>
+                        <th class="th-normal">House</th>
+                        <th class="th-normal">Score</th>
+                        <th class="th-normal">Members</th>
                       </tr>
                     </thead>
                     <tbody>
                         {% for house in houses %}
                         <tr>
-                          <td class="text-black-50">{{forloop.counter}}</td>
+                          <td><div{% if forloop.counter0 < 1 %} class="circle-first-podium" {% elif forloop.counter0 < 2 %} class="circle-second-podium"
+                            {% elif forloop.counter0 < 3 %} class="circle-third-podium" {% elif forloop.counter0 < 4 %} class="circle-fourth-podium"
+                            {% endif %}>{{ forloop.counter }}</th>
                           <td>{{house.name}}</td>
-                          <td>{{house.points}}</td>
+                          <td><div class="rounded text-center p-2 points-rectangle">{{house.points}}</td>
                           <td>{{house.memberCount}}</td>
                         </tr>   
                         {%endfor%}

@@ -9,7 +9,7 @@ class UserModelTestCase(TestCase):
 
     def setUp(self):
 
-        #For basic user model
+        # For basic user model
         firstName = 'John'
         lastName = 'Doe'
         email = 'testEmail1@example.org'
@@ -23,7 +23,7 @@ class UserModelTestCase(TestCase):
             password = password
         )
 
-        #For extended users
+        # For extended users
         firstName2 = 'Jane'
         lastName2 = 'Smith'
         email2 = 'testEmail2@example.org'
