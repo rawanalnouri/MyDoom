@@ -2,7 +2,7 @@
 from django.contrib import messages
 from django.test import TestCase
 from django.urls import reverse
-from ExpenseTracker.forms import EditProfile
+from ExpenseTracker.forms import EditProfileForm
 from ExpenseTracker.models import User
 from ExpenseTracker.tests.testHelpers import reverse_with_next
 
@@ -38,8 +38,8 @@ class EditProfileViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'editProfile.html')
-        signUpForm = response.context['form']
-        self.assertTrue(isinstance(signUpForm,EditProfile))
+        form = response.context['form']
+        self.assertTrue(isinstance(form, EditProfileForm))
 
     def testUnsuccesfulProfileUpdate(self):
         self.formInput['username'] = "a{35}"
@@ -50,7 +50,7 @@ class EditProfileViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'editProfile.html')
         form = response.context['form']
-        self.assertTrue(isinstance(form, EditProfile))
+        self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'bob123')

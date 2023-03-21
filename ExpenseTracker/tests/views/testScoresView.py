@@ -38,7 +38,7 @@ class ScoresViewTest(TestCase):
 
     def testUserOrder(self):    
         response = self.client.get(self.url)
-        users = response.context['points']
+        users = response.context['userPoints']
         self.assertEqual(users[0], self.points2)
         self.assertEqual(users[1], self.points1)
 

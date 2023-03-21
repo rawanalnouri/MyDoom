@@ -45,18 +45,18 @@
                 <div class="card-body">
                     <h5>User rankings</h5>
                     {% load mathfilters %}
-                    {% with pointsNumber=points.number|sub:1 %}
-                        {% with startingNumber=points.paginator.per_page|mul:pointsNumber %}
-                            {% include 'partials/users/userList.html' with points=points %}
+                    {% with pointsNumber=userPoints.number|sub:1 %}
+                        {% with startingNumber=userPoints.paginator.per_page|mul:pointsNumber %}
+                            {% include 'partials/users/userList.html' with userPoints=userPoints %}
                         {% endwith %}
                     {% endwith %}
                     <div class="pagination m-l-460">
-                        {% if points.has_previous %}
-                            <a id="pagination-button" href="?page={{ points.previous_page_number }}" class="m-r-5"><i class="bi bi-arrow-left btn-purple"></i></a>
+                        {% if userPoints.has_previous %}
+                            <a id="pagination-button" href="?page={{ userPoints.previous_page_number }}" class="m-r-5"><i class="bi bi-arrow-left btn-purple"></i></a>
                         {% endif %}
-                        page {{ points.number }} of {{ points.paginator.num_pages }}
-                        {% if points.has_next %}
-                            <a id="pagination-button" href="?page={{ points.next_page_number }}" class="m-l-5"><i class="bi bi-arrow-right btn-purple"></i></a>
+                        page {{ userPoints.number }} of {{ userPoints.paginator.num_pages }}
+                        {% if userPoints.has_next %}
+                            <a id="pagination-button" href="?page={{ userPoints.next_page_number }}" class="m-l-5"><i class="bi bi-arrow-right btn-purple"></i></a>
                         {% endif %}
                     </div>
                 </div>

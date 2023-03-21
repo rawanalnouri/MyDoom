@@ -13,7 +13,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for i in points %}
+        {% for i in userPoints %}
         <tr>            
             <th scrope="row"><div{% if i.user == topPoints.0.user %} class="circle-first" {% elif i.user == topPoints.1.user %} class="circle-second"
                 {% elif i.user == topPoints.2.user %} class="circle-third" {% elif i.user == topPoints.3.user %} class="circle-fourth"

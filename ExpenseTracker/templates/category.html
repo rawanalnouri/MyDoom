@@ -89,9 +89,9 @@ $(document).ready(function() {
         var expenditureId = $(this).data('expenditure');
         var categoryId = $(this).data('category');
         $.ajax({
-            url: "/category/" + categoryId + "/update/" + expenditureId + "/",
+            url: "/category/" + categoryId + "/edit/" + expenditureId + "/",
             success: function(data) {
-                $("form").attr("action", "/category/" + categoryId + "/update/" + expenditureId + "/");
+                $("form").attr("action", "/category/" + categoryId + "/edit/" + expenditureId + "/");
                 $("#edit-expenditure-modal .update-form").html(data);
                 $("#edit-expenditure-modal").modal("show");
             }

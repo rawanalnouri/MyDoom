@@ -1,5 +1,4 @@
-''' Tests for form handling categories being shared'''
-
+''' Tests for form handling categories being shared.'''
 from django.test import TestCase
 from ExpenseTracker.models import User, Category, Notification
 from ExpenseTracker.forms import ShareCategoryForm
@@ -7,9 +6,9 @@ from django.urls import reverse
 from django import forms
 
 class ShareCategoryFormTest(TestCase):
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
-    # Creates necessary objects and setup the test environment including two users, a 'Category', and the relationships between them
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.secondUser = User.objects.create_user(
@@ -24,8 +23,6 @@ class ShareCategoryFormTest(TestCase):
         self.user.categories.add(self.category)
         self.category.users.add(self.user)
 
-    # Tests the form with valid data
-    # Checks that the shared category has been added to the new user's categories and the new user has been added to the shared category's user
     def testFormWithValidData(self):
         validUser = self.secondUser
         self.user.followers.add(validUser)
@@ -42,7 +39,6 @@ class ShareCategoryFormTest(TestCase):
         self.assertTrue(validUser in self.category.users.all())
         self.assertTrue(self.category in validUser.categories.all())
 
-    # Tests the form with a user that already has a category with the same name as the shared category
     def testFromWithUserThatHasSameCategoryName(self):
         validUser = self.secondUser
         validUser.categories.add(self.category)
@@ -57,7 +53,6 @@ class ShareCategoryFormTest(TestCase):
             ):
             form.clean()
 
-    # Tests the form with an invalid user ID, checks that the form is not valid and has an error for the user field
     def testFormWithInvalidUser(self):
         invalidUserId = 3
         formData = {'user': invalidUserId}
@@ -65,7 +60,6 @@ class ShareCategoryFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertTrue('user' in form.errors)
 
-    # Tests the form with a user who is not a follower of the user, checks that the form is not valid and has an error for the user field.
     def testFormWithNonFollowerUser(self):
         nonFollowerUser = self.secondUser
         formData = {'user': nonFollowerUser.id}
@@ -73,7 +67,6 @@ class ShareCategoryFormTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertTrue('user' in form.errors)
 
-    # Tests the form with empty data, checks that the form is not valid and has an error for the user field
     def testFormWithEmptyData(self):
         form = ShareCategoryForm(fromUser=self.user, category=self.category, data={})
         self.assertFalse(form.is_valid())

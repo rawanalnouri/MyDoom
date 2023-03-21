@@ -209,7 +209,7 @@ class CategorySpendingLimitForm(forms.ModelForm):
         return cleanedData
 
 
-class EditProfile(forms.ModelForm):
+class EditProfileForm(forms.ModelForm):
     """Form to update user profiles."""
 
     firstName = forms.CharField(label='First name')
@@ -349,7 +349,7 @@ class OverallSpendingForm(forms.Form):
 
     def clean(self):
         """Clean the data and generate messages for any errors."""
-        
+
         cleanedData = super().clean()
         amount = cleanedData.get('amount')
         timePeriod = cleanedData.get('timePeriod')
