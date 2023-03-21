@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ExpenseTracker',
+    'walletwizard',
     'widget_tweaks',
     'mathfilters',
 ]
@@ -69,8 +69,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'ExpenseTracker.notificationContextProcessor.getNotifications',
-                'ExpenseTracker.pointsContextProcessor.getPoints',
+                'walletwizard.notificationContextProcessor.getNotifications',
+                'walletwizard.pointsContextProcessor.getPoints',
                 'django_auto_logout.context_processors.auto_logout_client',
             ],
         },
@@ -128,10 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "ExpenseTracker" / "static"]
+STATICFILES_DIRS = [BASE_DIR / "walletwizard" / "static"]
 
 # Media folder to store user uploaded images
-MEDIA_ROOT  = os.path.join(BASE_DIR,'ExpenseTracker/media')
+MEDIA_ROOT  = os.path.join(BASE_DIR,'walletwizard/media')
 MEDIA_URL = '/media/'
 
 # Default primary key field type
@@ -140,7 +140,7 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # User model for authentication purposes
-AUTH_USER_MODEL = 'ExpenseTracker.User'
+AUTH_USER_MODEL = 'walletwizard.User'
 
 # Login URL for redirecting users from login protected views
 LOGIN_URL = 'logIn'

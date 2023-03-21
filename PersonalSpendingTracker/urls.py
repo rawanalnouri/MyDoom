@@ -15,14 +15,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ExpenseTracker.views.expenditureViews import *
-from ExpenseTracker.views.categoryViews import *
-from ExpenseTracker.views.authenticationViews import *
-from ExpenseTracker.views.expenditureViews import *
-from ExpenseTracker.views.notificationViews import *
-from ExpenseTracker.views.userViews import *
-from ExpenseTracker.views.reportsViews import *
-from ExpenseTracker.views.profileViews import *
+from walletwizard.views.expenditureViews import *
+from walletwizard.views.categoryViews import *
+from walletwizard.views.authenticationViews import *
+from walletwizard.views.expenditureViews import *
+from walletwizard.views.notificationViews import *
+from walletwizard.views.userViews import *
+from walletwizard.views.reportsViews import *
+from walletwizard.views.profileViews import *
 from django.conf import settings
 from django.conf.urls.static import static
 
