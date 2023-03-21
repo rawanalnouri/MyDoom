@@ -67,7 +67,7 @@ class TestLoginView(TestCase, LogInTester):
         listOfMessages = list(response.context['messages'])
         self.assertEqual(len(listOfMessages), 0)
 
-    # This test checks if a user earns 5 points for their first login within a 24-hour period. 
+    # This test checks if a user earns 5 points for their first login within a 24-hour period
     def testUserEarnsPointsIfFirstLogin(self):
         self.user.lastLogin = timezone.make_aware(datetime.now() - timedelta(days=1))
         self.user.save()
@@ -77,8 +77,7 @@ class TestLoginView(TestCase, LogInTester):
         # Check if user points have increased
         self.assertEqual(userPointsAfter, userPointsBefore+5)
 
-        # Check if user received points notifications.
- 
+        # Check if user received points notifications
         notifications = Notification.objects.filter(toUser=self.user).order_by('-createdAt')[:2]
         titles=getNotificationTitles(notifications)
         messages=getNotificationMessages(notifications)

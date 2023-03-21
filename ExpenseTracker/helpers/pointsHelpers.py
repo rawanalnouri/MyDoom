@@ -45,7 +45,7 @@ def housePointsUpdate(user, amount):
 
 '''
 Handles user losing points based on the percentage they've gone above their spending limit.
-Only called if over the limit
+Only called if over the limit.
 '''
 def losePoints(user, limit, spent):
     spentProportion = (spent-limit)/limit 
@@ -69,11 +69,12 @@ def losePoints(user, limit, spent):
         updatePoints(user, -25)
         createBasicNotification(user, "Points Lost!", "25 points lost for going over target")
 
-""" 
+
+''' 
 Checks if the user is already over their spending limit.
 Returns boolean for if over over and the total amount the user has spent within their 
 current spending limit.
-"""
+'''
 def checkIfOver(category):
     currentCategory = Category.objects.get(id=category.id)
 
@@ -107,5 +108,5 @@ def trackPoints(user, category, isOver, totalSpent):
             createBasicNotification(user, "Points Won!", "5 points for staying within target for " + currentCategory.name)
 
     else:
-        #if they are already over the amount want to loose point depending on the new expenditure, not the previos overdraft 
+        # if they are already over the amount want to lose point depending on the new expenditure, not the previos overdraft 
         losePoints(user, Decimal(currentCategory.spendingLimit.amount), currentCategory.spendingLimit.amount + newExpenditureAmount)

@@ -249,7 +249,6 @@ class UpdateExpenditureView(LoginRequiredMixin, View):
                     messages.error(request, f'Failed to update expenditure - {field}: {error}')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
                                 
-    
     def handle_no_permission(self):
         return redirect('logIn')
 
@@ -439,7 +438,6 @@ class ReportsView(LoginRequiredMixin, View):
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
             data1 = createArraysData(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
-
 
             graphData.update({'data1':data1})
             graphData.update({'text2':"Comparison to average over last 12 months"})

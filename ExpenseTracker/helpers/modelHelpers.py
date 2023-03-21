@@ -26,7 +26,7 @@ def computeTotalSpent(timePeriod, expenditures):
             total += float(expense.amount)
     return total
 
-# Function to compute spedning limit value in a month
+# Function to compute spending limit value in a month
 def computeTotalSpendingLimitByMonth(timePeriod, amount):
     result = 0.0
     if timePeriod == 'daily':
