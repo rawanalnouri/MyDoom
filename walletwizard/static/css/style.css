@@ -191,7 +191,6 @@ html,body{
   
 .base .side-menu .menu .item .sub-menu{
     background: var(--primary-color);
-    overflow: hidden;
     max-height: 0;
     transition: 0.3s;
     transition-property: background, max-height;
