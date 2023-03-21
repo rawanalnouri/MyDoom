@@ -1,3 +1,8 @@
+<!-- This file helps with rendering simple graphs which use one set of data
+points and one set of labels which allign with those data points by index -->
+
+<!-- 'num' is passed in to indicate which number of graph we are on, for example if
+we are on the second graph of the page, 'num' would be 2 -->
 <div id="container{{num}}" style="width: 100%">
   <canvas id="chart{{num}}"></canvas>
 </div>
@@ -74,6 +79,7 @@
     },
   };
   {% if type == 'doughnut' %}
+  // adding text inside a doughnut chart
   Chart.pluginService.register({
   beforeDraw: function(chart) {
     var width = chart.chart.width,
@@ -92,6 +98,7 @@
 });
  {% endif %}
 
+  // fucntion that actually renders and draws the graph
   const myChart{{num}} = new Chart(
   document.getElementById('chart{{num}}'),
   config
