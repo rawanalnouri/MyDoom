@@ -1,21 +1,20 @@
-from django.contrib import messages
+"""Tests for the reports view."""
 from django.test import TestCase
 from django.urls import reverse
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 from ExpenseTracker.forms import ReportForm
-from ExpenseTracker.models import *
+from ExpenseTracker.models import User, Expenditure, Category
 import datetime
 
-# class ReportViewTest(TestCase):
-
 class ReportViewTest(TestCase):
-
+    """Tests for the reports view."""
 
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
-
 
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
+        self.url = reverse('reports')
 
         self.expenditure = Expenditure.objects.get(id=1)
         self.expenditure.date = datetime.datetime.now()
@@ -31,22 +30,33 @@ class ReportViewTest(TestCase):
         }
         self.form = ReportForm(user=self.user, data=input)
 
-#  testing if page is correctly loaded
-# with the correct form
-# and with the correct template
+    def testReportsUrl(self):
+        self.assertEqual(self.url,'/reports/')
+
     def testCategoryReportViewGet(self):
-        url = reverse('reports')
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'reports.html')
         self.assertIsInstance(response.context['form'], ReportForm)
 
+    def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
+        response = self.client.post(reverse('reports'), self.input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('reports.html')
+
+    def testPostWithInvalidFormData(self):
+        self.input['selectedCategory'] = ''
+        response = self.client.post(reverse('reports'), self.input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('reports.html')
+        self.assertEqual(response.context['labels'], [])
+        self.assertEqual(response.context['data'], [])
+    
     def testReportsViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
-        url = reverse('reports')
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed('logIn.html')
 
     # def testCategoryTimeFilters(self):
@@ -63,19 +73,3 @@ class ReportViewTest(TestCase):
     #     #     self.assertNotContains(response, f'Post__{count}')
     #     # for count in range(200, 203):
     #     #     self.assertContains(response, f'Post__{count}')
-
-    def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
-        response = self.client.post(reverse('reports'), self.input, follow=True)
-        # category = Category.objects.get(id=1)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed('reports.html')
-
-    def testPostWithInvalidFormData(self):
-        self.input['selectedCategory'] = ""
-        response = self.client.post(reverse('reports'), self.input, follow=True)
-        category = Category.objects.get(id=1)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed('reports.html')
-        self.assertEqual(response.context['labels'], [])
-        self.assertEqual(response.context['data'], [])
-

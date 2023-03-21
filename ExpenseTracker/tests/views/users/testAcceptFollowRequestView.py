@@ -1,10 +1,12 @@
-# Tests for the accept follow request view
-
+"""Tests of accept follow request view."""
 from ExpenseTracker.models import User, Notification, FollowRequestNotification
 from django.test import TestCase
 from django.urls import reverse
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class AcceptFollowRequestViewTest(TestCase):
+    """Tests of accept follow request view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -23,7 +25,6 @@ class AcceptFollowRequestViewTest(TestCase):
         self.followNotifcation.save()
         self.url = reverse('acceptFollowRequest', args=[self.followNotifcation.id])
 
-    # This test ensures that when a user sends a follow request to another user.
     def testFromUserIsFollowingToUser(self):
         followersBefore = self.toUser.followerCount()
         self.client.get(self.url)
@@ -33,15 +34,15 @@ class AcceptFollowRequestViewTest(TestCase):
         self.assertTrue(self.fromUser.followees.filter(id=self.toUser.id).exists())
 
 
-    # This test ensures that when a user accepts a follow request, a notification is created for the fromUser with the message  "user has accepted your follow request".
     def testFromUserRecievesNotification(self):
         self.client.get(self.url)
         latestNotification = Notification.objects.filter(toUser=self.fromUser).latest('createdAt')
         self.assertTrue(latestNotification.title, 'Follow request accepted' )
         self.assertTrue(latestNotification.message, self.toUser.username + " has accepted your follow request"  )
 
-    # This test ensures that a user is redirected to the login page if they are not logged in when trying to follow another user.
-    def testRedirectsIfUserNotLoggedIn(self):
+    def testAcceptFollowRequestViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
+        redirectUrl = reverse_with_next('logIn', self.url)
         response = self.client.get(self.url)
-        self.assertRedirects(response, reverse('logIn'))
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')

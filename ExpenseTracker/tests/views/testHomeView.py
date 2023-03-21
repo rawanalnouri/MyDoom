@@ -1,16 +1,20 @@
-# Tests for the home notification view
+"""Tests for home view."""
 
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 import datetime
 
 class HomeViewTest(TestCase):
+    ''''''
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
+        self.url = reverse('home')
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
+
         self.expenditure = Expenditure.objects.get(id=1)
         self.expenditure.date = datetime.datetime.now()
         self.expenditure.save()
@@ -22,62 +26,57 @@ class HomeViewTest(TestCase):
         self.user.save()
         self.spendingLimit = SpendingLimit.objects.get(id=1)
 
-    #  This test ensures that the home view is using the correct HTML template, which should be home.html
     def testHomeViewUsesCorrectTemplate(self):
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'home.html')
-
-    # This test checks if the user is redirected to the login page if they are not logged in when trying to access the home page.
+    
     def testHomeViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('home'))
-        self.assertRedirects(response, '/logIn/')
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')
 
-    # This test checks if the totalSpentThisMonth() method returns the correct monthly total spent by the user.
     def testCorrectMonthlyTotalSpentForEachCategory(self):
         totalSpentThisMonth = self.expenditure.amount
         categorySpentThisMonth = self.expenditure.amount
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(totalSpentThisMonth, self.user.totalSpentThisMonth())
         self.assertEqual(categorySpentThisMonth, response.context['data'][0])
 
-    # Test for calculating the correct total spent in current day
     def testCorrectDailyLimitTotalSpentDataIsGenerated(self):
         self.category.spendingLimit.timePeriod = 'daily'
         self.category.save()
         totalSpentThisDay = self.expenditure.amount
         categorySpentThisDay = self.expenditure.amount
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(totalSpentThisDay, self.category.totalSpent())
         self.assertEqual(categorySpentThisDay, response.context['data'][0])
 
-    # Test for calculating the correct total spent in current week
     def testCorrectWeeklyLimitTotalSpentDataIsGenerated(self):
         self.category.spendingLimit.timePeriod = 'weekly'
         self.category.save()
         totalSpentThisDay = self.expenditure.amount
         categorySpentThisWeek = self.expenditure.amount
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(totalSpentThisDay, self.category.totalSpent())
         self.assertEqual(categorySpentThisWeek, response.context['data'][0])
 
-    # Test for calculating the correct total spent in current month
     def testCorrectMonthlyLimitTotalSpentDataIsGenerated(self):
         self.category.spendingLimit.timePeriod = 'monthly'
         self.category.save()
         totalSpentThisMonth = self.expenditure.amount
         categorySpentThisMonth = self.expenditure.amount
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(totalSpentThisMonth, self.category.totalSpent())
         self.assertEqual(categorySpentThisMonth, response.context['data'][0])
 
-    # Test for calculating the correct total spent in current year
     def testCorrectYearlyLimitTotalSpentDataIsGenerated(self):
         self.category.spendingLimit.timePeriod = 'yearly'
         self.category.save()
         totalSpentThisYear = self.expenditure.amount
         categorySpentThisYear = self.expenditure.amount
-        response = self.client.get(reverse('home'))
+        response = self.client.get(self.url)
         self.assertEqual(totalSpentThisYear, self.category.totalSpent())
         self.assertEqual(categorySpentThisYear, response.context['data'][0])        

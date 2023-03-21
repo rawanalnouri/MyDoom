@@ -101,7 +101,7 @@ class EditCategoryView(LoginRequiredMixin, View):
         form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
         if form.is_valid():
             category = form.save()
-            messages.success(self.request, f'Your category  \'{category.name}\' was updated successfully.')
+            messages.success(self.request, f'Your category \'{category.name}\' was updated successfully.')
             # add points for editing category
             updatePoints(self.request.user, 2)
             createBasicNotification(self.request.user, "New Points Earned!", "2 points earned for editing a new category.")
@@ -579,8 +579,8 @@ class ShowUserView(LoginRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    '''Generate content to be displayed in the template.'''
     def get_context_data(self, *args, **kwargs):
+        '''Generate content to be displayed in the template.'''
 
         context = super().get_context_data(*args, **kwargs)
         user = self.get_object()
@@ -588,8 +588,8 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         context['followable'] = (self.request.user != user)
         return context
 
-    '''Handle get request, and redirect to users if userId invalid.'''
     def get(self, request, *args, **kwargs):
+        '''Handle get request, and redirect to users if userId invalid.'''
 
         try:
             return super().get(request, *args, **kwargs)
@@ -622,12 +622,10 @@ class AcceptFollowRequestView(LoginRequiredMixin, View):
         fromUser = notification.fromUser
         follow(fromUser, toUser)
         messages.add_message(request, messages.SUCCESS, "Successfully accepted follow request.")
-
         # send accept notification
         title = 'Follow request accepted'
         message = f'{toUser.username} has accepted your follow request.'
         createBasicNotification(fromUser, title, message)
-
         # delete notification after being accepted
         return redirect('deleteRequest', notificationId = notification.id)
     
@@ -640,8 +638,8 @@ class UserListView(LoginRequiredMixin, ListView):
     context_object_name = 'users'
     paginate_by = 10
 
-    '''Generate content to be displayed in the template.'''
     def get_context_data(self, *args, **kwargs):
+        '''Generate content to be displayed in the template.'''
 
         context = super().get_context_data(*args, **kwargs)
         paginator = Paginator(self.get_queryset(), self.paginate_by)

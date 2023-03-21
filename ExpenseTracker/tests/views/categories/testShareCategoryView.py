@@ -1,12 +1,13 @@
-# Tests for the share category view
-
+"""Tests for share category view."""
 from ExpenseTracker.models import User, Category
 from ExpenseTracker.forms import ShareCategoryForm
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib import messages
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class CategroyShareViewTest(TestCase):
+    """Tests for share category view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -25,11 +26,9 @@ class CategroyShareViewTest(TestCase):
         self.user.followers.add(self.userToShareCategoryWith)
         self.userToShareCategoryWith.followers.add(self.user)
 
-    # Tests whether the URL for sharing a category is correct.
     def testUrl(self):
         self.assertEqual('/shareCategory/1/', self.url)
 
-    # Tests whether the share category form is rendered correctly and the expected form is used.
     def testShareCategoryViewGet(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -37,44 +36,39 @@ class CategroyShareViewTest(TestCase):
         shareCategoryForm = response.context['form']
         self.assertTrue(isinstance(shareCategoryForm,ShareCategoryForm))
 
-    # Tests whether an unsuccessful attempt to share a category results in the correct error message being displayed to the user.
     def testUnsuccessfulShareCategory(self):
         data = {'user': ''}
-        response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
+        response = self.client.post(self.url, data, follow=True)
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
         expectedMessage = "Failed to send share category request."
         self.assertEqual(str(messages[0]), expectedMessage)
 
-    # Tests whether an unsuccessful attempt to share a category with the same name results in the correct error message being displayed to the user.
     def testUnsuccessfulShareOfCategoryWithSameName(self):
         self.userToShareCategoryWith.categories.add(self.category)
         self.userToShareCategoryWith.save()
         data = {'user': self.userToShareCategoryWith.pk}
-        response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
+        response = self.client.post(self.url, data, follow=True)
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
         expectedMessage = 'The user you want to share this category with already has a category with the same name.\nChange the name of the category before sharing.'
         self.assertEqual(str(messages[0]), expectedMessage)
 
-    # Tests whether a successful attempt to share a category results in the correct success message being displayed and whether the user is taken to the correct page.
     def testSuccessfulShareCategory(self):
         data = {'user': self.userToShareCategoryWith.pk}
-        response = self.client.post(reverse('shareCategory', args=[self.category.id]), data, follow=True)
+        response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response, '/category/1/')
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
-        expectedMessage = "Successfully sent request to share '"+ self.category.name +"' with "+ self.userToShareCategoryWith.username
+        expectedMessage = "A request to share category 'testcategory' has been sent to '9lucy'."
         self.assertEqual(str(messages[0]), expectedMessage)
 
-    # Tests whether a user who is not logged in is redirected to the login page when attempting to share a category.
-    def testRedirectIfNotLoggedIn(self):
+    def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        url = reverse('shareCategory', args=[self.category.id])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed('logIn.html')

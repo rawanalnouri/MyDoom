@@ -1,11 +1,12 @@
-# Tests for the expenditure delete view
-
+"""Tests of delete expenditure view."""
 from django.test import TestCase
 from django.urls import reverse
-from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
-import datetime
+from ExpenseTracker.models import User, Category, Expenditure
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class DeleteExpenditureViewTest(TestCase):
+    """Tests of delete expenditure view."""
+    
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -15,15 +16,16 @@ class DeleteExpenditureViewTest(TestCase):
         self.category = Category.objects.get(id=1)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
+        self.url = reverse('deleteExpenditure', args=[self.category.id, self.expenditure.id])
         
-    #  This test case tests the functionality of deleting an expenditure. 
     def testDeleteExpenditureView(self):
-        response = self.client.get(reverse('deleteExpenditure', args=[self.category.id, self.expenditure.id]))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
 
-    # This test case tests if the deleteExpenditure view redirects to the login page when the user is not logged in. 
-    def testRedirectsToLoginIfUserNotLoggedIn(self):
+    def testRedirectIfNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('deleteExpenditure', args=[self.category.id, self.expenditure.id]))
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')

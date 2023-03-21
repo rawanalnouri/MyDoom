@@ -1,11 +1,13 @@
-# Tests for the create category view
-
+"""Tests of create category view."""
 from ExpenseTracker.models import User, Category, SpendingLimit
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.messages import get_messages
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class CreateCategoryViewTest(TestCase):
+    """Tests of create category view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -16,28 +18,27 @@ class CreateCategoryViewTest(TestCase):
             'amount': 20,
             'timePeriod':'daily',
         }
+        self.url = reverse('createCategory')
 
-    # This test checks if the view redirects to the category view on successful creation of a category with valid data.
     def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
-        response = self.client.post(reverse('createCategory'), self.data)
+        response = self.client.post(self.url, self.data)
         category = Category.objects.get(name='Food')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('category', args=[category.id]))
 
-    # This test checks if the view displays errors when invalid data is posted to the create category form
     def testCreateCategoryViewDisplaysErrorsOnFailure(self):
         self.data['name'] = ''
-        response = self.client.post(reverse('createCategory'), self.data)
+        response = self.client.post(self.url, self.data)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This field is required.')
 
-    # This test checks if the view redirects to the login page if the user is not logged in.
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('createCategory'))
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')
 
-    #  Tests if the correct error is displayed when a category is created
     def testCreateCategoryViewSameNameError(self):
         spendingLimit = SpendingLimit.objects.create(timePeriod='weekly', amount=10)
         category = Category.objects.create(name='SameName', description='This is another test category', spendingLimit=spendingLimit)
@@ -49,7 +50,7 @@ class CreateCategoryViewTest(TestCase):
             'timePeriod': 'daily',
             'amount': 5
         }
-        response = self.client.post(reverse('createCategory'), data=postData)
+        response = self.client.post(self.url, data=postData)
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
@@ -59,7 +60,7 @@ class CreateCategoryViewTest(TestCase):
     def testPostInvalidFormWithAmountTooHigh(self):
         self.user.overallSpendingLimit = None
         data = {'timePeriod': 'daily', 'amount': 200}
-        response = self.client.post(reverse('createCategory'), data=data)
+        response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.user.overallSpendingLimit, None)
         messages = list(response.context['messages'])

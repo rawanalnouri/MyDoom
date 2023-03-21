@@ -1,6 +1,12 @@
 ''' File of helper functions used within tests'''
 from ExpenseTracker.models import User
 from django.contrib.auth.hashers import make_password
+from django.urls import reverse
+
+def reverse_with_next(url_name, next_url):
+    url = reverse(url_name)
+    url += f"?next={next_url}"
+    return url
 
 class LogInTester:
     def isUserLoggedIn(self):
