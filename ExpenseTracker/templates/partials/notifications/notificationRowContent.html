@@ -6,9 +6,9 @@
     <p id="notification-timestamp">Recieved on {{notification.createdAt}}</p>
     {% if notification.type == "category" %}
         <a role="button" class="btn btn-sm btn-outline-purple" href="{% url 'acceptCategoryShare' notificationId=notification.id %}">Accept</a>
-        <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+        <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'deleteRequest' notificationId=notification.id %}">Decline</a>
     {% elif notification.type == "follow" %}
         <a role="button" class="btn btn-sm btn-outline-purple" href="{% url 'acceptFollowRequest' notificationId=notification.id %}">Accept</a>
-        <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'declineRequest' notificationId=notification.id %}">Decline</a>
+        <a role="button" class="btn btn-sm btn-outline-blue" href="{% url 'deleteRequest' notificationId=notification.id %}">Decline</a>
     {% endif %}
 </div>
