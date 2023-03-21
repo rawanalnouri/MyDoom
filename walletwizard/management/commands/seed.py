@@ -123,7 +123,8 @@ class Command(BaseCommand):
             house.save()
             userCount += 1
             for followee in random.sample(list(User.objects.all()), User.objects.count()):
-                user.followers.add(followee)
+                if user != followee:
+                    user.followers.add(followee)
         self.stdout.write(self.style.SUCCESS(f"Number of created users: {userCount}"))
 
     def _email(self, firstName, lastName):
