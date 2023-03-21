@@ -5,7 +5,6 @@ from ExpenseTracker.forms import ReportForm
 from ExpenseTracker.models import *
 import datetime
 
-# class ReportViewTest(TestCase):
 
 class ReportViewTest(TestCase):
 
@@ -49,21 +48,6 @@ class ReportViewTest(TestCase):
         self.assertRedirects(response, reverse('logIn'))
         self.assertTemplateUsed('logIn.html')
 
-    # def testCategoryTimeFilters(self):
-    #     # filter tests
-    #     for i in range(15):
-    #         expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.date.today(), amount=10)
-    #         self.category.expenditures.add(expenditure)
-    #     response = self.client.get(reverse('category', args=[self.category.id]))
-    #     self.assertEqual(len(response.context['expenditures']), 10)
-    #     # create_posts(other_user, 100, 103)
-    #     # create_posts(self.user, 200, 203)
-    #     # response = self.client.get(self.url)
-    #     # for count in range(100, 103):
-    #     #     self.assertNotContains(response, f'Post__{count}')
-    #     # for count in range(200, 203):
-    #     #     self.assertContains(response, f'Post__{count}')
-
     def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
         response = self.client.post(reverse('reports'), self.input, follow=True)
         # category = Category.objects.get(id=1)
@@ -78,4 +62,3 @@ class ReportViewTest(TestCase):
         self.assertTemplateUsed('reports.html')
         self.assertEqual(response.context['labels'], [])
         self.assertEqual(response.context['data'], [])
-

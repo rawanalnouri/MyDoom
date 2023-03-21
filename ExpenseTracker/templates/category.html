@@ -3,7 +3,7 @@
 {% block title %}{{category.name}}{% endblock %}
 
 {% block content %}
-<h3 id="category-header">{{ category.name }} 
+<h3 id="category-header">{{ category.name }}
     <div class="text-end">
         <button id="open-edit-category-modal" data-category="{{ category.id }}" class="btn btn-sm btn-outline-dark ms-2">
             <i class="bi bi-pencil"></i>
@@ -39,7 +39,7 @@
                   {% include 'partials/expenditures/pagination.html' with expenditures=expenditures %}
                 </div>
               </p>
-            </div>            
+            </div>
           </div>
         </div>
       <div class="col-md-6">
@@ -61,17 +61,16 @@
             <div class="mt-4">
               <p>Current Progress:</p>
               {% include 'partials/chart.html' %}
-              {% include 'analyse.html' %}      
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-{% include 'modals/expenditures/createExpenditure.html' %} 
-{% include 'modals/expenditures/editExpenditure.html' %} 
+{% include 'modals/expenditures/createExpenditure.html' %}
+{% include 'modals/expenditures/editExpenditure.html' %}
 {% include 'modals/categories/editCategory.html' %}
-{% include 'modals/categories/shareCategory.html' %} 
+{% include 'modals/categories/shareCategory.html' %}
 {% include 'modals/categories/deleteCategory.html' %}
 {% include 'modals/categories/viewUsersSharingCategory.html' %}
 
@@ -136,9 +135,9 @@ $(document).ready(function() {
             }
         });
     });
-    
+
 });
 
-</script>  
+</script>
 
 {% endblock %}
