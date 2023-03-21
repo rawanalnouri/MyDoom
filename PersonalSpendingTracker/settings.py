@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+from django.contrib.messages import constants as message_constants
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -133,10 +134,6 @@ STATICFILES_DIRS = [BASE_DIR / "ExpenseTracker" / "static"]
 MEDIA_ROOT  = os.path.join(BASE_DIR,'ExpenseTracker/media')
 MEDIA_URL = '/media/'
 
-# User model for authentication purposes
-AUTH_USER_MODEL = 'ExpenseTracker.User'
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -145,7 +142,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model for authentication purposes
 AUTH_USER_MODEL = 'ExpenseTracker.User'
 
-from django.contrib.messages import constants as message_constants
+# Login URL for redirecting users from login protected views
+LOGIN_URL = 'logIn'
+
+# URL where LoginProhibitedMixin redirects to
+REDIRECT_URL_WHEN_LOGGED_IN = 'home'
 
 # Message level tags should use Bootstrap terms
 MESSAGE_TAGS = {
@@ -153,13 +154,9 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'danger',
 }
 
-LOGIN_URL = 'logIn'
-
 AUTO_LOGOUT = {
     'IDLE_TIME':1800,
     # 1800 seconds in 30 minutes 
     'MESSAGE':'This session has expired',
     'REDIRECT_TO_LOGIN_IMMEDIATELY': True,
-    }
-
-
+}
