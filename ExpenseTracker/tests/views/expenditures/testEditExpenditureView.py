@@ -1,13 +1,14 @@
-# Tests for the expenditure update view
-
+"""Tests of edit expenditure view."""
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
 from ExpenseTracker.forms import ExpenditureForm
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 import datetime
-from django.contrib import messages
 
-class UpdateExpenditureViewTest(TestCase):
+class EditExpenditureViewTest(TestCase):
+    """Tests of edit expenditure view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
     
     def setUp(self):
@@ -18,17 +19,15 @@ class UpdateExpenditureViewTest(TestCase):
         self.category.users.add(self.user)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
-        self.url = reverse('updateExpenditure', args=[self.category.id, self.expenditure.id])
+        self.url = reverse('editExpenditure', args=[self.category.id, self.expenditure.id])
     
-    # Tests whether the GET request to update an expenditure form returns the expected status code, template, and instance of the form. 
-    def testGetMethod(self):
-        response = self.client.get(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
+    def testGetEditExpenditureView(self):
+        response = self.client.get(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertIsInstance(response.context['form'], ExpenditureForm)
         self.assertEqual(response.context['form'].instance, self.expenditure)
 
-    # Tests whether the POST request with valid data to update an expenditure returns the expected status code.
     def testPostMethodValidData(self):
         response = self.client.post(self.url, data={
             'title': 'Updated Title',
@@ -45,9 +44,8 @@ class UpdateExpenditureViewTest(TestCase):
         self.assertEqual(updated_expenditure.description, 'Updated Description')
         self.assertEqual(updated_expenditure.amount, 200.00)
 
-    # Tests whether the POST request with invalid data to update an expenditure returns the expected status code, template, and form. 
     def testPostMethodWithInvalidData(self):
-        response = self.client.post(reverse('updateExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
+        response = self.client.post(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
             'title': '',
             'description': '',
             'amount': '',
@@ -61,12 +59,12 @@ class UpdateExpenditureViewTest(TestCase):
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 3)
 
-
-    # Tests whether a user who is not logged in is redirected to the login page when attempting to update an expenditure.
-    def testRedirectsToLoginIfUserNotLoggedIn(self):
+    def testRedirectIfNotLoggedIn(self):
         self.client.logout()
-        response = self.client.get(reverse('updateExpenditure', args=[self.category.id, self.expenditure.id]))
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')
 
     def testExpenditureIsSharedWithCorrectCategory(self):
         category2 = Category.objects.create(

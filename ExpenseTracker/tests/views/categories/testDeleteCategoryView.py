@@ -1,10 +1,12 @@
-# Tests for the delete category view
-
+"""Tests for delete category view."""
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, Expenditure, SpendingLimit
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class DeleteCategoryViewTest(TestCase):
+    """Tests for delete category view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -16,23 +18,23 @@ class DeleteCategoryViewTest(TestCase):
         self.user.categories.add(self.category)
         self.category.users.add(self.user)
         self.category.expenditures.add(self.expenditure)
+        self.url = reverse('deleteCategory', args=[self.category.id])
 
-    # This test verifies that when a user deletes a category, the corresponding spending limit and expenditures are also deleted from the database.
     def testDeleteCategoryViewRemovesCategoryAndExpendituresAndSpendingLimit(self):
-        self.client.get(reverse('deleteCategory', args=[self.category.id]))
+        self.client.get(self.url)
         self.assertFalse(SpendingLimit.objects.filter(id=self.spendingLimit.id).exists())
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
         self.assertFalse(Category.objects.filter(id=self.category.id).exists())
 
-    # This test verifies that after deleting a category, the user is redirected to the home page and that the home.html template is used to render the response.
     def testRedirectToHomeAfterDelete(self):
-        response = self.client.get(reverse('deleteCategory', args=[self.category.id]), follow=True)
+        response = self.client.get(self.url, follow=True)
         userRedirect = reverse('home')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
 
-    # This test verifies that a user who is not logged in is redirected to the login page if they try to delete a category.
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()
-        response = self.client.delete(reverse('deleteCategory', args=[self.category.id]))
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
+        self.assertTemplateUsed('logIn.html')

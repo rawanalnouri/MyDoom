@@ -4,12 +4,13 @@ from django.views.generic import CreateView, TemplateView, ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.views import PasswordChangeView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import login,logout
 from django.http import Http404
 from django.core.paginator import Paginator
 from .models import *
 from .forms import *
-from django.core.exceptions import ObjectDoesNotExist
+from PersonalSpendingTracker.settings import REDIRECT_URL_WHEN_LOGGED_IN
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.db.models import Q
 from .helpers.pointsHelpers import *
 from .helpers.notificationsHelpers import *
@@ -19,12 +20,40 @@ from .notificationContextProcessor import getNotifications
 from django.utils import timezone
 from django.utils.timezone import datetime
 from datetime import datetime
+from django.contrib.auth.decorators import login_required
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import os
 
-'''Displays a specific category and handles create expenditure and edit category form submissions.'''
+class LoginProhibitedMixin:
+    """Mixin that redirects when a user is logged in."""
+
+    redirect_when_logged_in_url = None
+
+    def dispatch(self, *args, **kwargs):
+        """Redirect when logged in, or dispatch as normal otherwise."""
+        if self.request.user.is_authenticated:
+            return self.handle_already_logged_in(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
+
+    def handle_already_logged_in(self, *args, **kwargs):
+        url = self.get_redirect_when_logged_in_url()
+        return redirect(url)
+
+    def get_redirect_when_logged_in_url(self):
+        """Returns the url to redirect to when not logged in."""
+        if self.redirect_when_logged_in_url is None:
+            raise ImproperlyConfigured(
+                "LoginProhibitedMixin requires either a value for "
+                "'redirect_when_logged_in_url', or an implementation for "
+                "'get_redirect_when_logged_in_url()'."
+            )
+        else:
+            return self.redirect_when_logged_in_url
+        
+
 class CategoryView(LoginRequiredMixin, TemplateView):
+    '''View to show an individual category to the logged-in user.'''
 
     template_name = "category.html"
 
@@ -58,12 +87,9 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         return context
 
-    def handle_no_permission(self):
-        return redirect("logIn")
 
-
-'''Implements a view for editing categories'''
 class EditCategoryView(LoginRequiredMixin, View):
+    '''View to edit a category for the logged-in user.'''
     
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
@@ -75,22 +101,19 @@ class EditCategoryView(LoginRequiredMixin, View):
         form = CategorySpendingLimitForm(request.POST, user=request.user, instance=category)
         if form.is_valid():
             category = form.save()
-            messages.success(self.request, "Category updated successfully.")
-            # add points
-            updatePoints(self.request.user,5)
-            createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+            messages.success(self.request, f'Your category \'{category.name}\' was updated successfully.')
+            # add points for editing category
+            updatePoints(self.request.user, 2)
+            createBasicNotification(self.request.user, "New Points Earned!", "2 points earned for editing a new category.")
             return redirect(reverse('category', args=[category.id]))
         else:
             errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
             messages.error(self.request, "\n".join(errorMessages))
             return redirect(reverse('category', args=[kwargs['categoryId']]))
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view for creating a new category using a form'''
 class CreateCategoryView(LoginRequiredMixin, CreateView):
+    '''View to create a new category for the logged-in user.'''
 
     model = Category
     form_class = CategorySpendingLimitForm
@@ -103,10 +126,10 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         category = form.save()
-        messages.success(self.request, "Successfully Created Category")
-        # add points
-        updatePoints(self.request.user,5)
-        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category")
+        messages.success(self.request, f'A new category \'{category.name}\' has been successfully created.')
+        # add points for creating category
+        updatePoints(self.request.user, 5)
+        createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category.")
         category.save()
         return redirect(reverse('category', args=[category.id]))
 
@@ -114,30 +137,25 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.error(self.request, error)
         return super().form_invalid(form)
-
-    def handle_no_permission(self):
-        return redirect('logIn')
     
 
-'''Implements a view for deleting an expenditure'''
 class DeleteCategoryView(LoginRequiredMixin, View):
+    '''View to delete logged-in user's category.'''
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id = kwargs['categoryId'])
+        categoryName = category.name
         expenditures = category.expenditures.all()
         for expenditure in expenditures:
             expenditure.delete()
         category.spendingLimit.delete()
         category.delete()
-        messages.add_message(request, messages.SUCCESS, "Category successfully deleted")
+        messages.add_message(request, messages.SUCCESS, f'Your category \'{categoryName}\' was successfully deleted.')
         return redirect('home')
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view for sharing categories'''
 class ShareCategoryView(LoginRequiredMixin, View):
+    '''View to send a share request for a category from logged-in user to another user.'''
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
@@ -149,7 +167,7 @@ class ShareCategoryView(LoginRequiredMixin, View):
         form = ShareCategoryForm(fromUser=request.user, category=category, data=request.POST)
         if form.is_valid():
             toUser = form.save()
-            messages.add_message(request, messages.SUCCESS, "Successfully sent request to share '"+ category.name +"' with "+ toUser.username)
+            messages.add_message(request, messages.SUCCESS, f'A request to share category \'{category.name}\' has been sent to \'{toUser.username}\'.')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             validationErrors = form.errors.get('__all__', [])
@@ -160,45 +178,37 @@ class ShareCategoryView(LoginRequiredMixin, View):
                 messages.error(request, 'Failed to send share category request.')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
 
-'''Implements a view for accepting a share category requests'''
 class AcceptShareCategoryView(LoginRequiredMixin, View):
+    '''View to accept a share category request from another user for the logged-in user.'''
 
     def get(self, request, *args, **kwargs):
         notification = ShareCategoryNotification.objects.get(id=kwargs['notificationId'])
         toUser = notification.toUser
         category = notification.sharedCategory
 
-        # Sharing the category 
+        # Share the category 
         category.users.add(toUser)
         category.save()
         toUser.categories.add(category)
         toUser.save()
-        messages.add_message(request, messages.SUCCESS, "Successfully accepted share request ")
+        messages.add_message(request, messages.SUCCESS, f'Share category request for category \'{category.name}\' was accepted successfully.')
 
-        # Sending accept notification 
+        # Send accept notification 
         fromUser = notification.fromUser
         title = 'Category share request accepted'
-        message = toUser.username + " has accepted your request to share '"+ category.name +"'"
+        message = f'{toUser.username} has accepted your request to share the category \'{category.name}\'.'
         createBasicNotification(fromUser, title, message)
 
-        # Deleting the notification after it has been accepted 
-        return redirect('declineRequest', notificationId = notification.id)
-
-    def handle_no_permission(self):
-        return redirect('logIn')
+        # Delete the notification after it has been accepted
+        return redirect('deleteRequest', notificationId = notification.id)
 
 
-class DeclineRequestView(LoginRequiredMixin, View):
+class DeleteRequestView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect(request.META['HTTP_REFERER'])
-
-    def handle_no_permission(self):
-        return redirect('logIn')
 
 
 '''Implements a view for creating expenditures'''
@@ -214,20 +224,17 @@ class CreateExpenditureView(LoginRequiredMixin, View):
         form = ExpenditureForm(request.user, category, request.POST, request.FILES)
         if category and form.is_valid():
             currentCategoryInfo = checkIfOver(category)
-            messages.success(self.request, "Expenditure created successfully.")
-            form.save()
-            trackPoints(self.request.user, category,currentCategoryInfo[0], currentCategoryInfo[1])
+            expenditure = form.save()
+            messages.success(self.request, f'A new expenditure \'{expenditure.title}\' has been successfully created.')
+            trackPoints(self.request.user, category, currentCategoryInfo[0], currentCategoryInfo[1])
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             messages.error(self.request, "Failed to create expenditure.")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 
 '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
-class UpdateExpenditureView(LoginRequiredMixin, View):
+class EditExpenditureView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])     
@@ -241,37 +248,36 @@ class UpdateExpenditureView(LoginRequiredMixin, View):
         form = ExpenditureForm(request.user, category, request.POST, request.FILES, instance=expenditure)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, "Successfully Updated Expenditure")
+            messages.success(self.request, f'Expenditure  \'{expenditure.title}\' was successfully updated.')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(request, f'Failed to update expenditure - {field}: {error}')
+                    messages.error(request, f'Failed to update expenditure - {field}: {error}.')
             return redirect(reverse('category', args=[kwargs['categoryId']]))
-                                
-    def handle_no_permission(self):
-        return redirect('logIn')
+                            
 
-
-'''Implements a view for deleting an expenditure'''
 class DeleteExpenditureView(LoginRequiredMixin, View):
+    '''View that deletes an expenditure for a user.'''
 
     def get(self, request, *args, **kwargs):
         expenditure = Expenditure.objects.get(id=kwargs['expenditureId'])
-        # Removing receipt from folder if exists
+        expenditureTitle = expenditure.title
+        # Remove receipt from folder if exists
         receiptPath = os.path.join(settings.MEDIA_ROOT, expenditure.receipt.name)
         if not os.path.isdir(receiptPath):
             os.remove(receiptPath)
 
         expenditure.delete()
-        messages.add_message(request, messages.SUCCESS, "Expenditure successfully deleted")
+        messages.add_message(request, messages.SUCCESS, f'Your expenditure \'{expenditureTitle}\' was successfully deleted.')
         return redirect(reverse('category', args=[kwargs['categoryId']]))
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
+class SignUpView(LoginProhibitedMixin, View):
+    """View that signs up user."""
 
-class SignUpView(View):
+    redirect_when_logged_in_url = REDIRECT_URL_WHEN_LOGGED_IN
+
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('home')
@@ -289,61 +295,73 @@ class SignUpView(View):
             createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
             createBasicNotification(user, "Welcome to spending trracker!", "Manage your money here and earn points for staying on track!")
 
-            # assign house
-            n = user.id % 4
-            house=House.objects.get(id=n+1)
-            user.house=house
+            # assign house to new user
+            house = House.objects.get(id = (user.id % 4) + 1)
+            user.house = house
             user.save()
-            house.memberCount=house.memberCount+1
+            house.memberCount += 1
             house.save()
             housePointsUpdate(user, 50)
            
-            return redirect('home')
+            return redirect(REDIRECT_URL_WHEN_LOGGED_IN)
         return render(request, 'signUp.html', {'form': signUpForm})
 
 
-class LogInView(View):
+class LogInView(LoginProhibitedMixin, View):
+    '''View that logs in a user.'''
+
+    http_method_names = ['get', 'post']
+    redirect_when_logged_in_url = REDIRECT_URL_WHEN_LOGGED_IN
+
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('home')
-        else:
-            form = LogInForm()
-            return render(request, 'logIn.html', {"form": form})
+        """Display log in template."""
+
+        self.next = request.GET.get('next') or ''
+        return self.render()
 
     def post(self, request, *args, **kwargs):
+        """Handle log in attempt."""
+
         form = LogInForm(request.POST)
+        self.next = request.POST.get('next') or REDIRECT_URL_WHEN_LOGGED_IN
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = form.getUser()
             if user is not None:
                 login(request, user)
+                # add 5 points if first login of the day
                 if user.lastLogin.date() != datetime.now().date():
-                    # if this is the first login of the day, add 5 points
                     updatePoints(user, 5)
                     createBasicNotification(user, "New Points Earned!", "5 points earned for daily login")
-                # Update user lastLogin after checking if this is is first login of the day
+                # update user's 'lastLogin'
                 user.lastLogin = timezone.now()
                 user.save(update_fields=['lastLogin'])
-                return redirect('home')
-
+                return redirect(self.next)
         messages.add_message(request, messages.ERROR, "The credentials provided were invalid!")
-        return render(request, 'logIn.html', {"form": form})
+        return self.render()
+    
+    def render(self):
+        """Render log in template with blank log in form."""
+
+        form = LogInForm()
+        return render(self.request, 'logIn.html', {"form": form, 'next': self.next})
 
 
 class LogOutView(LoginRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
+    '''View that logs a signed-in user out.'''
+
+    def get(self, request):
         logout(request)
         return redirect('index')
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
+class IndexView(LoginProhibitedMixin, View):
+    '''View that is displayed to a user before signing in.'''
 
-class IndexView(View):
+    redirect_when_logged_in_url = REDIRECT_URL_WHEN_LOGGED_IN
+
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('home')
+            return redirect(REDIRECT_URL_WHEN_LOGGED_IN)
         else:
             return render(request, 'index.html')
 
@@ -353,17 +371,16 @@ def generateGraph(categories, spentInCategories, type, graphNum = ''):
     return dict
 
 
-'''Implements a view for handling requests to the home page'''
 class HomeView(LoginRequiredMixin, View):
+    '''View that handles and shows the Home page to the user.'''
 
     def get(self, request):
         categories = []
         totalSpent = []
 
         for category in Category.objects.filter(users__in=[request.user]):
-            # all categories
             categories.append(str(category))
-            # total spend per category
+            # calculate total spent this month per category
             categoryExpenseThisMonth = 0.0
             today = datetime.now()
             for expense in category.expenditures.filter(date__month=today.month):
@@ -386,11 +403,10 @@ class HomeView(LoginRequiredMixin, View):
 
         return render(request, "home.html", context)
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-'''Implements a view for handling requests to the scores page'''
 class ScoresView(LoginRequiredMixin, ListView):
+    '''View that handles and shows the Scores page to the user.'''
+
     model = Points
     template_name = "scores.html"
     paginate_by = 10
@@ -405,11 +421,10 @@ class ScoresView(LoginRequiredMixin, ListView):
         context['topPoints'] = orderedPoints[:4]
         return context
 
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 
 class ReportsView(LoginRequiredMixin, View):
+    '''View that handles and shows the Reports page to the user.'''
+
     def get(self, request):
         form = ReportForm(user=request.user)
         graphData = generateGraph([], [], 'bar')
@@ -433,7 +448,7 @@ class ReportsView(LoginRequiredMixin, View):
             graphData = generateGraph(categories, totalSpent, 'bar')
             graphData.update({"form": form, "text": f"An overview of your spending within the last {timePeriod}."})
 
-            # Generate a graph for historical data
+            # generate a graph for historical data
             first_day_this_month = today.replace(day=1)
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
@@ -459,24 +474,17 @@ class ReportsView(LoginRequiredMixin, View):
             graphData = generateGraph(categories, totalSpent, 'bar')
             graphData.update({"form": form, "text": "Waiting for your selection..."})
             return render(request, "reports.html", graphData)
-            
-        # Handles what happens if it's false
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-'''View that handles requests to the profile page'''
 class ProfileView(LoginRequiredMixin, View):
+    '''View to display logged-in user's profile.'''
 
     def get(self, request):
         return render(request,'profile.html')
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''View that handles requests to the edit profile page'''
 class EditProfileView(LoginRequiredMixin, View):
+    '''View to edit logged-in user's profile.'''
 
     def get(self,request):
         newForm = EditProfile(instance=request.user)
@@ -486,16 +494,15 @@ class EditProfileView(LoginRequiredMixin, View):
         form = EditProfile(instance=request.user, data=request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Profile updated successfully')
+            messages.success(request, 'Your profile has been updated successfully.')
             return redirect('profile')
         else:
             return render(request, "editProfile.html", {'form': form})
 
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 
 class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
+    '''View to change logged-in user's password.'''
+
     template_name = 'changePassword.html'
     form_class = PasswordChangeForm
 
@@ -510,49 +517,41 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
     def get_success_url(self):
         return reverse('home')
 
-    def handle_no_permission(self):
-        return redirect('logIn')
-
 
 class NotificationsView(LoginRequiredMixin, View):
+    '''View to display logged-in user's notifications.'''
 
     def get(self,request):
         context = {}
         allNotifications = getNotifications(request)
-        # adding pagination
-        unreadPaginator = Paginator(allNotifications['unreadNotifications'], 5) # Show 5 unread notifications per page
+        # add pagination - show 5 unread notifications per page
+        unreadPaginator = Paginator(allNotifications['unreadNotifications'], 5)
         unreadPage = self.request.GET.get('page')
         unreadNotificationPaginated = unreadPaginator.get_page(unreadPage)
         context['unreadNotificationsPaginated'] = unreadNotificationPaginated
-
-        readPaginator = Paginator(allNotifications['readNotifications'], 5) # Show 5 read notifications per page
+        # Show 5 read notifications per page
+        readPaginator = Paginator(allNotifications['readNotifications'], 5)
         readPage = self.request.GET.get('page')
         readNotificationPaginated = readPaginator.get_page(readPage)
         context['readNotificationsPaginated'] = readNotificationPaginated
 
         return render(request, "notifications.html", context)
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view function for marking notifications as read'''
 class EditNotificationsView(LoginRequiredMixin, View):
+    '''View to mark logged-in user's notifications as read.'''
 
     def get(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
         notification.isSeen = not notification.isSeen
         notification.save()
 
-        # Making the user stay on whichever page they called this request
+        # Make logged-in user stay on whichever page they called this request
         return redirect(request.META['HTTP_REFERER'])
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view function for deleting a notification'''
 class DeleteNotificationsView(LoginRequiredMixin, View):
+    '''View to delete a logged-in user's notification.'''
 
     def get(self, request, *args, **kwargs):
         notification = Notification.objects.get(id=kwargs['notificationId'])
@@ -560,23 +559,17 @@ class DeleteNotificationsView(LoginRequiredMixin, View):
             Notification.objects.get(id=kwargs['notificationId']).delete()
         return redirect("notifications")
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view function for deleting all read notifications'''
 class DeleteAllNotifications(LoginRequiredMixin, View):
+    '''View to delete all of logged-in user's notifications.'''
 
     def get(self, request, *args, **kwargs):
         Notification.objects.filter(toUser = request.user, isSeen = True).delete()
         return redirect("notifications")
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''View that shows individual user details.'''
 class ShowUserView(LoginRequiredMixin, DetailView):
+    '''View that shows individual user details.'''
 
     model = User
     template_name = 'showUser.html'
@@ -586,8 +579,8 @@ class ShowUserView(LoginRequiredMixin, DetailView):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    '''Generate content to be displayed in the template.'''
     def get_context_data(self, *args, **kwargs):
+        '''Generate content to be displayed in the template.'''
 
         context = super().get_context_data(*args, **kwargs)
         user = self.get_object()
@@ -595,20 +588,17 @@ class ShowUserView(LoginRequiredMixin, DetailView):
         context['followable'] = (self.request.user != user)
         return context
 
-    '''Handle get request, and redirect to users if userId invalid.'''
     def get(self, request, *args, **kwargs):
+        '''Handle get request, and redirect to users if userId invalid.'''
 
         try:
             return super().get(request, *args, **kwargs)
         except Http404:
             return redirect(reverse('users'))
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''View that handles follow/unfollow user functionality'''
 class FollowToggleView(LoginRequiredMixin, View):
+    '''View that handles follow request and unfollow user functionality'''
 
     def get(self, request, userId, *args, **kwargs):
         currentUser = request.user
@@ -616,47 +606,40 @@ class FollowToggleView(LoginRequiredMixin, View):
             followee = User.objects.get(id=userId)
             sentFollowRequest = toggleFollow(currentUser, followee)
             if sentFollowRequest:
-                messages.add_message(request, messages.SUCCESS, "Successfully sent follow request to "+ followee.username)
+                messages.add_message(request, messages.SUCCESS, f'A follow request has been sent to {followee.username}.')
         except ObjectDoesNotExist:
             return redirect('users')
         else:
             return redirect('showUser', userId=userId)
 
-    def handle_no_permission(self):
-        return redirect('logIn')
 
-
-'''Implements a view for accepting a follow request category requests'''
 class AcceptFollowRequestView(LoginRequiredMixin, View):
+    '''View to accept a follow request from another user for the logged-in user.'''
 
     def get(self, request, *args, **kwargs):
         notification = FollowRequestNotification.objects.get(id=kwargs['notificationId'])
         toUser = notification.toUser
         fromUser = notification.fromUser
         follow(fromUser, toUser)
-        messages.add_message(request, messages.SUCCESS, "Successfully accepted follow request ")
-
-        # Sending accept notification
+        messages.add_message(request, messages.SUCCESS, "Successfully accepted follow request.")
+        # send accept notification
         title = 'Follow request accepted'
-        message = toUser.username + " has accepted your follow request"
+        message = f'{toUser.username} has accepted your follow request.'
         createBasicNotification(fromUser, title, message)
+        # delete notification after being accepted
+        return redirect('deleteRequest', notificationId = notification.id)
+    
 
-        # Deleting notification after being accepted
-        return redirect('declineRequest', notificationId = notification.id)
-
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-'''View that shows a list of all users and allows user to filter users based on username'''
 class UserListView(LoginRequiredMixin, ListView):
+    '''View to show the list of all users.'''
 
     model = User
     template_name = 'users.html'
     context_object_name = 'users'
     paginate_by = 10
 
-    '''Generate content to be displayed in the template.'''
     def get_context_data(self, *args, **kwargs):
+        '''Generate content to be displayed in the template.'''
 
         context = super().get_context_data(*args, **kwargs)
         paginator = Paginator(self.get_queryset(), self.paginate_by)
@@ -665,10 +648,8 @@ class UserListView(LoginRequiredMixin, ListView):
         context['users'] = users
         return context
 
-    def handle_no_permission(self):
-        return redirect('logIn')
-
-
+'''View function to allow logged-in user to filter users by username.'''
+@login_required
 def searchUsers(request):
     query = request.GET.get('q')
     if query is None:
@@ -680,8 +661,8 @@ def searchUsers(request):
     return render(request, 'partials/users/searchResults.html', {'users': users})
 
 
-'''Implements a view for updating or setting the overall spending limit for the user.'''
 class SetOverallSpendingLimitView(LoginRequiredMixin, View):
+    '''View function to update or set the logged-in user's overall spending limit.'''
 
     def get(self, request, *args, **kwargs):
         form = OverallSpendingForm(user=request.user)
@@ -691,7 +672,7 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
         form = OverallSpendingForm(request.POST, user=request.user)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, "Successfully updated overall spending limit.")
+            messages.add_message(request, messages.SUCCESS, "Your overall spending limit has been updated successfully.")
             return redirect('home')
         else:
             validationErrors = form.errors.get('__all__', [])
@@ -701,6 +682,3 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
             else:
                 messages.error(request, 'Failed to update overall spending limit.')
             return redirect('home')
-
-    def handle_no_permission(self):
-        return redirect('logIn')

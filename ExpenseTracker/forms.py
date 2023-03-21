@@ -1,3 +1,4 @@
+"""Forms for the walletwizards app."""
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
 from .models import User, Category, SpendingLimit, Expenditure
@@ -5,12 +6,14 @@ from django.core.validators import RegexValidator
 from ExpenseTracker.helpers.notificationsHelpers import *
 from ExpenseTracker.helpers.modelHelpers import *
 import os
+from django.contrib.auth import authenticate
 from decimal import Decimal
 
 class SignUpForm(forms.ModelForm):
-    '''Form to allow a user to sign up to the system'''
+    """Form enabling unregistered users to sign up."""
 
     class Meta:
+        """Form options."""
         model = User
         fields = ["firstName", "lastName", "username", "email"]
 
@@ -27,14 +30,17 @@ class SignUpForm(forms.ModelForm):
     passwordConfirmation = forms.CharField(label='Password confirmation', widget=forms.PasswordInput())
 
     def clean(self):
+        """Clean the data and generate messages for any errors."""
+
         super().clean()
         newPassword = self.cleaned_data.get("newPassword")
         passwordConfirmation = self.cleaned_data.get("passwordConfirmation")
         if newPassword != passwordConfirmation:
             self.add_error("passwordConfirmation", "Confirmation does not match password.")
 
-    '''Creates a new user and saves it to the database'''
     def save(self):
+        """Create a new user."""
+
         super().save(commit=False)
         newUser = User.objects.create_user(
             username=self.cleaned_data.get('username').lower(),
@@ -46,16 +52,31 @@ class SignUpForm(forms.ModelForm):
         return newUser
 
 
-'''Form to allow a user to login'''
 class LogInForm(forms.Form):
+    """Form enabling registered users to log in."""
+
     username = forms.CharField(label="Username")
     password = forms.CharField(label="Password", widget=forms.PasswordInput)
 
+    def getUser(self):
+        """Returns authenticated user if possible."""
+
+        user = None
+        if self.is_valid():
+            username = self.cleaned_data.get('username')
+            password = self.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+        return user
+
 
 class ExpenditureForm(forms.ModelForm):
+    """Form enabling users to create or update an expenditure."""
+
     otherCategory = forms.ChoiceField(label = "Select category to share expenditure with",)
 
     class Meta:
+        """Form options."""
+
         model = Expenditure
         fields = ['title', 'description', 'amount', 'date','receipt']
         widgets = {
@@ -74,18 +95,20 @@ class ExpenditureForm(forms.ModelForm):
         
     def getCategoryChoices(self):
         categoryArray = [(-1, "None")]
-        for x in Category.objects.filter(users__in=[self.user]).exclude(id=self.category.id):
-            categoryArray.append((x.id, x))
+        for category in Category.objects.filter(users__in=[self.user]).exclude(id=self.category.id):
+            categoryArray.append((category.id, category))
         return categoryArray
 
         
     def save(self, commit=True):
+        """Create a new expenditure."""
+
         expenditure = super().save()
         if commit:
             self.category.expenditures.add(expenditure)
             self.category.save()
 
-            # Handling extra categories
+            # handle extra categories
             otherCategoryId = self.cleaned_data.get("otherCategory")
                 
             if (int(otherCategoryId) >= 0):
@@ -93,7 +116,7 @@ class ExpenditureForm(forms.ModelForm):
                 otherCategory.expenditures.add(expenditure)
                 otherCategory.save()
 
-            # Removing old file from media folder
+            # remove old file from media folder
             newReceipt = self.cleaned_data.get("receipt")
             if (self.initialReceipt != None and self.initialReceipt != newReceipt):
                 path = os.path.join(settings.MEDIA_ROOT, self.initialReceipt.name)
@@ -105,7 +128,11 @@ class ExpenditureForm(forms.ModelForm):
 
 
 class CategorySpendingLimitForm(forms.ModelForm):
+    """Form enabling users to create or update a category and its spending limit."""
+
     class Meta:
+        """Form options."""
+
         model = Category
         fields = ['name','description']
         widgets = {
@@ -120,6 +147,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
     amount = forms.DecimalField(label="Amount [GBP]", min_value=0.01)
 
     def save(self, commit=True):
+        """Create a category and its spending limit."""
+
         category = super().save(commit=False)
         spendingLimit = SpendingLimit.objects.create(
             timePeriod = self.cleaned_data['timePeriod'],
@@ -134,6 +163,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
         return category
 
     def validateName(self, name):
+        """Check the new category's name is not the same as another category name of the user."""
+
         existingCategories = Category.objects.filter(
             name__iexact=name, users__in=[self.user]
         ).exclude(id=self.instance.id)
@@ -144,6 +175,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
             )
     
     def validateSpendingLimits(self, timePeriod, amount):
+        """Check the new category's spending limit does not exceed user's overall spending limit."""
+
         categoriesTotal = Decimal(0)
         for category in Category.objects.all():
             categoriesTotal += category.totalSpendingLimitByMonth()
@@ -162,12 +195,14 @@ class CategorySpendingLimitForm(forms.ModelForm):
             )
 
     def clean(self):
+        """Clean the data and generate messages for any errors."""
+
         cleanedData = super().clean()
         amount = cleanedData.get('amount')
         if amount:
             timePeriod = cleanedData.get('timePeriod')
             amount = Decimal(amount)
-            if (self.user.overallSpendingLimit):
+            if self.user.overallSpendingLimit:
                 self.validateSpendingLimits(timePeriod, amount)
         name = cleanedData.get('name')
         self.validateName(name)
@@ -175,15 +210,21 @@ class CategorySpendingLimitForm(forms.ModelForm):
 
 
 class EditProfile(forms.ModelForm):
+    """Form to update user profiles."""
+
     firstName = forms.CharField(label='First name')
     lastName = forms.CharField(label='Last name')
 
     class Meta:
+        """Form options."""
+
         model = User
         fields = ["firstName", "lastName", "username", "email"]
 
 
 class ChangePasswordForm(PasswordChangeForm):
+    """Form enabling users to change their password."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -202,9 +243,13 @@ class ChangePasswordForm(PasswordChangeForm):
 
 
 class ShareCategoryForm(forms.ModelForm):
+    '''Form enabling a user to send a share category request to another user.'''
+
     user = forms.ModelChoiceField(queryset=User.objects.none())
 
     class Meta:
+        '''Form options.'''
+
         model = Category
         fields = []
 
@@ -214,7 +259,6 @@ class ShareCategoryForm(forms.ModelForm):
         self.category = category
         self.fromUser = fromUser
 
-    # Sends a share request to the user selected
     def save(self, commit=True):
         toUser = self.cleaned_data['user']
         title = "New Category Shared!"
@@ -240,8 +284,10 @@ TIME_PERIOD_CHOICES = [
     ('month', 'Monthly'),
 ]
 
-'''Form to allow a user to select a category to generate a report for'''
+
 class ReportForm(forms.Form):
+    '''Form enabling a user to select a category to generate a report for.'''
+
     timePeriod = forms.ChoiceField(choices = TIME_PERIOD_CHOICES, label = "Time Frame")
     selectedCategory = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, label = "Categories")
 
@@ -252,11 +298,14 @@ class ReportForm(forms.Form):
 
     def createCategorySelection(self):
         categoryArray = []
-        for x in Category.objects.filter(users__in=[self.user]):
-            categoryArray.append((x.id, x))
+        for category in Category.objects.filter(users__in=[self.user]):
+            categoryArray.append((category.id, category))
         return categoryArray
 
+
 class OverallSpendingForm(forms.Form):
+    '''Form enabling a user to set or update their overall spending limit.'''
+
     timePeriod = forms.ChoiceField(label="Time period", choices=SpendingLimit.TIME_CHOICES)
     amount = forms.DecimalField(label="Amount [GBP]", min_value=0.01)
 
@@ -265,6 +314,8 @@ class OverallSpendingForm(forms.Form):
         super(OverallSpendingForm, self).__init__(*args, **kwargs)
 
     def save(self):
+        """Create user's overall spending limit."""
+
         timePeriod = self.cleaned_data['timePeriod']
         amount = self.cleaned_data['amount']
         if self.user.overallSpendingLimit:
@@ -283,6 +334,8 @@ class OverallSpendingForm(forms.Form):
         return self.user.overallSpendingLimit
     
     def validateSpendingLimits(self, timePeriod, amount):
+        """Check user's new overall spending limit does not exceed their current category spending limits."""
+
         categoriesTotal = Decimal(0)
         for category in Category.objects.all():
             categoriesTotal += category.totalSpendingLimitByMonth()
@@ -295,6 +348,8 @@ class OverallSpendingForm(forms.Form):
                                     +'limits set in your categories.', code='invalid')
 
     def clean(self):
+        """Clean the data and generate messages for any errors."""
+        
         cleanedData = super().clean()
         amount = cleanedData.get('amount')
         timePeriod = cleanedData.get('timePeriod')

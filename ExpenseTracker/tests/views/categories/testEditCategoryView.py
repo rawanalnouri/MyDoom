@@ -1,12 +1,14 @@
-# Tests for the edit category view
-
+"""Tests of edit category view."""
 from django.test import TestCase
 from django.urls import reverse
 from ExpenseTracker.models import User, Category, SpendingLimit
 from ExpenseTracker.forms import CategorySpendingLimitForm
 from django.contrib.messages import get_messages
+from ExpenseTracker.tests.testHelpers import reverse_with_next
 
 class EditCategoryViewTest(TestCase):
+    """Tests of edit category view."""
+
     fixtures = ['ExpenseTracker/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -14,17 +16,15 @@ class EditCategoryViewTest(TestCase):
         self.client.force_login(self.user)
         self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
+        self.category.save()
+        self.url = reverse('editCategory', args=[self.category.id])
 
-
-    # Verifies that the Edit Category view can be accessed and displays the correct form.
     def testGetEditCategoryView(self):
-        url = reverse('editCategory', kwargs={'categoryId': self.category.id})
-        response = self.client.get(url)
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertIsInstance(response.context['form'], CategorySpendingLimitForm)
 
-    #  Tests if a valid form is submitted for editing a category and it is updated successfully.
     def testPostEditCategoryWhenFormIsValid(self):
         data = {
             'name': 'Updated Title', 
@@ -32,16 +32,14 @@ class EditCategoryViewTest(TestCase):
             'timePeriod': 'monthly', 
             'amount': 100 
         }
-        response = self.client.post(reverse('editCategory', args=[self.category.id]), data, follow=True)
+        response = self.client.post(self.url, data, follow=True)
         self.assertRedirects(response, '/category/1/')
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
-        expectedMessage = "Category updated successfully."
+        expectedMessage = "Your category 'Updated Title' was updated successfully."
         self.assertEqual(str(messages[0]), expectedMessage)
 
-
-    # Tests if an invalid form is submitted for editing a category and the update fails with an appropriate message.
     def testPostEditCategoryWhenFormIsInvalid(self):
         data = {
             'name': '', 
@@ -49,25 +47,20 @@ class EditCategoryViewTest(TestCase):
             'timePeriod': 'monthly', 
             'amount': -1
         }
-        response = self.client.post(reverse('editCategory', args=[self.category.id]), data)
-        self.assertRedirects(response, reverse('category', args=[self.category.id]))
+        response = self.client.post(self.url, data)
+        self.assertRedirects(response,  reverse('category', args=[self.category.id]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         expectedMessage = "Failed to update category."
         self.assertEqual(str(messages[0]), expectedMessage)
-    
-    # Verifies that the user is redirected to the login page if they are not logged in while accessing the Edit Category view.
+
     def testEditCategoryViewRedirectIfNotLoggedIn(self):
         self.client.logout()
-        url = reverse('editCategory', kwargs={'categoryId': self.category.id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('logIn'))
+        redirectUrl = reverse_with_next('logIn', self.url)
+        response = self.client.get(self.url)
+        self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed('logIn.html')
 
-
-    # This test checks that when a user tries to edit a category and enters a name 
-    # that already exists for the same user, an error message is displayed and the category is not updated.
     def testEditCategoryViewSameNameError(self):
         newSpendingLimit = SpendingLimit.objects.create(timePeriod='weekly', amount=10)
         newCategory = Category.objects.create(name='Food', description='This is another test category', spendingLimit=newSpendingLimit)
