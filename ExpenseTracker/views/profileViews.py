@@ -50,7 +50,7 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
 
 
 class SetOverallSpendingLimitView(LoginRequiredMixin, View):
-    '''View function to update or set the logged-in user's overall spending limit.'''
+    '''View to update or set the logged-in user's overall spending limit.'''
 
     def get(self, request, *args, **kwargs):
         form = OverallSpendingForm(user=request.user)
