@@ -1,7 +1,6 @@
 ''' Helper file handling points functionality '''
 
-from ExpenseTracker.models import Points, Category, SpendingLimit, Expenditure
-from django.utils.timezone import datetime, timedelta
+from ExpenseTracker.models import Points, Category
 from .notificationsHelpers import createBasicNotification
 from decimal import Decimal
 
