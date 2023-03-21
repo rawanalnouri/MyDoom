@@ -28,6 +28,7 @@
                 <p class="card-text small"><strong>Full name:</strong> {{ user.fullName }}</p>
                 <p class="card-text small"><strong>Username:</strong> {{ user.username }}</p>
                 <p class="card-text small"><strong>Email:</strong> {{ user.email }}</p>
+                <a href="{% url 'showUser' user.id %}" class="btn btn-outline-dark" active" role="button" aria-pressed="true">View Followers</a>
               </div>
             </div>
             <div class="padding-hr"></div>
@@ -63,7 +64,7 @@
             <div class="card card-border shadow-sm">
               <div class="card-body">
                 <div class="card-text">
-                  <p>{{month}} {{year}}</p>
+                  <p>Total spending in {{month}} {{year}}</p>
                   <h3 class="m-b-25">£{{user.totalSpentThisMonth}}</h3>
 
                 </div>
@@ -131,11 +132,11 @@
         </div>
       </div>
       {% endif %}
-      
+
     </div>
   </div>
 </div>
-{% include 'modals/overallSpendingLimit.html' %} 
+{% include 'modals/overallSpendingLimit.html' %}
 
 <script>
 
