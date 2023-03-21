@@ -22,6 +22,7 @@ from datetime import datetime
 from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 import os
+from PersonalSpendingTracker.settings import LOGIN_URL
 
 '''Displays a specific category and handles create expenditure and edit category form submissions.'''
 class CategoryView(LoginRequiredMixin, TemplateView):
@@ -59,7 +60,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
         return context
 
     def handle_no_permission(self):
-        return redirect("logIn")
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for editing categories'''
@@ -86,7 +87,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             return redirect(reverse('category', args=[kwargs['categoryId']]))
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for creating a new category using a form'''
@@ -116,7 +117,7 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         return super().form_invalid(form)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
     
 
 '''Implements a view for deleting an expenditure'''
@@ -133,7 +134,7 @@ class DeleteCategoryView(LoginRequiredMixin, View):
         return redirect('home')
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for sharing categories'''
@@ -161,7 +162,7 @@ class ShareCategoryView(LoginRequiredMixin, View):
             return redirect(reverse('category', args=[kwargs['categoryId']]))
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for accepting a share category requests'''
@@ -189,7 +190,7 @@ class AcceptShareCategoryView(LoginRequiredMixin, View):
         return redirect('declineRequest', notificationId = notification.id)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class DeclineRequestView(LoginRequiredMixin, View):
@@ -198,7 +199,7 @@ class DeclineRequestView(LoginRequiredMixin, View):
         return redirect(request.META['HTTP_REFERER'])
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for creating expenditures'''
@@ -223,7 +224,7 @@ class CreateExpenditureView(LoginRequiredMixin, View):
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for updating an expenditure and handling update expenditure form submissions'''
@@ -250,7 +251,7 @@ class UpdateExpenditureView(LoginRequiredMixin, View):
             return redirect(reverse('category', args=[kwargs['categoryId']]))
                                 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for deleting an expenditure'''
@@ -268,7 +269,7 @@ class DeleteExpenditureView(LoginRequiredMixin, View):
         return redirect(reverse('category', args=[kwargs['categoryId']]))
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class SignUpView(View):
@@ -337,7 +338,7 @@ class LogOutView(LoginRequiredMixin, View):
         return redirect('index')
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class IndexView(View):
@@ -387,7 +388,7 @@ class HomeView(LoginRequiredMixin, View):
         return render(request, "home.html", context)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 '''Implements a view for handling requests to the scores page'''
 class ScoresView(LoginRequiredMixin, ListView):
@@ -406,7 +407,7 @@ class ScoresView(LoginRequiredMixin, ListView):
         return context
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class ReportsView(LoginRequiredMixin, View):
@@ -463,7 +464,7 @@ class ReportsView(LoginRequiredMixin, View):
         # Handles what happens if it's false
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 '''View that handles requests to the profile page'''
 class ProfileView(LoginRequiredMixin, View):
@@ -472,7 +473,7 @@ class ProfileView(LoginRequiredMixin, View):
         return render(request,'profile.html')
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''View that handles requests to the edit profile page'''
@@ -492,7 +493,7 @@ class EditProfileView(LoginRequiredMixin, View):
             return render(request, "editProfile.html", {'form': form})
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
@@ -511,7 +512,7 @@ class ChangePasswordView(LoginRequiredMixin, PasswordChangeView):
         return reverse('home')
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 class NotificationsView(LoginRequiredMixin, View):
@@ -533,7 +534,7 @@ class NotificationsView(LoginRequiredMixin, View):
         return render(request, "notifications.html", context)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view function for marking notifications as read'''
@@ -548,7 +549,7 @@ class EditNotificationsView(LoginRequiredMixin, View):
         return redirect(request.META['HTTP_REFERER'])
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view function for deleting a notification'''
@@ -561,7 +562,7 @@ class DeleteNotificationsView(LoginRequiredMixin, View):
         return redirect("notifications")
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view function for deleting all read notifications'''
@@ -572,7 +573,7 @@ class DeleteAllNotifications(LoginRequiredMixin, View):
         return redirect("notifications")
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''View that shows individual user details.'''
@@ -604,7 +605,7 @@ class ShowUserView(LoginRequiredMixin, DetailView):
             return redirect(reverse('users'))
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''View that handles follow/unfollow user functionality'''
@@ -623,7 +624,7 @@ class FollowToggleView(LoginRequiredMixin, View):
             return redirect('showUser', userId=userId)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 '''Implements a view for accepting a follow request category requests'''
@@ -645,7 +646,7 @@ class AcceptFollowRequestView(LoginRequiredMixin, View):
         return redirect('declineRequest', notificationId = notification.id)
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 '''View that shows a list of all users and allows user to filter users based on username'''
 class UserListView(LoginRequiredMixin, ListView):
@@ -666,7 +667,7 @@ class UserListView(LoginRequiredMixin, ListView):
         return context
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)
 
 
 def searchUsers(request):
@@ -703,4 +704,4 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
             return redirect('home')
 
     def handle_no_permission(self):
-        return redirect('logIn')
+        return redirect(LOGIN_URL)

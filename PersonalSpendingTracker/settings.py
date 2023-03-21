@@ -153,6 +153,8 @@ MESSAGE_TAGS = {
     message_constants.ERROR: 'danger',
 }
 
+LOGIN_URL = 'logIn'
+
 AUTO_LOGOUT = {
     'IDLE_TIME':1800,
     # 1800 seconds in 30 minutes 
