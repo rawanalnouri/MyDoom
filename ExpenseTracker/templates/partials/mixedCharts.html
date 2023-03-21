@@ -1,3 +1,9 @@
+<!-- This file helps when you need to show mixed charts on a page.
+These are charts that show more than one set of data, for example you could
+have a line chart on top of a bar chart on a single canvas area -->
+
+<!-- 'num' is passed in to indicate which number of graph we are on, for example if
+we are on the second graph of the page, 'num' would be 2 -->
 <div id="container{{num}}" style="width: 100%">
   <canvas id="chart{{num}}"></canvas>
 </div>
@@ -68,6 +74,7 @@
     }
   };
 
+  // fucntion that actually renders and draws the graph
   const myChart{{num}} = new Chart(
   document.getElementById('chart{{num}}'),
   config
