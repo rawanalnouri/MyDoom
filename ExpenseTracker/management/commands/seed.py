@@ -61,6 +61,9 @@ class Command(BaseCommand):
             spendingLimit = random.choice(list(SpendingLimit.objects.all())),
         )
         admin.categories.add(category)
+        admin.save()
+        category.users.add(admin)
+        category.save()
         points=Points.objects.create(
             user = admin,
             count = random.randrange(1, 500),
