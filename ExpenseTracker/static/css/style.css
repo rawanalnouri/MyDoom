@@ -19,7 +19,6 @@
 
 html,body{
     background: var(--body-color);
-    margin-top: 70px;
 }
 
 @font-face {
