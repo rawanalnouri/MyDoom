@@ -12,7 +12,7 @@ from PersonalSpendingTracker.settings import REDIRECT_URL_WHEN_LOGGED_IN
 from django.utils import timezone
 from django.utils.timezone import datetime
 from datetime import datetime
-from .helpers import LoginProhibitedMixin
+from ..helpers.viewsHelpers import LoginProhibitedMixin
 
         
 class SignUpView(LoginProhibitedMixin, View):

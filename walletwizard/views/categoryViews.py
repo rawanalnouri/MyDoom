@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from walletwizard.models import Category
 from walletwizard.forms import CategorySpendingLimitForm, ShareCategoryForm
 from walletwizard.helpers.pointsHelpers import updatePoints, createBasicNotification
-from .helpers import generateGraph
+from ..helpers.viewsHelpers import generateGraph
 
 
 class CategoryView(LoginRequiredMixin, TemplateView):

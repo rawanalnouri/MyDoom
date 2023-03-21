@@ -9,7 +9,7 @@ from walletwizard.forms import ReportForm
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from walletwizard.helpers.reportsHelpers import createArraysData
-from .helpers import generateGraph
+from ..helpers.viewsHelpers import generateGraph
 
 
 class HomeView(LoginRequiredMixin, View):
