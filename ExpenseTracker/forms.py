@@ -337,9 +337,8 @@ class OverallSpendingForm(forms.Form):
         """Check user's new overall spending limit does not exceed their current category spending limits."""
 
         categoriesTotal = Decimal(0)
-        for category in Category.objects.all():
+        for category in Category.objects.filter(users__in=[self.user]):
             categoriesTotal += category.totalSpendingLimitByMonth()
-
         amount = Decimal(amount)
         overallTotal = computeTotalSpendingLimitByMonth(timePeriod, amount)
 
