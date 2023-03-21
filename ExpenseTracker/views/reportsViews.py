@@ -58,7 +58,7 @@ class ScoresView(LoginRequiredMixin, ListView):
         paginator = Paginator(orderedPoints, self.paginate_by)
         pageNumber = self.request.GET.get('page')
         context['houses'] = House.objects.order_by('-points')
-        context['points'] = paginator.get_page(pageNumber)
+        context['userPoints'] = paginator.get_page(pageNumber)
         context['topPoints'] = orderedPoints[:4]
         return context
 
