@@ -46,29 +46,24 @@ def housePointsUpdate(user, amount):
 Handles user losing points based on the percentage they've gone above their spending limit.
 Only called if over the limit.
 '''
+losePointsData = [
+ [0, 10, -3, "Points Lost!",  "3 points lost for going over target"],
+ [10, 30, -5, "Points Lost!",  "5 points lost for going over target"],
+ [30, 50, -10, "Points Lost!",  "10 points lost for going over target"],
+ [50, 70, -15, "Points Lost!",  "15 points lost for going over target"],
+ [70, 100, -20, "Points Lost!",  "20 points lost for going over target"],
+ [100, float('inf'), -25, "Points Lost!",  "25 points lost for going over target"],
+ ]
+
 def losePoints(user, limit, spent):
     spentProportion = (spent-limit)/limit 
-    percentage = spentProportion*100
-    if percentage <= 10:
-        updatePoints(user, -3)
-        createBasicNotification(user, "Points Lost!", "3 points lost for going over target")
-    elif percentage > 10 and percentage <= 30:
-        updatePoints(user,-5)
-        createBasicNotification(user, "Points Lost!", "5 points lost for going over target")
-    elif percentage>30 and percentage<=50:
-        updatePoints(user, -10)
-        createBasicNotification(user,"Points Lost!", "10 points lost for going over target")
-    elif percentage>50 and percentage<=70:
-        updatePoints(user, -15)
-        createBasicNotification(user, "Points Lost!", "15 points lost for going over target")
-    elif percentage>70 and percentage<=100:
-        updatePoints(user, -20)
-        createBasicNotification(user,"Points Lost!","20 points lost for going over target")
-    else:
-        updatePoints(user, -25)
-        createBasicNotification(user, "Points Lost!", "25 points lost for going over target")
-
-
+    percentage = spentProportion * 100
+    for data in losePointsData: 
+        if (percentage > data[0] and percentage <= data[1]):
+            updatePoints(user, data[2])
+            createBasicNotification(user, data[3], data[4])
+            return
+        
 ''' 
 Checks if the user is already over their spending limit.
 Returns boolean for if over over and the total amount the user has spent within their 
