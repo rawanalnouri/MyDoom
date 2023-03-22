@@ -40,7 +40,7 @@
               <div class="card card-border mb-3 shadow-sm" style="width: 21rem; height: 22rem;">
                 <div class="card-body">
                   <div class="card-text">
-                      {% include 'partials/charts/chart.html' with height=15 width=15 type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
+                      {% include 'partials/chart.html' with height=15 width=15 type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
                    </div>
                 </div>
               </div>
@@ -79,7 +79,7 @@
           {% if not user.categories.all %}
             <p class="card-text" style="text-align: center;">No expenditures made yet!</p>
           {% else %}
-            {% include 'partials/charts/chart.html' with height=15 width=15 %}
+            {% include 'partials/chart.html' with height=15 width=15 %}
           {% endif %}
         </div>
       </div>
