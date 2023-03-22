@@ -21,7 +21,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-6">
-          <div class="card">
+          <div class="card" style="width: 35rem;">
             <div class="card-body">
               <div class="row align-items-center">
                 <div class="col">
@@ -43,7 +43,7 @@
           </div>
         </div>
       <div class="col-md-6">
-        <div class="card">
+        <div class="card" style="width: 35rem;">
           <div class="card-body">
             <h5 class="card-title">Category Information</h5>
             <div class="d-flex justify-content-between align-items-center">
@@ -60,7 +60,9 @@
             </div>
             <div class="mt-4">
               <p>Current Progress:</p>
-              {% include 'partials/chart.html' %}
+              <div style="width: 18rem; height: 18rem;">
+                {% include 'partials/charts/chart.html' with height=1 width=1 %}
+              </div>
             </div>
           </div>
         </div>
