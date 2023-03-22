@@ -8,7 +8,8 @@ from walletwizard.models import Points, House, Category
 from walletwizard.forms import ReportForm
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
-from walletwizard.helpers.reportsHelpers import createArraysData
+from walletwizard.helpers.reportsHelpers import createDataAverageArrays
+from walletwizard.helpers.reportsHelpers import createDataAndLabelArrays
 from ..helpers.viewsHelpers import generateGraph
 
 
@@ -43,7 +44,7 @@ class HomeView(LoginRequiredMixin, View):
         }}
 
         return render(request, "home.html", context)
-    
+
 
 class ScoresView(LoginRequiredMixin, ListView):
     '''View that handles and shows the Scores page to the user.'''
@@ -82,7 +83,7 @@ class ReportsView(LoginRequiredMixin, View):
             timePeriod = form.cleaned_data.get('timePeriod')
             selectedCategories = form.cleaned_data.get('selectedCategory')
 
-            createdArrays = createArraysData(selectedCategories, timePeriod)
+            createdArrays = createDataAndLabelArrays(selectedCategories, timePeriod)
             categories = createdArrays[0]
             totalSpent = createdArrays[1]
 
@@ -93,19 +94,19 @@ class ReportsView(LoginRequiredMixin, View):
             first_day_this_month = today.replace(day=1)
             first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
             first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
-            data1 = createArraysData(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
+            data1 = createDataAverageArrays(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
 
             graphData.update({'data1':data1})
             graphData.update({'text2':"Comparison to average over last 12 months"})
 
             six_months_ago = today + relativedelta(months=-6)
-            data2 = createArraysData(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
+            data2 = createDataAverageArrays(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
 
             graphData.update({'data2':data2})
             graphData.update({'text2':f"Compare your average spendings per {timePeriod} in the past"})
 
             three_months_ago = today + relativedelta(months=-3)
-            data3 = createArraysData(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
+            data3 = createDataAverageArrays(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
 
             graphData.update({'data3':data3})
             graphData.update({'text3':f"Your average spending per {timePeriod}"})

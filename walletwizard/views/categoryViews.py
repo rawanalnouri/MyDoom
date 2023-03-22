@@ -30,11 +30,13 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         categoryLabels = []
         spendingData = []
+        totalSpent = 0
         for category in Category.objects.filter(id=kwargs["categoryId"]):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
             cur = float(category.totalSpent())
+            totalSpent = category.progress
             spendingData.append(cur)
             remainingBudget = round(float(category.spendingLimit.amount) - cur, 2)
             if remainingBudget < 0:
@@ -43,13 +45,14 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
+        context.update({'total':totalSpent})
 
         return context
 
 
 class EditCategoryView(LoginRequiredMixin, View):
     '''View to edit a category for the logged-in user.'''
-    
+
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = CategorySpendingLimitForm(user=request.user, instance=category)
@@ -96,7 +99,7 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         for error in form.non_field_errors():
             messages.error(self.request, error)
         return super().form_invalid(form)
-    
+
 
 class DeleteCategoryView(LoginRequiredMixin, View):
     '''View to delete logged-in user's category.'''
