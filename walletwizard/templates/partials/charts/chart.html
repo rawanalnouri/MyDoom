@@ -7,12 +7,13 @@ we are on the second graph of the page, 'num' would be 2 -->
   <canvas id="chart{{num}}"></canvas>
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-    var canvas = document.getElementById("chart{{num}}");
-    canvas.width = {{width}};
-    canvas.height = {{height}};
+    if(+{{resizeChart}} == 1) {
+      var canvas = document.getElementById("chart{{num}}");
+      canvas.width = {{width}}+0;
+      canvas.height = {{height}}+0;
+    }
 
   var config = {
     type:'{{type}}',

@@ -8,49 +8,45 @@
 <hr>
 
 
-  <div class="row">
 
-  <div class="col justify-content-center">
-    <div class="card w-100">
-      <div class="card-body">
-        <h6 class="card-title">Make your selection</h6>
-        <form action="{% url 'reports' %}" method="post">
-          {% csrf_token %}
-          {{ form }}
-          <input type = "submit", class="button">
-        </form>
-      </div>
+<div class="row">
+  <div class="card w-25">
+    <div class="card-body">
+      <h6 class="card-title">Make your selection</h6>
+      <form action="{% url 'reports' %}" method="post">
+        {% csrf_token %}
+        <h5>Time period: {{ form.timePeriod }}</h5>
+        <h5>Categories:</h5>
+        {{ form.selectedCategory }}
+        <input type = "submit", class="button">
+      </form>
     </div>
-    </div>
-    <div class="col justify-content-center">
-    <div class="card w-75">
-      <div class="card-body">
-        <div style="width: 50rem; height: 30rem; padding-right: 7rem; margin: 0;">
-          <p class="card-text text-center">{{ text }}</p>
-          {% include 'partials/charts/chart.html' with height=1 width=2 num=1 %}
-        </div>
-      </div>
-    </div>
-    </div>
-
   </div>
 
-  <div class="row">
-
-    <div class="card w-50">
-        <div class="card-body" style="margin: 0;">
-          <p class="card-text text-center">{{ text2 }}</p>
-          {% include 'partials/charts/mixedChart.html' with num=2 withbar=True hidden=True %}
-        </div>
+  <div class="card w-75">
+    <div class="card-body">
+      <p class="card-text text-center">{{ text }}</p>
+      {% include 'partials/charts/chart.html' with resizeChart=0 num=1 %}
     </div>
+  </div>
+</div>
+
+<div class = "row">
     <div class="card w-50">
       <div class="card-body">
-        <p class="card-text text-center">{{ text3 }}</p>
-        {% include 'partials/charts/mixedChart.html' with num=3 %}
+        <p class="card-text text-center">{{ text2 }}</p>
+        {% include 'partials/charts/mixedChart.html' with num=2 withbar=True hidden=True %}
       </div>
-    </div>
-
   </div>
+
+  <div class="card w-50">
+    <div class="card-body">
+      <p class="card-text text-center">{{ text3 }}</p>
+      {% include 'partials/charts/mixedChart.html' with num=3 %}
+    </div>
+  </div>
+
+</div>
 
 
 {% endblock %}
