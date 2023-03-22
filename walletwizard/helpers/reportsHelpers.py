@@ -55,16 +55,63 @@ def convertBudgetToMonthly(category):
     else:
         return amount
 
-'''Genrates data for the graphs on the reports page
-in the case that no pastMonthsFilterApplied and no numberOfDaysWeeksMonthsArray
-is passed means both graph data and labels are being generated for the main
-graph, which only looks at data from the previous day, week, and month. The
-labels will be reused for the filtered data grsphs so they can be reused instead
-of regenerated'''
-def createArraysData(categories, timePeriod, pastMonthsFilterApplied=None, numberOfDaysWeeksMonthsArray=''):
+# Genrating data for the graphs on the reports page
+'''This function generates 2 arrays (graph data points as well as their
+allocated labels). The data consistes of the expenditures within the last 'day',
+'week', or 'month', according to the user's choice'''
+def createDataAndLabelArrays(categories, timePeriod):
     today = datetime.now()
     names = []
     data =[]
+    filteredCategories=''
+    for selected in categories:
+        category = Category.objects.get(id=selected)
+        budgetCalculated = category.spendingLimit.getNumber()
+
+        categorySpend = 0.00
+        names.append(category.name)
+
+        if timePeriod == 'day':
+            # filtering all expenditures within the previous day
+            budgetCalculated = convertBudgetToDaily(category)
+            yesterday = today - timedelta(days=1)
+            filteredCategories = category.expenditures.filter(date__gte=yesterday)
+
+        if timePeriod == 'week':
+            # filtering all expenditures within the previous week
+            budgetCalculated = convertBudgetToWeekly(category)
+            weekStart = today
+            weekStart -= timedelta(days=weekStart.weekday())
+            weekEnd = today + timedelta(days = 1)
+            filteredCategories = category.expenditures.filter(date__gte=weekStart, date__lt=weekEnd)
+
+        if timePeriod == 'month':
+            # filtering all expenditures within the previous month
+            budgetCalculated = convertBudgetToMonthly(category)
+            filteredCategories = category.expenditures.filter(date__month=today.month, date__year=today.year)
+
+        for expense in filteredCategories:
+            categorySpend += float(expense.amount)
+
+        # adding the percentage each category's used budget, capped at 100%
+        amount = categorySpend/float(budgetCalculated)*100
+        if amount < 100:
+            data.append(round(amount,2))
+        else:
+            data.append(100)
+
+    returnedArrays = []
+    returnedArrays.append(names)
+    returnedArrays.append(data)
+    return returnedArrays
+
+
+'''This function generates a single data array. The data calculations are made
+according to the user's choice of whether they want an mean analysis of 'daily',
+'weekly', or 'monthly' ependitures.'''
+def createDataAverageArrays(categories, timePeriod, pastMonthsFilterApplied, numberOfDaysWeeksMonthsArray):
+    today = datetime.now()
+    data = []
     filteredCategories=''
 
     for selected in categories:
@@ -72,53 +119,30 @@ def createArraysData(categories, timePeriod, pastMonthsFilterApplied=None, numbe
         budgetCalculated = category.spendingLimit.getNumber()
 
         categorySpend = 0.00
-        # if categories need to be filtetered, they are filtered and then their total expediture is calculated
-        if pastMonthsFilterApplied:
-            filteredCategories = category.expenditures.filter(date__gte=pastMonthsFilterApplied)
-            for expense in filteredCategories:
-                categorySpend += float(expense.amount)
-        else:
-            # in the case that no filter is applied (the first main graph us being generated), the labels are loaded
-            names.append(category.name)
+        # category expenditures are filtered and then their total is calculated
+        filteredCategories = category.expenditures.filter(date__gte=pastMonthsFilterApplied)
+        for expense in filteredCategories:
+            categorySpend += float(expense.amount)
 
         if timePeriod == 'day':
+            # average spending per day is calculated
             budgetCalculated = convertBudgetToDaily(category)
-            if pastMonthsFilterApplied:
-                # for the filtered smaller graphs, the average spending per day is calculated
-                days = numberOfDaysWeeksMonthsArray[0]
-                categorySpend = categorySpend/days
-            else:
-                # for the larger main graph, we filter for the most recent day's expeditures
-                yesterday = today - timedelta(days=1)
-                filteredCategories = category.expenditures.filter(date__gte=yesterday)
+            days = numberOfDaysWeeksMonthsArray[0]
+            categorySpend = categorySpend/days
 
         if timePeriod == 'week':
+            # average spending per week is calculated
             budgetCalculated = convertBudgetToWeekly(category)
-            if pastMonthsFilterApplied:
-                # for the filtered smaller graphs, the average spending per week is calculated
-                weeks = numberOfDaysWeeksMonthsArray[1]
-                categorySpend = categorySpend/weeks
-            else:
-                # for the larger main graph, we filter for the most recent week's expeditures
-                weekStart = today
-                weekStart -= timedelta(days=weekStart.weekday())
-                weekEnd = today + timedelta(days = 1)
-                filteredCategories = category.expenditures.filter(date__gte=weekStart, date__lt=weekEnd)
+            # for the filtered smaller graphs, the average spending per week is calculated
+            weeks = numberOfDaysWeeksMonthsArray[1]
+            categorySpend = categorySpend/weeks
 
         if timePeriod == 'month':
+            # average spending per month is calculated
             budgetCalculated = convertBudgetToMonthly(category)
-            if pastMonthsFilterApplied:
-                # for the filtered smaller graphs, the average spending per month is calculated
-                months = numberOfDaysWeeksMonthsArray[2]
-                categorySpend = categorySpend/months
-            else:
-                # for the larger main graph, we filter for the most recent month's expeditures
-                filteredCategories = category.expenditures.filter(date__month=today.month, date__year=today.year)
-
-        if pastMonthsFilterApplied==None:
-            # for the main graph, all expeditures are added up for each category
-            for expense in filteredCategories:
-                categorySpend += float(expense.amount)
+            # for the filtered smaller graphs, the average spending per month is calculated
+            months = numberOfDaysWeeksMonthsArray[2]
+            categorySpend = categorySpend/months
 
         # capping the maximum data to 100%
         amount = categorySpend/float(budgetCalculated)*100
@@ -127,12 +151,4 @@ def createArraysData(categories, timePeriod, pastMonthsFilterApplied=None, numbe
         else:
             data.append(100)
 
-    if pastMonthsFilterApplied:
-        # the smaller graphs are reusing labels from the bigger graph generated first so only data is neede for them
-        return data
-    else:
-        # the main graph needs both labels and data to be returned for its use
-        returnedArrays = []
-        returnedArrays.append(names)
-        returnedArrays.append(data)
-        return returnedArrays
+    return data

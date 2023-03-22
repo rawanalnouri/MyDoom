@@ -15,7 +15,9 @@
       <h6 class="card-title">Make your selection</h6>
       <form action="{% url 'reports' %}" method="post">
         {% csrf_token %}
-        {{ form }}
+        <h5>Time period: {{ form.timePeriod }}</h5>
+        <h5>Categories:</h5>
+        {{ form.selectedCategory }}
         <input type = "submit", class="button">
       </form>
     </div>
