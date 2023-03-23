@@ -1,13 +1,11 @@
-''' Helper file handling functions used by models '''
-
+''' Helper file for models functions.'''
 from datetime import datetime
 from datetime import timedelta
 from decimal import Decimal
 
-AVERAGE_DAYS_PER_MONTH = Decimal(30.4)
-AVERAGE_WEEKS_PER_MONTH = Decimal(4.4)
+AVERAGE_DAYS_PER_MONTH = Decimal(30.43)
+AVERAGE_WEEKS_PER_MONTH = Decimal(4.35)
 
-# Function to compute spending in expenditures based on time period 
 def computeTotalSpent(timePeriod, expenditures):
     total = 0.0
     today = datetime.now()
@@ -26,7 +24,6 @@ def computeTotalSpent(timePeriod, expenditures):
             total += float(expense.amount)
     return total
 
-# Function to compute spending limit value in a month
 def computeTotalSpendingLimitByMonth(timePeriod, amount):
     result = 0.0
     if timePeriod == 'daily':

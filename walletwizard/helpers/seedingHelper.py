@@ -103,7 +103,6 @@ expenditures =[
     'Tickets for Events and Shows'
 ]
 
-
 notificationTitles=[
     'House points lost!',
     'House points gained!',
@@ -119,5 +118,3 @@ notificationMessages=[
     '5 points gained',
     'user123 has accepted your request'
 ]
-    
-
