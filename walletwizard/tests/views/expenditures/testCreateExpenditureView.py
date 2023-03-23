@@ -44,15 +44,16 @@ class CreateExpenditureViewTest(TestCase):
     
     def testCreateExpenditureViewWhenFormIsInvalid(self):
         self.data['title'] = ''
-        self.data['date'] = ''
         self.data['amount'] = -1
-        response = self.client.post(self.url, self.data)
-        self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
+        response = self.client.post(self.url, self.data, follow=True)
+        self.assertTemplateUsed(response, 'category.html')
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
-        self.assertEqual(len(messages), 1)
-        expectedMessage = "Failed to create expenditure."
-        self.assertEqual(str(messages[0]), expectedMessage)
+        self.assertEqual(len(messages), 2)
+        expectedMessageForTitle = 'Failed to create expenditure - Title: This field is required.'
+        self.assertEqual(str(messages[0]), expectedMessageForTitle)
+        expectedMessageForAmount = 'Failed to create expenditure - Amount: Ensure this value is greater than or equal to 0.01.'
+        self.assertEqual(str(messages[1]), expectedMessageForAmount)
         self.assertEqual(Expenditure.objects.count(), 1)
         self.assertEqual(Expenditure.objects.first().title, 'testexpenditure')
 

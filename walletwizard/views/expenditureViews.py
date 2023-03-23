@@ -26,10 +26,11 @@ class CreateExpenditureView(LoginRequiredMixin, View):
             expenditure = form.save()
             messages.success(request, f'A new expenditure \'{expenditure.title}\' has been successfully created.')
             updateUserPointsForExpenditureCreation(request.user, category, overLimit)
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.error(request, "Failed to create expenditure.")
-            return render(request, 'partials/bootstrapForm.html', {'form': form})
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, 'Failed to create expenditure - '+ str(field).title() +': '+ str(error))
+        return redirect(reverse('category', args=[kwargs['categoryId']]))
 
 
 class EditExpenditureView(LoginRequiredMixin, View):
@@ -48,12 +49,11 @@ class EditExpenditureView(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
             messages.success(self.request, f'Expenditure  \'{expenditure.title}\' was successfully updated.')
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(request, f'Failed to update expenditure - {field}: {error}.')
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
+                    messages.error(request, 'Failed to update expenditure - '+ str(field).title() +': '+ str(error))
+        return redirect(reverse('category', args=[kwargs['categoryId']]))
                             
 
 class DeleteExpenditureView(LoginRequiredMixin, View):

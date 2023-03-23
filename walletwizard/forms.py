@@ -136,7 +136,8 @@ class CategorySpendingLimitForm(forms.ModelForm):
         model = Category
         fields = ['name','description']
         widgets = {
-            'spendingLimit': forms.Select(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'spendingLimit': forms.Select(attrs={'class': 'form-control'})
         }
 
     def __init__(self, *args, **kwargs):
