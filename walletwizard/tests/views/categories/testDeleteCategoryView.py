@@ -20,7 +20,7 @@ class DeleteCategoryViewTest(TestCase):
         self.category.expenditures.add(self.expenditure)
         self.url = reverse('deleteCategory', args=[self.category.id])
 
-    def testDeleteCategoryViewRemovesCategoryAndExpendituresAndSpendingLimit(self):
+    def testDeleteCategoryViewDeletesCategoryExpendituresAndSpendingLimit(self):
         self.client.get(self.url)
         self.assertFalse(SpendingLimit.objects.filter(id=self.spendingLimit.id).exists())
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())

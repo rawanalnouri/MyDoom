@@ -6,7 +6,7 @@ from decimal import Decimal
 AVERAGE_DAYS_PER_MONTH = Decimal(30.43)
 AVERAGE_WEEKS_PER_MONTH = Decimal(4.35)
 
-def computeTotalSpent(timePeriod, expenditures):
+def computeTotalSpentInTimePeriod(timePeriod, expenditures):
     total = 0.0
     today = datetime.now()
     if timePeriod == 'daily':

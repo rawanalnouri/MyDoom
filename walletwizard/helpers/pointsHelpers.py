@@ -66,7 +66,7 @@ Checks if the category is over its set spending limit.
 Returns True if over, else returns False.
 '''
 def isCategoryOverSpendingLimit(category):
-    return category.spendingLimit.amount < category.totalSpent()
+    return category.spendingLimit.amount < category.totalSpentInTimePeriod()
 
 '''
 Handles the user gaining and losing points after an expenditure is made.
@@ -77,7 +77,7 @@ User loses points if they are over the limit.
 def updateUserPointsForExpenditureCreation(user, category, overLimit):
     expenditure = category.expenditures.latest('createdAt')
     
-    spendingCurrent = category.totalSpent()
+    spendingCurrent = category.totalSpentInTimePeriod()
     spendingLimit = category.spendingLimit.amount
     
     if overLimit:

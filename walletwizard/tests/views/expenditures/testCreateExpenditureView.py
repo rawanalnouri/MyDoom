@@ -56,7 +56,7 @@ class CreateExpenditureViewTest(TestCase):
         self.assertEqual(Expenditure.objects.count(), 1)
         self.assertEqual(Expenditure.objects.first().title, 'testexpenditure')
 
-    def testCreateExpenditureRedirectIfNotLoggedIn(self):
+    def testRedirectsUserToLogInIfNotLoggedIn(self):
         self.client.logout()
         redirectUrl = reverse_with_next('logIn', self.url)
         response = self.client.get(self.url)
