@@ -1,18 +1,18 @@
-''' Tests for form handling user sign up'''
+'''Unit tests of sign up form.'''
 from django import forms
 from django.test import TestCase
 from walletwizard.forms import SignUpForm
-from walletwizard.models import User
 from django.urls import reverse
 
 class SignUpFormTest(TestCase):
+    '''Unit tests of sign up form.'''
     
     def setUp(self):
         self.input = {
-            "firstName": "Bob",
-            "lastName": "White",
-            'username': 'bob123',
-            "email": "bobwhite@email.org",
+            "firstName": "John",
+            "lastName": "Doe",
+            'username': 'testuser',
+            "email": "johndoe@email.org",
             "newPassword": "Password123",
             "passwordConfirmation": "Password123"
         }
@@ -39,7 +39,7 @@ class SignUpFormTest(TestCase):
         self.assertFalse(form.is_valid())
 
     def testFormDisallowsEmailWithoutAtSymbol(self):
-        self.input['email'] = 'email'
+        self.input['email'] = 'invalidEmail'
         self.assertFalse(SignUpForm(data=self.input).is_valid())
 
     def testEmailCannotBeEmpty(self):
@@ -49,7 +49,7 @@ class SignUpFormTest(TestCase):
     def testEmailHasToBeUnique(self):
         self.client.post(reverse('signUp'), self.input)
         # Change other unique field so should fail at fact email not unique
-        self.input['username'] = "9bob" 
+        self.input['username'] = "9john" 
         self.assertFalse(SignUpForm(data=self.input).is_valid())
 
     def testFormDisallowsPasswordsOfLengthLessThan8(self):
@@ -75,6 +75,6 @@ class SignUpFormTest(TestCase):
     def testUsernameHasToBeUnique(self):
         self.client.post(reverse('signUp'), self.input)
         #change other unique field so should fail at fact username not unique
-        self.input['email'] = "bob@email.com"
+        self.input['email'] = "john@email.com"
         self.assertFalse(SignUpForm(data=self.input).is_valid())
         
