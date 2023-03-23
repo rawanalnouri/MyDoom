@@ -9,7 +9,7 @@ from walletwizard.helpers.seedingHelper import *
 
 class Command(BaseCommand):
     PASSWORD = "Password123"
-    SPENDING_LIMIT_COUNT = CATEGORY_COUNT = 50
+    SPENDING_LIMIT_COUNT = CATEGORY_COUNT = 30
     EXPENDITURE_COUNT = 50
     USER_COUNT = 10
     NOTIFICATION_COUNT = 5
