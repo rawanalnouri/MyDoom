@@ -1,5 +1,4 @@
-"""Tests for home view."""
-
+"""Tests for the home view."""
 from django.test import TestCase
 from django.urls import reverse
 from walletwizard.models import User, Category, Expenditure, SpendingLimit
@@ -7,7 +6,8 @@ from walletwizard.tests.testHelpers import reverse_with_next
 import datetime
 
 class HomeViewTest(TestCase):
-    ''''''
+    """Tests for the home view."""
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):

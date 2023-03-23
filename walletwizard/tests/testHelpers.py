@@ -1,11 +1,11 @@
-''' File of helper functions used within tests'''
+''' File of helper functions used within tests.'''
 from walletwizard.models import User
 from django.contrib.auth.hashers import make_password
 from django.urls import reverse
 
-def reverse_with_next(url_name, next_url):
-    url = reverse(url_name)
-    url += f"?next={next_url}"
+def reverse_with_next(urlName, nextUrl):
+    url = reverse(urlName)
+    url += f"?next={nextUrl}"
     return url
 
 class LogInTester:

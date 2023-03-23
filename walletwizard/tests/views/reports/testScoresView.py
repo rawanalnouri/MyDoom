@@ -1,11 +1,11 @@
-"""Tests for scores view."""
+"""Tests for the scores view."""
 from django.test import TestCase
 from django.urls import reverse
 from walletwizard.models import Points, House, User
 from walletwizard.tests.testHelpers import reverse_with_next
 
 class ScoresViewTest(TestCase):
-    """Tests for scores view."""
+    """Tests for the scores view."""
 
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 

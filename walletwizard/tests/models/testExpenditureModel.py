@@ -105,12 +105,12 @@ class ExpenditureModelTestCase(TestCase):
         self._assertExpenditureIsValid()
 
 
-    def testRecieptCanBeNone(self):
-        self.expenditure.reciept = None
+    def testReceiptCanBeNone(self):
+        self.expenditure.receipt = None
         self._assertExpenditureIsValid()
 
-    def testRecieptCanBeBlank(self):
-        self.expenditure.reciept = ''
+    def testReceiptCanBeBlank(self):
+        self.expenditure.receipt = ''
         self._assertExpenditureIsValid()
 
 

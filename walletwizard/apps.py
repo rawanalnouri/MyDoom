@@ -15,5 +15,5 @@ class ExpensetrackerConfig(AppConfig):
             for house in DEFAULT_HOUSES:
                 House.objects.get_or_create(**house)
 
-         # Connect the create_default_houses function to the post_migrate signal
+        # Connect the createHouses function to the post_migrate signal
         post_migrate.connect(createHouses, sender=self)

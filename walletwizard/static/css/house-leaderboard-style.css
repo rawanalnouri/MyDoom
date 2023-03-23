@@ -1,32 +1,17 @@
-.podium {
-    height: 20%;
-    width: 20%;
-    text-align: center;
-    margin: 0px;
-    padding: 10px;
-    border-radius: 10px;
-    display: inline-block;
-    vertical-align: bottom;
-}
-
 .gold {
     background-color: #809bce;
-    height: 300px;
 }
 
 .silver {
     background-color: #95b8d1;
-    height: 250px;
 }
 
 .bronze {
     background-color: #d6eadf;
-    height: 200px;
 }
   
 .fourth {
     background-color: #eac4d5;
-    height: 150px;
 }
 
 .bar-chart {
