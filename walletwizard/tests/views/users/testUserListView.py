@@ -19,7 +19,7 @@ class UserListViewTest(TestCase):
         self.assertTrue('users' in response.context)
         users = response.context['users']
         self.assertEqual(len(users), 1)
-        self.assertEqual(users[0].username, 'bob123')
+        self.assertEqual(users[0].username, 'testuser')
     
     def testUserListViewPagination(self):
         createUsers(15) # 16 users total

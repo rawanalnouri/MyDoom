@@ -14,7 +14,7 @@ class EditProfileViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username='bob123')
+        self.user = User.objects.get(username='testuser')
         self.client.force_login(self.user)
         self.url = reverse('editProfile')
         self.formInput = {
@@ -53,9 +53,9 @@ class EditProfileViewTest(TestCase):
         self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.username, 'bob123')
-        self.assertEqual(self.user.firstName, 'bob')
-        self.assertEqual(self.user.lastName, 'white')
+        self.assertEqual(self.user.username, 'testuser')
+        self.assertEqual(self.user.firstName, 'john')
+        self.assertEqual(self.user.lastName, 'doe')
         self.assertEqual(self.user.email, 'test@email.com')
     
     def testSuccesfulProfileUpdate(self):

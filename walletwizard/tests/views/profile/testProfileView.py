@@ -12,7 +12,7 @@ class ProfileViewTest(TestCase):
     ]
 
     def setUp(self):
-        self.user = User.objects.get(username='bob123')
+        self.user = User.objects.get(username='testuser')
         self.client.force_login(self.user)
         self.url = reverse('profile')
 

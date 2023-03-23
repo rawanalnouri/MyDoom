@@ -1,5 +1,4 @@
-''' Tests for form handling the creation of expenditures'''
-
+'''Unit tests of the expenditure form.'''
 from django.test import TestCase
 from django import forms
 from walletwizard.forms import ExpenditureForm
@@ -7,18 +6,22 @@ from walletwizard.models import Expenditure, Category, SpendingLimit, User
 import datetime
 
 class ExpenditureFormTest(TestCase):
+    '''Unit tests of the expenditure form.'''
+
+    fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-        self.user = User.objects.create_user(username='testuser', email='test@email.com', password='testpassword')
-        self.spendingLimit = SpendingLimit.objects.create(amount='20', timePeriod='daily')
-        self.category = Category.objects.create(name='Food', spendingLimit=self.spendingLimit)
+        self.user = User.objects.get(id=1)
+        self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
-        self.expenditure = Expenditure.objects.create(
-            title='Grocery Shopping',
-            description='Weekly grocery shopping',
-            amount=100.00,
-            date=datetime.date.today(),
-        )
+        self.expenditure = Expenditure.objects.get(id=1) 
+        self.formInput = {
+            'title': 'Grocery Shopping',
+            'description': 'Peas and beans',
+            'amount': 50.00,
+            'date': datetime.date.today(),
+            'otherCategory': -1
+        }
         self.category.expenditures.add(self.expenditure)
     
     def testFormHasCorrectFieldsAndWidgets(self):
@@ -33,52 +36,29 @@ class ExpenditureFormTest(TestCase):
         self.assertIsInstance(form.fields['date'].widget, forms.DateInput)
 
     def testFormValidation(self):
-        data = {
-            'title': 'Grocery Shopping',
-            'description': 'Weekly grocery shopping',
-            'amount': 100.00,
-            'date': datetime.date.today(),
-            'otherCategory': -1,
-        }
-        form = ExpenditureForm(self.user, self.category, data)
+        form = ExpenditureForm(self.user, self.category, self.formInput)
         self.assertTrue(form.is_valid())
 
     def testFormValidationMissingFields(self):
-        data = {
-            'title': '',
-            'description': '',
-            'amount': '',
-            'date': '',
-            'otherCategory': '',
-        }
-        form = ExpenditureForm(self.user, self.category, data)
+        self.formInput['title'] = ''
+        self.formInput['description'] = ''
+        self.formInput['amount'] = ''
+        self.formInput['date'] = ''
+        self.formInput['otherCategory'] = ''
+        form = ExpenditureForm(self.user, self.category, self.formInput)
         self.assertFalse(form.is_valid())
 
     def testFormSave(self):
-        form = ExpenditureForm(self.user, self.category, {
-            'title': 'Grocery Shopping',
-            'description': 'Weekly grocery shopping',
-            'amount': 100.00,
-            'date': datetime.date.today(),
-            'otherCategory': -1,
-        })
+        form = ExpenditureForm(self.user, self.category, self.formInput)
         expenditure = form.save(self.category)
         self.assertEqual(expenditure.title, 'Grocery Shopping')
-        # Verify
         self.assertTrue(expenditure in self.category.expenditures.all())
     
     def testFormUpdate(self):
-        form = ExpenditureForm(self.user, self.category, instance=self.expenditure, data={
-            'title': 'Updated Title',
-            'description': 'Updated Description',
-            'amount': 200.00,
-            'date': datetime.date.today(),
-            'otherCategory': -1,
-        })
+        form = ExpenditureForm(self.user, self.category, instance=self.expenditure, data=self.formInput)
         self.assertTrue(form.is_valid())
-        updated_expenditure = form.save(self.category)
-        # Verify
-        self.assertEqual(updated_expenditure.title, 'Updated Title')
-        self.assertEqual(updated_expenditure.description, 'Updated Description')
-        self.assertEqual(updated_expenditure.amount, 200)
-        self.assertEqual(updated_expenditure.date, datetime.date.today())
+        updatedExpenditure = form.save(self.category)
+        self.assertEqual(updatedExpenditure.title, 'Grocery Shopping')
+        self.assertEqual(updatedExpenditure.description, 'Peas and beans')
+        self.assertEqual(updatedExpenditure.amount, 50)
+        self.assertEqual(updatedExpenditure.date, datetime.date.today())

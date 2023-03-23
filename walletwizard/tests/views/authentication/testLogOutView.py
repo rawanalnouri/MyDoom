@@ -18,7 +18,7 @@ class LogOutViewTest(TestCase, LogInTester):
         self.assertEqual(self.url,'/logOut/')
 
     def testLogOutAndRedirect(self):
-        self.client.login(username='bob123', password='Password123')
+        self.client.login(username='testuser', password='Password123')
         self.assertTrue(self.isUserLoggedIn())
         response = self.client.get(self.url, follow=True)
         response_url = reverse('index')
@@ -31,7 +31,7 @@ class LogOutViewTest(TestCase, LogInTester):
         self.assertNotContains(response, 'logOut')
 
     def testLogOutShownWhenLoggedIn(self):
-        self.client.login(username='bob123', password='Password123')
+        self.client.login(username='testuser', password='Password123')
         response = self.client.get('/home/')
         self.assertContains(response, 'logOut')
 

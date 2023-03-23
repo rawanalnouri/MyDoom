@@ -1,14 +1,13 @@
-''' Tests for form handling user editing their profile'''
-
+'''Unit tests of the edit profile form.'''
 from django import forms
 from django.test import TestCase
 from walletwizard.forms import EditProfileForm
-from walletwizard.models import *
+from walletwizard.models import User
 
 class EditProfileFormTestCase(TestCase):
-    fixtures = [
-        'walletwizard/tests/fixtures/defaultObjects.json'
-    ]
+    '''Unit tests of the edit profile form.'''
+
+    fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
     
     def setUp(self):
         self.input = {
@@ -18,7 +17,7 @@ class EditProfileFormTestCase(TestCase):
             "email": "janedoe@example.org",
         }
 
-    def testFormHasNecessaryFields(self):
+    def testFormHasNecessaryFieldsAndWidgets(self):
         form = EditProfileForm()
         self.assertIn('firstName', form.fields)
         self.assertIn('lastName', form.fields)
@@ -26,25 +25,41 @@ class EditProfileFormTestCase(TestCase):
         self.assertIn('email', form.fields)
         self.assertTrue(form.fields['email'], forms.EmailField)
 
-    def testValidUserForm(self):
+    def testFormValidation(self):
         form = EditProfileForm(data=self.input)
         self.assertTrue(form.is_valid())
 
-    def testFormUsesModelValidation(self):
-        # Ensure you cannot use an existing username
-        self.input['username'] = 'bob123'
+    def testFormDoesNotAcceptUsernameThatAlreadyExists(self):
+        self.input['username'] = 'testuser'
+        form = EditProfileForm(data=self.input)
+        self.assertFalse(form.is_valid())
+    
+    def testFormValidationMissingFields(self):
+        self.input['firstName'] = ''
+        self.input['lastName'] = ''
+        self.input['username'] = ''
+        self.input['email'] = ''
+        form = EditProfileForm(data=self.input)
+        self.assertFalse(form.is_valid())
+
+    def testFormUsesModelValidationForUsername(self):
+        self.input['username'] = 'b'
+        form = EditProfileForm(data=self.input)
+        self.assertFalse(form.is_valid())
+    
+    def testFormUsesModelValidationForEmail(self):
+        self.input['email'] = 'invalidEmail'
         form = EditProfileForm(data=self.input)
         self.assertFalse(form.is_valid())
 
     def testFormSavesCorrectly(self):
-        user = User.objects.get(username='bob123')
+        user = User.objects.get(username='testuser')
         form = EditProfileForm(instance=user, data=self.input)
-        before_count = User.objects.count()
+        beforeCount = User.objects.count()
         form.save()
-        after_count = User.objects.count()
-        self.assertEqual(after_count, before_count)
+        afterCount = User.objects.count()
+        self.assertEqual(afterCount, beforeCount)
         self.assertEqual(user.username, 'janedoe')
         self.assertEqual(user.firstName, 'Jane')
         self.assertEqual(user.lastName, 'Doe')
         self.assertEqual(user.email, 'janedoe@example.org')
-        
