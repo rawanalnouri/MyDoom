@@ -52,7 +52,15 @@ class EditCategoryView(LoginRequiredMixin, View):
     
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = CategorySpendingLimitForm(user=request.user, instance=category)
+        spendingLimit = category.spendingLimit
+        form = CategorySpendingLimitForm(
+            user = request.user, 
+            instance = category,                      
+            initial = {
+                'timePeriod': spendingLimit.timePeriod, 
+                'amount': spendingLimit.amount
+            }
+        )
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
