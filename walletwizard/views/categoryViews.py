@@ -28,24 +28,17 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             'expenditures': expenditures,
         }
 
-        categoryLabels = []
-        spendingData = []
-        totalSpent = 0
-        for category in Category.objects.filter(id=kwargs["categoryId"]):
-            categoryLabels.append(str(category))
-            categoryLabels.append("Remaining Budget")
-            # append total spent in category to date
-            cur = float(category.totalSpentInTimePeriod())
-            progressPercentage = category.progressAsPercentage()
-            spendingData.append(cur)
-            remainingBudget = round(float(category.spendingLimit.amount) - cur, 2)
-            if remainingBudget < 0:
-                remainingBudget = 0
-            spendingData.append(remainingBudget)
+        currentAmount = float(category.totalSpentInTimePeriod())
+        remainingAmount = round(float(category.spendingLimit.amount) - currentAmount, 2)
+        if remainingAmount < 0:
+            remainingAmount = 0
+
+        categoryLabels = [str(category), "Remaining Budget"]
+        spendingData = [currentAmount, remainingAmount]
 
         graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
-        context.update({'percentageSpent': progressPercentage})
+        context.update({'percentageSpent': str(category.progressAsPercentage())+'%'})
 
         return context
 
