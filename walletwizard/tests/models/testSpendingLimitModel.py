@@ -53,6 +53,10 @@ class SpendingLimitModelTestCase(TestCase):
         self.spendingLimit.amount = 0
         self._assertSpendingLimitIsInvalid()
     
+    def testAmountMustHaveMaximum20Digits(self):
+        self.spendingLimit.amount = int('1'+'0'*19)
+        self._assertSpendingLimitIsInvalid()
+
     def testAmountMinimumValueCannotBeLessThanNoughtPointNoughtOne(self):
         self.spendingLimit.amount = Decimal('0.00').normalize()
         self._assertSpendingLimitIsInvalid()
