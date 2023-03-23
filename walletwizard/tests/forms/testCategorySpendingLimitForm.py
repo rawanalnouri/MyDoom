@@ -1,11 +1,12 @@
-''' Tests for form handling the creation of categories'''
-
+'''Unit tests of the category and category spending limit form.'''
 from django.test import TestCase
 from django import forms
 from walletwizard.models import Category, User
 from walletwizard.forms import CategorySpendingLimitForm
 
 class CategorySpendingLimitFormTest(TestCase):
+    '''Unit tests of the category and category spending limit form.'''
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
@@ -69,8 +70,7 @@ class CategorySpendingLimitFormTest(TestCase):
         self.assertEqual(cleanedData['description'], 'This is a test category')
         self.assertEqual(cleanedData['timePeriod'], 'daily')
         self.assertEqual(cleanedData['amount'], 10)
-
-        # checks two categories with the same name cannot be created
+        # Check two categories with the same name cannot be created
         self.data['name'] = 'testcategory'
         form2 = CategorySpendingLimitForm(data=self.data, user=self.user)
         self.assertFalse(form2.is_valid())
