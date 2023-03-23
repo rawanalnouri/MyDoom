@@ -3,7 +3,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
-from django.forms import ValidationError
 from libgravatar import Gravatar
 from .helpers.modelHelpers import *
 from datetime import datetime
@@ -20,7 +19,7 @@ class SpendingLimit(models.Model):
         ('yearly', 'Yearly')
     ]
     timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=False)
-    amount = models.DecimalField(max_digits=50, validators=[MinValueValidator(0.01)], decimal_places=2)
+    amount = models.DecimalField(max_digits=20, validators=[MinValueValidator(0.01)], decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 

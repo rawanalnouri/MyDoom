@@ -1,8 +1,6 @@
-''' Tests for the Notification models'''
-
+'''Unit tests for the Notification models.'''
 from walletwizard.models import Notification, User, ShareCategoryNotification, FollowRequestNotification, Category
 from django.test import TestCase
-from datetime import date
 from django.core.exceptions import ValidationError
 
 class NotificationModelTestCase(TestCase):
