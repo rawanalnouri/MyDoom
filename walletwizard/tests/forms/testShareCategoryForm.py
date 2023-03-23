@@ -1,4 +1,4 @@
-''' Tests for form handling categories being shared.'''
+'''Unit tests of share category form.'''
 from django.test import TestCase
 from walletwizard.models import User, Category, Notification
 from walletwizard.forms import ShareCategoryForm
@@ -6,7 +6,8 @@ from django.urls import reverse
 from django import forms
 
 class ShareCategoryFormTest(TestCase):
-
+    '''Unit tests of share category form.'''
+    
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):

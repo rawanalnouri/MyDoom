@@ -96,7 +96,7 @@ class LoginViewTest(TestCase, LogInTester):
         self.assertEqual(listOfMessages[0].level, messages.ERROR)
 
     def testSuccessfulLogIn(self):
-        formInput = { 'username': 'bob123', 'password': 'Password123' }
+        formInput = { 'username': 'testuser', 'password': 'Password123' }
         response = self.client.post(self.url, formInput, follow=True)
         self.assertTrue(self.isUserLoggedIn())
         userRedirect = reverse('home')
@@ -108,7 +108,7 @@ class LoginViewTest(TestCase, LogInTester):
     
     def testSuccesfulLogInWithRedirect(self):
         redirectUrl = reverse('scores')
-        formInput = { 'username': 'bob123', 'password': 'Password123', 'next': redirectUrl }
+        formInput = { 'username': 'testuser', 'password': 'Password123', 'next': redirectUrl }
         response = self.client.post(self.url, formInput, follow=True)
         self.assertTrue(self.isUserLoggedIn())
         self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
@@ -129,7 +129,7 @@ class LoginViewTest(TestCase, LogInTester):
         self.user.lastLogin = timezone.make_aware(datetime.now() - timedelta(days=1))
         self.user.save()
         userPointsBefore = Points.objects.get(user=self.user).count
-        formInput = { 'username': 'bob123', 'password': 'Password123' }
+        formInput = { 'username': 'testuser', 'password': 'Password123' }
         self.client.post(self.url, formInput)
         userPointsAfter = Points.objects.get(user=self.user).count
         # Check if user points have increased

@@ -69,7 +69,7 @@ class SearchUsersViewTest(TestCase):
     def testSearchUsersWithoutQuery(self):
         url = reverse('searchUsers')
         response = self.client.get(url)
-        self.assertContains(response, 'bob123')
+        self.assertContains(response, 'testuser')
         self.assertContains(response, 'janedoe')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/users/searchResults.html')
