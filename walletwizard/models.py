@@ -35,7 +35,7 @@ class SpendingLimit(models.Model):
 
 '''model for storing and tracking user expenditures.'''
 class Expenditure(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
@@ -53,10 +53,10 @@ class Expenditure(models.Model):
 class Category(models.Model):
 
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=50)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures', blank=True)
-    description = models.TextField(blank=True)
+    description = models.CharField(blank=True, max_length=250)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 

@@ -1,61 +1,108 @@
-''' Tests for the Category model'''
-
+'''Unit tests of the Category model'''
 from walletwizard.models import Category, SpendingLimit, Expenditure, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from datetime import datetime
 
 class CategoryModelTestCase(TestCase):
+    '''Unit tests of the Category model'''
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-        self.user1 = User.objects.get(id = 1)
-
-        firstName2 = 'Jane'
-        lastName2 = 'Smith'
-        email2 = 'testEmail2@example.org'
-        username2 = 'janesmith'
-        password2 = "Password123"
-        self.user2 = User.objects.create(
-            username = username2,
-            firstName = firstName2,
-            lastName = lastName2,
-            email = email2,
-            password = password2
+        self.user = User.objects.get(id=1)
+        self.secondUser = User.objects.create_user(
+            username='janedoe', 
+            email='janedoe@example.org', 
+            firstName='Jane',
+            lastName='Doe',
+            password='Password123',
         )
+        self.expenditure = Expenditure.objects.get(id=1)
+        self.category = Category.objects.get(id=1)
 
-        self.spendingLimit = SpendingLimit.objects.get(id = 1)
-        self.expenditure = Expenditure.objects.get(id = 1)
-        self.category = Category.objects.get(id = 1)
-
-        self.category.users.add(self.user1)
-        self.category.users.add(self.user2)
-        self.category.spendingLimit = self.spendingLimit
-        self.category.expenditures.add(self.expenditure)
-
-    def testCategoryIsValid(self):
+    def _assertCategoryIsValid(self):
         try:
             self.category.full_clean()
         except:
-            self.fail('category must be valid')
+            self.fail('Test category should be valid')
+    
+    def _assertCategoryIsInvalid(self):
+        with self.assertRaises(ValidationError):
+            self.category.full_clean()
 
-    def testNoBlankName(self):
+    def testNameCannotBeBlank(self):
+        self.category.name = ''
+        self._assertCategoryIsInvalid()
+    
+    def testNameCannotBeNone(self):
         self.category.name = None
-        with self.assertRaises(ValidationError):
-            self.category.full_clean()
+        self._assertCategoryIsInvalid()
+    
+    def testNameNeedNotBeUnique(self):
+        secondSpendingLimit = SpendingLimit.objects.create(amount=100, timePeriod='weekly')
+        secondCategory = Category.objects.create(name='secondCategory', spendingLimit=secondSpendingLimit)
+        self.category.name = secondCategory.name
+        self._assertCategoryIsValid()
+    
+    def testNameMustBeAtMostFiftyCharactersLong(self):
+        self.category.name = 'x' * 51
+        self._assertCategoryIsInvalid()
+    
+    def testNameCanBeLessThanFiftyCharactersLong(self):
+        self.category.name = 'x' * 25
+        self._assertCategoryIsValid()
+    
+    def testNameCanBeEightyCharactersLong(self):
+        self.category.name = 'x' * 50
+        self._assertCategoryIsValid()
 
-    def testNoBlankSpendingLimit(self):
+    def testSpendingLimitCannotNone(self):
         self.category.spendingLimit = None
-        with self.assertRaises(ValidationError):
-            self.category.full_clean()
+        self._assertCategoryIsInvalid()
 
-    def testNameWithinLengthLimit(self):
-        self.category.name = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
-        with self.assertRaises(ValidationError):
-            self.category.full_clean()
+    def testExpendituresCannotStoreNonExpenditureModels(self):
+        with self.assertRaises(TypeError):
+            self.category.expenditures.add(self.user)
 
-    def testCategoryProgressWithZeroSpendingLimit(self):
-        self.category.spendingLimit.amount = 0
-        self.assertEqual(0, self.category.progress())
+    def testExpendituresCanStoreOneExpenditureModel(self):
+        self.category.expenditures.add(self.expenditure)
+        self._assertCategoryIsValid()
+
+    def testExpendituresCanStoreMoreThanOneExpenditureModel(self):
+        for i in range(15):
+            expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.today(), amount=10)
+            self.category.expenditures.add(expenditure)
+            self._assertCategoryIsValid()
+
+    def testDescriptionCanBeBlank(self):
+        self.category.description = ''
+        self._assertCategoryIsValid()
+
+    def testDescriptionMustBeAtMost250CharactersLong(self):
+        self.category.description = 'x' * 251
+        self._assertCategoryIsInvalid()
+
+    def testDescriptionCanBeLessThan250CharactersLong(self):
+        self.category.description = 'x' * 200
+        self._assertCategoryIsValid()
+
+    def testDescriptionCanBe250CharactersLong(self):
+        self.category.description = 'x' * 250
+        self._assertCategoryIsValid()
+    
+    def testDescriptionNeedNotBeUnique(self):
+        secondSpendingLimit = SpendingLimit.objects.create(
+            amount=100, 
+            timePeriod='weekly'
+        )
+        secondCategory = Category.objects.create(
+            name='secondCategory', 
+            description='This is the second category\'s description.',
+            spendingLimit=secondSpendingLimit,
+        )
+        self.category.description = secondCategory.description
+        self._assertCategoryIsValid()
 
    
 
