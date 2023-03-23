@@ -3,16 +3,14 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.core.validators import MinValueValidator
-from django.forms import ValidationError
 from libgravatar import Gravatar
-from .helpers.modelHelpers import *
+from .helpers.modelHelpers import computeTotalSpendingLimitByMonth, computeTotalSpentInTimePeriod
 from datetime import datetime
 from django.utils import timezone
 from decimal import Decimal
 
-'''model for setting and monitoring user's financial goals and spending limits.'''
 class SpendingLimit(models.Model):
-
+    '''Model for storing and managing user's spending limits for each category and overall.'''
     TIME_CHOICES = [
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
@@ -25,6 +23,8 @@ class SpendingLimit(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
+        '''Model options.'''
+
         ordering = ['-createdAt']
 
     def __str__(self):
@@ -33,8 +33,8 @@ class SpendingLimit(models.Model):
     def getNumber(self):
         return self.amount
 
-'''model for storing and tracking user expenditures.'''
 class Expenditure(models.Model):
+    '''Model for storing and managing user expenditures.'''
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
@@ -44,14 +44,15 @@ class Expenditure(models.Model):
     updatedAt = models.DateTimeField(auto_now=True)
 
     class Meta:
+        '''Model options.'''
+
         ordering = ['-date']
 
     def __str__(self):
         return self.title
 
-'''model for storing and managing user expense categories.'''
 class Category(models.Model):
-
+    '''Model for storing and managing categories that users will add expenditures to.'''
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
     name = models.CharField(max_length=80)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE)
@@ -60,15 +61,15 @@ class Category(models.Model):
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
-    def progress(self):
-        total = computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures)
+    def progressAsPercentage(self):
+        total = computeTotalSpentInTimePeriod(self.spendingLimit.timePeriod, self.expenditures)
         if self.spendingLimit.amount==0:
             return 0.00
         else:
             return round(100*total/float(self.spendingLimit.amount), 2)
     
-    def totalSpent(self):
-        return Decimal(round(computeTotalSpent(self.spendingLimit.timePeriod, self.expenditures), 2))
+    def totalSpentInTimePeriod(self):
+        return Decimal(round(computeTotalSpentInTimePeriod(self.spendingLimit.timePeriod, self.expenditures), 2))
 
     def totalSpendingLimitByMonth(self):
         return Decimal(round(computeTotalSpendingLimitByMonth(self.spendingLimit.timePeriod, self.spendingLimit.amount), 2))
@@ -76,16 +77,14 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-''' model for the different houses '''
 class House(models.Model):
-    # image= models.ImageField(upload_to='images/') 
+    '''Model for storing and managing houses.'''
     points = models.IntegerField(default=0)
-    # HOUSE_CHOICES = {'one','two','three','four'}
     name = models.CharField(max_length=20, blank=False)
     memberCount = models.IntegerField(default=0)
 
-'''model for user authentication.'''
 class User(AbstractUser):
+    '''Model for storing and managing users.'''
     username   = models.CharField(
         max_length=30,
         unique=True,
@@ -105,47 +104,50 @@ class User(AbstractUser):
     house = models.ForeignKey(House, on_delete=models.CASCADE, blank=True, null=True)
     overallSpendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE, blank=True, null=True)
     
-
     class Meta:
+        '''Model options.'''
+
         ordering = ['username']
 
-    '''Return a URL to the user's gravatar'''
+    def fullName(self):
+        return f'{self.firstName} {self.lastName}'
+    
     def gravatar(self, size=120):
+        '''Return a URL to the user's gravatar'''
         gravatar_object = Gravatar(self.email)
         gravatar_url = gravatar_object.get_image(size=size, default='mp')
         return gravatar_url
 
-    '''Return a URL to a miniature version of the user's gravatar.'''
     def miniGravatar(self):
+        '''Return a URL to a miniature version of the user's gravatar.'''
         return self.gravatar(size=60)
 
-    def fullName(self):
-        return f'{self.firstName} {self.lastName}'
-
-    '''Returns whether self follows the given user.'''
     def isFollowing(self, user):
+        '''Returns whether self follows the given user.'''
         return user in self.followees.all()
 
-    '''Returns the number of followers of self.'''
     def followerCount(self):
+        '''Return the number of followers of self.'''
         return self.followers.count()
 
-    '''Returns the number of followees of self.'''
     def followeeCount(self):
+        '''Return the number of followees of self.'''
         return self.followees.count()
 
-    def totalProgress(self):
-        total = 0.0
+    def progressAsPercentage(self):
+        '''Return the user's total category progress as a percentage.'''
         limit = 0.0
+        total = 0.0
         for category in self.categories.all():
             limit += float(category.spendingLimit.amount)
-            total += computeTotalSpent(category.spendingLimit.timePeriod, category.expenditures)
-        if limit==0:
+            total += computeTotalSpentInTimePeriod(category.spendingLimit.timePeriod, category.expenditures)
+        if limit == 0:
             return 0.00
         else:
-            return round(100*total/limit, 2)
+            return round(100 * total/limit, 2)
     
     def totalSpentThisMonth(self):
+        '''Return the total amount spent by the user this month.'''
         total = 0.0
         today = datetime.now()
         for category in self.categories.all():
@@ -153,9 +155,8 @@ class User(AbstractUser):
                 total += float(expense.amount)
         return round(total, 2)
 
-'''model for storing and managing user notifications.'''
 class Notification(models.Model):
-
+    '''Model for storing and managing user notifications.'''
     toUser = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     message = models.CharField(max_length=255)
@@ -169,22 +170,28 @@ class Notification(models.Model):
     type = models.CharField(max_length=20, choices=TYPE_CHOICES, blank=False)
 
     class Meta:
+        '''Model options.'''
+
         ordering = ['-createdAt']
 
     def __str__(self):
         return self.message
     
 class ShareCategoryNotification(Notification):
+    '''Model for storing and managing share category notifications.'''
     sharedCategory = models.ForeignKey(Category, on_delete=models.CASCADE)
     fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class FollowRequestNotification(Notification):
+    '''Model for storing and managing follow request notifications.'''
     fromUser = models.ForeignKey(User, on_delete=models.CASCADE)
 
-''' model for the points that the user earns '''
 class Points(models.Model):
+    '''Model for storing and managing user points.'''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)
     
     class Meta:
+        '''Model options.'''
+
         ordering = ['-count']
