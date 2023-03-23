@@ -22,7 +22,7 @@ def createShareCategoryNotification(toUser, title, message, sharedCategory, from
     type='category'
     )
 
-# Function to create a follow requesty notifcation for a user 
+# Function to create a follow request notification for a user 
 def createFollowRequestNotification(toUser, title, message, fromUser):
     FollowRequestNotification.objects.create(
     toUser=toUser,
