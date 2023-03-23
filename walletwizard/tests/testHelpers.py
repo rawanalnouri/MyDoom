@@ -17,8 +17,8 @@ def createUsers(num):
     for i in range(num):
         user = User.objects.create(
             username=f"user{i+1}",
-            first_name=f"first_name{i+1}",
-            last_name=f"last_name{i+1}",
+            firstName=f"firstName{i+1}",
+            lastName=f"lastName{i+1}",
             email=f"user{i+1}@example.com",
             password=make_password("password")
         )

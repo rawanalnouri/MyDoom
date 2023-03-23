@@ -81,8 +81,8 @@ class House(models.Model):
     # image= models.ImageField(upload_to='images/') 
     points = models.IntegerField(default=0)
     # HOUSE_CHOICES = {'one','two','three','four'}
-    name = models.CharField(max_length=20, blank=False)
-    memberCount = models.IntegerField(default=0)
+    name = models.CharField(max_length=50, unique=True, blank=False)
+    memberCount = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
 '''model for user authentication.'''
 class User(AbstractUser):

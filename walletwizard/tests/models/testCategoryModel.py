@@ -3,6 +3,7 @@ from walletwizard.models import Category, SpendingLimit, Expenditure, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from datetime import datetime
+from walletwizard.tests.testHelpers import createUsers
 
 class CategoryModelTestCase(TestCase):
     '''Unit tests of the Category model'''
@@ -11,25 +12,8 @@ class CategoryModelTestCase(TestCase):
 
     def setUp(self):
         self.user = User.objects.get(id=1)
-        self.secondUser = User.objects.create_user(
-            username='janedoe', 
-            email='janedoe@example.org', 
-            firstName='Jane',
-            lastName='Doe',
-            password='Password123',
-        )
         self.expenditure = Expenditure.objects.get(id=1)
         self.category = Category.objects.get(id=1)
-
-    def _assertCategoryIsValid(self):
-        try:
-            self.category.full_clean()
-        except:
-            self.fail('Test category should be valid')
-    
-    def _assertCategoryIsInvalid(self):
-        with self.assertRaises(ValidationError):
-            self.category.full_clean()
 
     def testNameCannotBeBlank(self):
         self.category.name = ''
@@ -53,7 +37,7 @@ class CategoryModelTestCase(TestCase):
         self.category.name = 'x' * 25
         self._assertCategoryIsValid()
     
-    def testNameCanBeEightyCharactersLong(self):
+    def testNameCanBeFiftyCharactersLong(self):
         self.category.name = 'x' * 50
         self._assertCategoryIsValid()
 
@@ -74,6 +58,19 @@ class CategoryModelTestCase(TestCase):
             expenditure = Expenditure.objects.create(title='testexpenditure' + str(i), date=datetime.today(), amount=10)
             self.category.expenditures.add(expenditure)
             self._assertCategoryIsValid()
+
+    def testUsersCannotStoreNonUserModels(self):
+        with self.assertRaises(TypeError):
+            self.category.users.add(self.expenditure)
+
+    def testUsersCanStoreOneUserModel(self):
+        self.category.users.add(self.user)
+        self._assertCategoryIsValid()
+
+    def testUsersCanStoreMoreThanOneUserModel(self):
+        users = createUsers(15)
+        self.category.users.add(*users)
+        self._assertCategoryIsValid()
 
     def testDescriptionCanBeBlank(self):
         self.category.description = ''
@@ -104,7 +101,15 @@ class CategoryModelTestCase(TestCase):
         self.category.description = secondCategory.description
         self._assertCategoryIsValid()
 
-   
+    def _assertCategoryIsValid(self):
+        try:
+            self.category.full_clean()
+        except:
+            self.fail('Test category should be valid')
+    
+    def _assertCategoryIsInvalid(self):
+        with self.assertRaises(ValidationError):
+            self.category.full_clean() 
 
 
 
