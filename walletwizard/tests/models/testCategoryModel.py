@@ -1,5 +1,4 @@
-''' Tests for the Category model'''
-
+''' Tests for the Category model.'''
 from walletwizard.models import Category, SpendingLimit, Expenditure, User
 from django.test import TestCase
 from django.core.exceptions import ValidationError
@@ -39,7 +38,7 @@ class CategoryModelTestCase(TestCase):
             self.fail('category must be valid')
 
     def testNoBlankName(self):
-        self.category.name = None
+        self.category.name = ''
         with self.assertRaises(ValidationError):
             self.category.full_clean()
 
@@ -49,13 +48,13 @@ class CategoryModelTestCase(TestCase):
             self.category.full_clean()
 
     def testNameWithinLengthLimit(self):
-        self.category.name = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
+        self.category.name = 'x' * 81
         with self.assertRaises(ValidationError):
             self.category.full_clean()
 
     def testCategoryProgressWithZeroSpendingLimit(self):
         self.category.spendingLimit.amount = 0
-        self.assertEqual(0, self.category.progress())
+        self.assertEqual(0, self.category.progressAsPercentage())
 
    
 

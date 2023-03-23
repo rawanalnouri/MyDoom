@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from walletwizard.models import Category, Expenditure
 from walletwizard.forms import ExpenditureForm
 import os
-from walletwizard.helpers.pointsHelpers import trackPoints, checkIfOver
+from walletwizard.helpers.pointsHelpers import updateUserPointsForExpenditureCreation, isCategoryOverSpendingLimit
 
         
 class CreateExpenditureView(LoginRequiredMixin, View):
@@ -22,13 +22,13 @@ class CreateExpenditureView(LoginRequiredMixin, View):
         category = Category.objects.get(id=kwargs['categoryId'])
         form = ExpenditureForm(request.user, category, request.POST, request.FILES)
         if category and form.is_valid():
-            currentCategoryInfo = checkIfOver(category)
+            overLimit = isCategoryOverSpendingLimit(category)
             expenditure = form.save()
-            messages.success(self.request, f'A new expenditure \'{expenditure.title}\' has been successfully created.')
-            trackPoints(self.request.user, category, currentCategoryInfo[0], currentCategoryInfo[1])
+            messages.success(request, f'A new expenditure \'{expenditure.title}\' has been successfully created.')
+            updateUserPointsForExpenditureCreation(request.user, category, overLimit)
             return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
-            messages.error(self.request, "Failed to create expenditure.")
+            messages.error(request, "Failed to create expenditure.")
             return render(request, 'partials/bootstrapForm.html', {'form': form})
 
 

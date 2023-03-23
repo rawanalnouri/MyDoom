@@ -19,10 +19,10 @@
                           <img src="{{ user.gravatar }}" class="rounded-circle mx-1 my-2">
                       </div>
                       <h6 class="f-w-600">{{ user.username }}</h6>
-                      {% if user.followers.count == 1 %}
-                        <p>{{ user.followers.count }} Follower </p>
+                      {% if user.followerCount == 1 %}
+                        <p>{{ user.followerCount }} Follower </p>
                       {% else %}
-                        <p>{{ user.followers.count }} Followers </p>
+                        <p>{{ user.followerCount }} Followers </p>
                       {% endif %}
                       <i class=" mdi mdi-square-edit-outline feather icon-edit m-t-10 f-16"></i>
                   </div>
