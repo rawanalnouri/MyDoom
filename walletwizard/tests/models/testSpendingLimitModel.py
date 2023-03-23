@@ -20,7 +20,7 @@ class SpendingLimitModelTestCase(TestCase):
         self.spendingLimit.timePeriod = ''
         self._assertSpendingLimitIsInvalid()
 
-    def testTimePeriodMustBeFromSpendingLimitTimePeriodChoices(self):
+    def testInvalidTimePeriodChoice(self):
         self.spendingLimit.timePeriod = 'invalidChoice'
         self._assertSpendingLimitIsInvalid()
 

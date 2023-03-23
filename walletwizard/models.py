@@ -156,10 +156,10 @@ class User(AbstractUser):
 class Notification(models.Model):
 
     toUser = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    message = models.CharField(max_length=255)
+    title = models.CharField(max_length=80, blank=False)
+    message = models.CharField(max_length=250, blank=False)
+    isSeen = models.BooleanField(default=False)
     createdAt = models.DateTimeField(auto_now_add=True)
-    isSeen = models.BooleanField(default = False)
     TYPE_CHOICES = [
         ('basic', 'Basic'),
         ('category', 'Category'),
