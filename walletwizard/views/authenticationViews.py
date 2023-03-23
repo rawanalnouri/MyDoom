@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login,logout
 from walletwizard.models import House
 from walletwizard.forms import SignUpForm, LogInForm
-from walletwizard.helpers.pointsHelpers import createPoints, updatePoints, housePointsUpdate
+from walletwizard.helpers.pointsHelpers import createUserPoints, updateUserPoints, updateHousePoints
 from walletwizard.helpers.notificationsHelpers import createBasicNotification
 from PersonalSpendingTracker.settings import REDIRECT_URL_WHEN_LOGGED_IN
 from django.utils import timezone
@@ -31,7 +31,7 @@ class SignUpView(LoginProhibitedMixin, View):
         signUpForm = SignUpForm(request.POST)
         if signUpForm.is_valid():
             user = signUpForm.save()
-            points = createPoints(user)
+            points = createUserPoints(user)
             login(request, user)
 
             createBasicNotification(user, "New Points Earned!", str(points) + " points earned for signing up!")
@@ -43,7 +43,7 @@ class SignUpView(LoginProhibitedMixin, View):
             user.save()
             house.memberCount += 1
             house.save()
-            housePointsUpdate(user, 50)
+            updateHousePoints(user, 50)
            
             return redirect(REDIRECT_URL_WHEN_LOGGED_IN)
         return render(request, 'signUp.html', {'form': signUpForm})
@@ -72,7 +72,7 @@ class LogInView(LoginProhibitedMixin, View):
                 login(request, user)
                 # add 5 points if first login of the day
                 if user.lastLogin.date() != datetime.now().date():
-                    updatePoints(user, 5)
+                    updateUserPoints(user, 5)
                     createBasicNotification(user, "New Points Earned!", "5 points earned for daily login")
                 # update user's 'lastLogin'
                 user.lastLogin = timezone.now()

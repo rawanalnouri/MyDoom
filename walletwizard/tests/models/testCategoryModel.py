@@ -100,6 +100,11 @@ class CategoryModelTestCase(TestCase):
         )
         self.category.description = secondCategory.description
         self._assertCategoryIsValid()
+    
+
+    def testSpendingLimitCannotBeNone(self):
+        self.category.spendingLimit = None
+        self._assertCategoryIsInvalid()
 
     def _assertCategoryIsValid(self):
         try:

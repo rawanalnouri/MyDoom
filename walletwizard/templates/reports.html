@@ -26,7 +26,7 @@
   <div class="card w-75">
     <div class="card-body">
       <p class="card-text text-center">{{ text }}</p>
-      {% include 'partials/chart.html' with num=1 %}
+      {% include 'partials/charts/chart.html' with resizeChart=0 num=1 %}
     </div>
   </div>
 </div>
@@ -35,14 +35,14 @@
     <div class="card w-50">
       <div class="card-body">
         <p class="card-text text-center">{{ text2 }}</p>
-        {% include 'partials/mixedCharts.html' with num=2 withbar=True hidden=True %}
+        {% include 'partials/charts/mixedChart.html' with num=2 withbar=True hidden=True %}
       </div>
   </div>
 
   <div class="card w-50">
     <div class="card-body">
       <p class="card-text text-center">{{ text3 }}</p>
-      {% include 'partials/mixedCharts.html' with num=3 %}
+      {% include 'partials/charts/mixedChart.html' with num=3 %}
     </div>
   </div>
 

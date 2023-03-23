@@ -53,7 +53,14 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
     '''View to update or set the logged-in user's overall spending limit.'''
 
     def get(self, request, *args, **kwargs):
-        form = OverallSpendingForm(user=request.user)
+        spendingLimit = request.user.overallSpendingLimit
+        form = OverallSpendingForm(
+            user = request.user, 
+            initial = {
+                'timePeriod': spendingLimit.timePeriod, 
+                'amount': spendingLimit.amount
+            }
+        )
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):

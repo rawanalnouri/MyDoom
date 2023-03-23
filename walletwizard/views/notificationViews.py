@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from walletwizard.models import ShareCategoryNotification, Notification
 from walletwizard.helpers.notificationsHelpers import createBasicNotification
-from walletwizard.notificationContextProcessor import getNotifications
+from walletwizard.contextProcessors.notificationsContextProcessor import getNotifications
 
         
 class AcceptShareCategoryView(LoginRequiredMixin, View):

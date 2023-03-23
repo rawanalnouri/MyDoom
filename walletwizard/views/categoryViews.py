@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from walletwizard.models import Category
 from walletwizard.forms import CategorySpendingLimitForm, ShareCategoryForm
-from walletwizard.helpers.pointsHelpers import updatePoints, createBasicNotification
+from walletwizard.helpers.pointsHelpers import updateUserPoints, createBasicNotification
 from ..helpers.viewsHelpers import generateGraph
 
 
@@ -35,8 +35,8 @@ class CategoryView(LoginRequiredMixin, TemplateView):
             categoryLabels.append(str(category))
             categoryLabels.append("Remaining Budget")
             # append total spent in category to date
-            cur = float(category.totalSpent())
-            totalSpent = category.progress
+            cur = float(category.totalSpentInTimePeriod())
+            progressPercentage = category.progressAsPercentage()
             spendingData.append(cur)
             remainingBudget = round(float(category.spendingLimit.amount) - cur, 2)
             if remainingBudget < 0:
@@ -45,7 +45,7 @@ class CategoryView(LoginRequiredMixin, TemplateView):
 
         graphData = generateGraph(categoryLabels, spendingData, "doughnut")
         context.update(graphData)
-        context.update({'total':totalSpent})
+        context.update({'percentageSpent': progressPercentage})
 
         return context
 
@@ -55,7 +55,15 @@ class EditCategoryView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
-        form = CategorySpendingLimitForm(user=request.user, instance=category)
+        spendingLimit = category.spendingLimit
+        form = CategorySpendingLimitForm(
+            user = request.user, 
+            instance = category,                      
+            initial = {
+                'timePeriod': spendingLimit.timePeriod, 
+                'amount': spendingLimit.amount
+            }
+        )
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
@@ -65,7 +73,7 @@ class EditCategoryView(LoginRequiredMixin, View):
             category = form.save()
             messages.success(self.request, f'Your category \'{category.name}\' was updated successfully.')
             # add points for editing category
-            updatePoints(self.request.user, 2)
+            updateUserPoints(self.request.user, 2)
             createBasicNotification(self.request.user, "New Points Earned!", "2 points earned for editing a new category.")
             return redirect(reverse('category', args=[category.id]))
         else:
@@ -90,7 +98,7 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         category = form.save()
         messages.success(self.request, f'A new category \'{category.name}\' has been successfully created.')
         # add points for creating category
-        updatePoints(self.request.user, 5)
+        updateUserPoints(self.request.user, 5)
         createBasicNotification(self.request.user, "New Points Earned!", "5 points earned for creating a new category.")
         category.save()
         return redirect(reverse('category', args=[category.id]))
