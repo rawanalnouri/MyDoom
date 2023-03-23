@@ -184,7 +184,7 @@ class FollowRequestNotification(Notification):
 ''' model for the points that the user earns '''
 class Points(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    count = models.IntegerField(default=0)
+    count = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     
     class Meta:
         ordering = ['-count']
