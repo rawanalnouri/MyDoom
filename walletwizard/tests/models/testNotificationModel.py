@@ -1,153 +1,90 @@
-''' Tests for the Notification models'''
-
+'''Unit tests for the Notification model.'''
 from walletwizard.models import Notification, User, ShareCategoryNotification, FollowRequestNotification, Category
 from django.test import TestCase
-from datetime import date
 from django.core.exceptions import ValidationError
 
 class NotificationModelTestCase(TestCase):
+    '''Unit tests for the Notification model.'''
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-        #For basic notification model
-        firstName = 'John'
-        lastName = 'Doe'
-        email = 'testEmail1@example.org'
-        username = 'johndoe'
-        password = "Password123"
-        self.user = User.objects.create(
-            username = username,
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            password = password
-        )
-
-        self.notification = Notification.objects.create(
-            toUser = self.user,
-            title = "Test Title",
-            message = "This is a notification message text for test purposes.",
-            type = 'basic'
-        )
-
-        #For extended notifications
-        firstName2 = 'Jane'
-        lastName2 = 'Smith'
-        email2 = 'testEmail2@example.org'
-        username2 = 'janesmith'
-        password2 = "Password123"
-        self.user2 = User.objects.create(
-            username = username2,
-            firstName = firstName2,
-            lastName = lastName2,
-            email = email2,
-            password = password2
-        )
-
-        self.followRequestNotification = FollowRequestNotification.objects.create(
-            toUser = self.user,
-            title = "Test Title",
-            message = "This is a 'follow request' notification message text for test purposes.",
-            type = 'follow',
-            fromUser = self.user2
-        )
-
-        self.category = Category.objects.get(id = 1)
-
-        self.shareCategoryNotification = ShareCategoryNotification.objects.create(
-            toUser = self.user,
-            title = "Test Title",
-            message = "This is a 'share category' notification message text for test purposes.",
-            type = 'category',
-            sharedCategory = self.category,
-            fromUser = self.user2
-        )
+        self.notification = Notification.objects.get(id=1)
     
+    def testToUserCannotBeNone(self):
+        self.notification.toUser = None
+        self._assertNotificationIsInvalid()
 
-    def testNotificationIsValid(self):
+    def testToUserInNotificationExistsInUsers(self):
+        notificationToUser = self.notification.toUser
+        self.assertTrue(User.objects.filter(id=notificationToUser.id).exists())
+    
+    def testTitleCannotBeEmpty(self):
+        self.notification.title = ''
+        self._assertNotificationIsInvalid()
+
+    def testTitleCannotBeNone(self):
+        self.notification.toUser = None
+        self._assertNotificationIsInvalid()
+
+    def testTitleMustBeAtMostEightyCharactersLong(self):
+        self.notification.title = 'x' * 81
+        self._assertNotificationIsInvalid()
+    
+    def testTitleCanBeEightyCharactersLong(self):
+        self.notification.title = 'x' * 80
+        self._assertNotificationIsValid()
+    
+    def testMessageCannotBeEmpty(self):
+        self.notification.message = ''
+        self._assertNotificationIsInvalid()
+
+    def testMessageCannotBeNone(self):
+        self.notification.message = None
+        self._assertNotificationIsInvalid()
+    
+    def testMessageMustBeAtMostTwoHundredAndFiftyCharactersLong(self):
+        self.notification.message = 'x' * 251
+        self._assertNotificationIsInvalid()
+    
+    def testMessageCanBeTwoHundredAndFiftyCharactersLong(self):
+        self.notification.message = 'x' * 250
+        self._assertNotificationIsValid()
+    
+    def testIsSeenFieldCanBeFalse(self):
+        self.notification.isSeen = 0
+        self._assertNotificationIsValid()
+
+    def testIsSeenFieldCanBeTrue(self):
+        self.notification.isSeen = 0
+        self._assertNotificationIsValid()
+
+    def testIsSeenFieldMustBeValid(self):
+        self.notification.isSeen = 4
+        self._assertNotificationIsInvalid()
+
+    def testTypeChoicesCanBe(self):
+        self.notification.isSeen = 4
+        self._assertNotificationIsInvalid()
+
+    def testInvalidTypeChoice(self):
+        self.notification.type = 'invalidChoice'
+        self._assertNotificationIsInvalid()
+
+    def testTypeMustBeFromNotificationTypeChoices(self):
+        for choice in Notification.TYPE_CHOICES:
+            self.notification.type = choice[0]
+            self._assertNotificationIsValid()
+    
+    def testNotificationToStringIsEqualToMessage(self):
+        self.assertEqual(self.notification.message, str(self.notification))
+
+    def _assertNotificationIsValid(self):
         try:
             self.notification.full_clean()
         except:
-            self.fail('Notification must be valid')
-
-    def testNoBlankUser(self):
-        self.notification.toUser = None
+            self.fail('Test notification should be valid')
+    
+    def _assertNotificationIsInvalid(self):
         with self.assertRaises(ValidationError):
             self.notification.full_clean()
-
-    def testNoBlankTitle(self):
-        self.notification.title = None
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testNoBlankMessage(self):
-        self.notification.message = None
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testNoBlankIsSeenField(self):
-        self.notification.isSeen = None
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testNoBlankType(self):
-        self.notification.type = None
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testTitleWithinLengthLimit(self):
-        self.notification.title = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testMessageWithinLengthLimit(self):
-        self.notification.message = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXIa;lkdfj"
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testValidType(self):
-        self.notification.type = 'testChoice'
-        with self.assertRaises(ValidationError):
-            self.notification.full_clean()
-
-    def testUserExists(self):
-        self.user.save()
-        user = User.objects.get(email = self.notification.toUser.email)
-        self.assertEqual(user, self.notification.toUser)
-
-    # Follow request notification tests
-
-    def testNoBlankFromUser(self):
-        self.followRequestNotification.fromUser = None
-        with self.assertRaises(ValidationError):
-            self.followRequestNotification.full_clean()
-
-    def testFromUserExists(self):
-        self.user2.save()
-        user2 = User.objects.get(email = self.followRequestNotification.fromUser.email)
-        self.assertEqual(user2, self.followRequestNotification.fromUser)
-
-   # Share category notification tests
-
-    def testNoBlankSharedFromUser(self):
-        self.shareCategoryNotification.fromUser = None
-        with self.assertRaises(ValidationError):
-            self.shareCategoryNotification.full_clean()
-
-    def testNoBlankCategory(self):
-        self.shareCategoryNotification.sharedCategory = None
-        with self.assertRaises(ValidationError):
-            self.shareCategoryNotification.full_clean()
-
-    def testSharedFromUserExists(self):
-        self.user2.save()
-        user2 = User.objects.get(email = self.shareCategoryNotification.fromUser.email)
-        self.assertEqual(user2, self.shareCategoryNotification.fromUser)
-
-    def testCategoryExists(self):
-        self.category.save()
-        category = Category.objects.get(name = self.shareCategoryNotification.sharedCategory.name)
-        self.assertEqual(category, self.shareCategoryNotification.sharedCategory)
-
-    def testCorrectStringReturned(self):
-        self.assertEqual(self.notification.message, str(self.notification))

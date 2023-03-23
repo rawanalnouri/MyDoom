@@ -18,7 +18,7 @@ class SpendingLimit(models.Model):
         ('yearly', 'Yearly')
     ]
     timePeriod = models.CharField(max_length=20, choices=TIME_CHOICES, blank=False)
-    amount = models.DecimalField(max_digits=50, validators=[MinValueValidator(0.01)], decimal_places=2)
+    amount = models.DecimalField(max_digits=20, validators=[MinValueValidator(0.01)], decimal_places=2)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -35,8 +35,8 @@ class SpendingLimit(models.Model):
 
 class Expenditure(models.Model):
     '''Model for storing and managing user expenditures.'''
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=250, blank=True)
     amount = models.DecimalField(max_digits=10, validators=[MinValueValidator(0.01)], decimal_places=2)
     date = models.DateField()
     receipt = models.ImageField(upload_to='receipts/', blank=True, null=True)
@@ -54,10 +54,10 @@ class Expenditure(models.Model):
 class Category(models.Model):
     '''Model for storing and managing categories that users will add expenditures to.'''
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='users')
-    name = models.CharField(max_length=80)
+    name = models.CharField(max_length=50)
     spendingLimit = models.ForeignKey(SpendingLimit, on_delete=models.CASCADE)
     expenditures = models.ManyToManyField(Expenditure, related_name='expenditures', blank=True)
-    description = models.TextField(blank=True)
+    description = models.CharField(blank=True, max_length=250)
     createdAt = models.DateTimeField(auto_now_add=True)
     updatedAt = models.DateTimeField(auto_now=True)
 
@@ -80,8 +80,8 @@ class Category(models.Model):
 class House(models.Model):
     '''Model for storing and managing houses.'''
     points = models.IntegerField(default=0)
-    name = models.CharField(max_length=20, blank=False)
-    memberCount = models.IntegerField(default=0)
+    name = models.CharField(max_length=50, unique=True, blank=False)
+    memberCount = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
 class User(AbstractUser):
     '''Model for storing and managing users.'''
@@ -158,10 +158,10 @@ class User(AbstractUser):
 class Notification(models.Model):
     '''Model for storing and managing user notifications.'''
     toUser = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=255)
-    message = models.CharField(max_length=255)
+    title = models.CharField(max_length=80, blank=False)
+    message = models.CharField(max_length=250, blank=False)
+    isSeen = models.BooleanField(default=False)
     createdAt = models.DateTimeField(auto_now_add=True)
-    isSeen = models.BooleanField(default = False)
     TYPE_CHOICES = [
         ('basic', 'Basic'),
         ('category', 'Category'),
@@ -189,7 +189,7 @@ class FollowRequestNotification(Notification):
 class Points(models.Model):
     '''Model for storing and managing user points.'''
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    count = models.IntegerField(default=0)
+    count = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     
     class Meta:
         '''Model options.'''

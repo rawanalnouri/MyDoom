@@ -16,7 +16,6 @@ class ReportsFormTest(TestCase):
         self.category.save()
         self.user.categories.add(self.category)
         self.user.save()
-        self.client.force_login(self.user)
         self.input = {
             "timePeriod": "month",
             "selectedCategory": [self.category.id]

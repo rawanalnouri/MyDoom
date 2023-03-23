@@ -1,137 +1,165 @@
-''' Tests for the User model'''
-
-from walletwizard.models import User
+'''Unit tests for the User model.'''
+from walletwizard.models import User, Category, SpendingLimit
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 class UserModelTestCase(TestCase):
+    '''Unit tests for the User model.'''
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
-
-        # For basic user model
-        firstName = 'John'
-        lastName = 'Doe'
-        email = 'testEmail1@example.org'
-        username = 'johndoe'
-        password = "Password123"
-        self.user = User.objects.create(
-            username = username,
-            firstName = firstName,
-            lastName = lastName,
-            email = email,
-            password = password
+        self.user = User.objects.get(id=1)
+        self.secondUser = User.objects.create_user(
+            username='janedoe', 
+            email='janedoe@example.org', 
+            firstName='Jane',
+            lastName='Doe',
+            password='Password123',
         )
 
-        # For extended users
-        firstName2 = 'Jane'
-        lastName2 = 'Smith'
-        email2 = 'testEmail2@example.org'
-        username2 = 'janesmith'
-        password2 = "Password123"
-        self.user2 = User.objects.create(
-            username = username2,
-            firstName = firstName2,
-            lastName = lastName2,
-            email = email2,
-            password = password2
-        )
-
-    def testUserIsValid(self):
+    def _assertUserIsValid(self):
         try:
             self.user.full_clean()
         except:
-            self.fail('user must be valid')
+            self.fail('Test user should be valid')
 
-    def testNoBlankUsername(self):
-        self.user.username = None
+    def _assertUserIsInvalid(self):
         with self.assertRaises(ValidationError):
             self.user.full_clean()
+
+
+    def testUsernameCannotBeBlank(self):
+        self.user.username = ''
+        self._assertUserIsInvalid()
+
+    def testUsernameCannotBeNone(self):
+        self.user.username = None
+        self._assertUserIsInvalid()
 
     def testUsernameCanBe30CharactersLong(self):
         self.user.username = 'x' * 30
-        self.user.full_clean()
+        self._assertUserIsValid()
 
-    def testUsernameCannotBeOver30CharactersLong(self):
+    def testUsernameMustNotBeOver30CharactersLong(self):
         self.user.username = 'x' * 31
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
     def testUsernameMustBeUnique(self):
-        self.user.username = self.user2.username
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self.user.username = self.secondUser.username
+        self._assertUserIsInvalid()
 
-    def testUsernameContainsOnlyAlphanumericals(self):
+    def testUsernameMustOnlyContainAlphanumericals(self):
         self.user.username = 'john!doe'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
     def testUsernameContainAtLeast3Alphanumericals(self):
         self.user.username = 'jo'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
     def testUsernameCanContainNumbers(self):
         self.user.username = 'j0hndoe2'
-        self.user.full_clean()
+        self._assertUserIsValid()
 
-    def testNoBlankFirstName(self):
+
+    def testFirstNameMustNotBeBlank(self):
+        self.user.firstName = ''
+        self._assertUserIsInvalid()
+
+    def testFirstNameMustNotBeNone(self):
         self.user.firstName = None
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
-    def testNoBlankLastName(self):
+    def testFirstNameMustNotBeOver50CharactersLong(self):
+        self.user.firstName = 'x' * 51
+        self._assertUserIsInvalid()
+
+    def testFirstNameCanBe50CharactersLong(self):
+        self.user.firstName = 'x' * 50
+        self._assertUserIsValid()
+    
+
+    def testLastNameMustNotBeBlank(self):
+        self.user.lastName = ''
+        self._assertUserIsInvalid()
+    
+    def testLastNameMustNotBeNone(self):
         self.user.lastName = None
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
-    def testNoBlankEmail(self):
-        self.user.email = None
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+    def testLastNameMustNotBeOver50CharactersLong(self):
+        self.user.lastName = 'x' * 51
+        self._assertUserIsInvalid()
 
-    def testFirstNameWithinLengthLimit(self):
-        self.user.firstName = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXIa;lkdfj"
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+    def testLastNameCanBe50CharactersLong(self):
+        self.user.firstName = 'x' * 50
+        self._assertUserIsValid()
 
-    def testLastNameWithinLengthLimit(self):
-        self.user.lastName = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
 
-    def testNoBlankEmail(self):
+    def testEmailMustNotBeBlank(self):
         self.user.email = ''
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
+    
+    def testEmailMustNotBeNone(self):
+        self.user.email = None
+        self._assertUserIsInvalid()
 
     def testEmailMustBeUnique(self):
-        self.user.email = self.user2.email
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self.user.email = self.secondUser.email
+        self._assertUserIsInvalid()
 
-    def testMustContainAUsername(self):
+    def testEmailMustContainUsername(self):
         self.user.email = '@example.org'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
     def testMustContainAtSymbol(self):
         self.user.email = 'johndoe.example.org'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
     def testMustContainDomainName(self):
         self.user.email = 'johndoe@.org'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
-    def testMustContainDomain(self):
+    def testEmailMustContainDomain(self):
         self.user.email = 'johndoe@example'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
 
-    def testOnlyOneAt(self):
+    def testEmailMustHaveOnlyOneAt(self):
         self.user.email = 'johndoe@@example.org'
-        with self.assertRaises(ValidationError):
-            self.user.full_clean()
+        self._assertUserIsInvalid()
+
+
+    def testCategoriesCannotStoreNonCategoryModels(self):
+        with self.assertRaises(TypeError):
+            self.user.categories.add(self.secondUser)
+
+    def testCategoriesCanStoreOneCategoryModel(self):
+        category = Category.objects.get(id=1)
+        self.user.categories.add(category)
+        self._assertUserIsValid()
+
+    def testCategoriesCanStoreMoreThanOneCategoryModel(self):
+        for i in range(15):
+            spendingLimit = SpendingLimit.objects.create(amount=10+i, timePeriod='daily')
+            category = Category.objects.create(name='testcategory'+str(i), spendingLimit=spendingLimit)
+            self.user.categories.add(category)
+            self._assertUserIsValid()
+        
+    
+    def testFollowCounters(self):
+        thirdUser = User.objects.create(
+            username='lucywhite', 
+            email='lucywhite@example.org', 
+            firstName='Lucy',
+            lastName='White',
+            password='Password123',
+        )
+        self.user.followers.add(self.secondUser)
+        self.secondUser.followers.add(thirdUser)
+        self.secondUser.followers.add(self.user)
+        self.assertEqual(thirdUser.followerCount(), 0)
+        self.assertEqual(thirdUser.followeeCount(), 1)
+        self.assertEqual(self.user.followerCount(), 1)
+        self.assertEqual(self.user.followeeCount(), 1)
+        self.assertEqual(self.secondUser.followerCount(), 2)
+        self.assertEqual(self.secondUser.followeeCount(), 1)

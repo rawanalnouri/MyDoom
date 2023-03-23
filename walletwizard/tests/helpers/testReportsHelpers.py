@@ -1,8 +1,6 @@
-from django.contrib import messages
 from django.test import TestCase
-from django.urls import reverse
 from walletwizard.forms import ReportForm
-from walletwizard.models import *
+from walletwizard.models import User, Expenditure, Category
 import datetime
 from walletwizard.helpers.reportsHelpers import *
 from dateutil.relativedelta import relativedelta

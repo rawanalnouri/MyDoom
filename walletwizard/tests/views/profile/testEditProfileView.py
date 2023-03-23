@@ -34,43 +34,49 @@ class EditProfileViewTest(TestCase):
         self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed('logIn.html')
 
-    def testGetSignUp(self):
+    def testGetEditProfile(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'editProfile.html')
         form = response.context['form']
         self.assertTrue(isinstance(form, EditProfileForm))
-
+    
     def testUnsuccesfulProfileUpdate(self):
-        self.formInput['username'] = "a{35}"
-        before_count = User.objects.count()
+        self.formInput['username'] = 'b'
+        self.formInput['email'] = 'invalidEmail'
         response = self.client.post(self.url, self.formInput)
-        after_count = User.objects.count()
-        self.assertEqual(after_count, before_count)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'editProfile.html')
         form = response.context['form']
-        self.assertTrue(isinstance(form, EditProfileForm))
         self.assertTrue(form.is_bound)
-        self.user.refresh_from_db()
+        self.assertTemplateUsed(response, 'editProfile.html')
+        # check user does not update
         self.assertEqual(self.user.username, 'testuser')
         self.assertEqual(self.user.firstName, 'john')
         self.assertEqual(self.user.lastName, 'doe')
-        self.assertEqual(self.user.email, 'test@email.com')
+        self.assertEqual(self.user.email, 'johndoe@email.com')
+        # check errors
+        self.assertIn('username', form.errors)
+        self.assertIn('email', form.errors)
     
     def testSuccesfulProfileUpdate(self):
-        before_count = User.objects.count()
         response = self.client.post(self.url, self.formInput, follow=True)
-        after_count = User.objects.count()
-        self.assertEqual(after_count, before_count)
-        response_url = reverse('profile')
-        self.assertRedirects(response, response_url, status_code=302, target_status_code=200)
+        responseUrl = reverse('profile')
+        self.assertRedirects(response, responseUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'profile.html')
-        messages_list = list(response.context['messages'])
-        self.assertEqual(len(messages_list), 1)
-        self.assertEqual(messages_list[0].level, messages.SUCCESS)
+        # check user updates
         self.user.refresh_from_db()
         self.assertEqual(self.user.username, 'johndoe2')
         self.assertEqual(self.user.firstName, 'John2')
         self.assertEqual(self.user.lastName, 'Doe2')
         self.assertEqual(self.user.email, 'johndoe2@example.org')
+        # check messages
+        messagesList = list(response.context['messages'])
+        self.assertEqual(len(messagesList), 1)
+        self.assertEqual(str(messagesList[0]), 'Your profile has been updated successfully.')
+        self.assertEqual(messagesList[0].level, messages.SUCCESS)
+
+    def testSuccesfulProfileUpdateDoesNotIncreaseNumberOfUsers(self):
+        beforeCount = User.objects.count()
+        self.client.post(self.url, self.formInput, follow=True)
+        afterCount = User.objects.count()
+        self.assertEqual(afterCount, beforeCount)

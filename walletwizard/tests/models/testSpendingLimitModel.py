@@ -1,56 +1,79 @@
-''' Tests for the SpendingLimit model'''
-
+'''Tests for the SpendingLimit model.'''
 from walletwizard.models import SpendingLimit
 from django.test import TestCase
 from django.core.exceptions import ValidationError
+from decimal import Decimal
 
 class SpendingLimitModelTestCase(TestCase):
+    '''Tests for the SpendingLimit model.'''
+
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.spendingLimit = SpendingLimit.objects.get(id=1)
 
-
-    def testSpendingLimitIsValid(self):
-        try:
-            self.spendingLimit.full_clean()
-        except:
-            self.fail('Spending Limit must be valid')
-
-    def testNoBlankTimePeriod(self):
+    def testTimePeriodCannotBeNone(self):
         self.spendingLimit.timePeriod = None
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+        self._assertSpendingLimitIsInvalid()
 
-    def testNoBlankAmount(self):
-        self.spendingLimit.amount = None
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+    def testTimePeriodCannotBlank(self):
+        self.spendingLimit.timePeriod = ''
+        self._assertSpendingLimitIsInvalid()
 
-    def testTimePeriodWithinLengthLimit(self):
-        self.spendingLimit.timePeriod = "TCI5h49Wc6OLthsThldTZ3VKXxt3EhlEdcZgZJLYmnH4MOciYXqR41433LrOdBL5JU0te7RPRzNgyTxN3eBDBnl4osIWDLRHwmva0FBWZQYPGWDRdrN78mXYPwjBlz4HxKL9u59bvKOcGQ6sGDIedqY0GPprjoa1Yk9FiMbbhWXuRff0r4dftrwECyM7uCtyeNFxrD5BXEROrANuajTkgKIQI8IcpiezguQaxl0q8eXOFTb2Ix5M0YMhTzBhHa2s0YXI"
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+    def testInvalidTimePeriodChoice(self):
+        self.spendingLimit.timePeriod = 'invalidChoice'
+        self._assertSpendingLimitIsInvalid()
 
-    def testTimePeriodIsValid(self):
-        self.spendingLimit.timePeriod = "test"
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+    def testTimePeriodCanBeFromSpendingLimitTimePeriodChoices(self):
+        for choice in SpendingLimit.TIME_CHOICES:
+            self.spendingLimit.timePeriod = choice[0]
+            self._assertSpendingLimitIsValid()
 
-    def testAmountWithinLengthLimit(self):
-        self.spendingLimit.amount = 123456789.12
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+    def testTimePeriodCanBeLessThanTwentyCharacters(self):
+        self.spendingLimit.timePeriod = 'weekly'
+        self._assertSpendingLimitIsValid()
 
-    def testAmountWithinDecimalLimit(self):
+    def testAmountHasMaximumTwoDecimalPlaces(self):
         self.spendingLimit.amount = 1234.1234
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+        self._assertSpendingLimitIsInvalid()
 
-    def testAmountNotNegative(self):
+    def testAmountCanHaveNoDecimalPlaces(self):
+        self.spendingLimit.amount = 1234
+        self._assertSpendingLimitIsValid()
+
+    def testAmountCannotHaveOneDecimalPlace(self):
+        self.spendingLimit.amount = 1234.1
+        self._assertSpendingLimitIsInvalid()
+
+    def testAmountMustNotBeLessThanZero(self):
         self.spendingLimit.amount = -0.01
-        with self.assertRaises(ValidationError):
-            self.spendingLimit.full_clean()
+        self._assertSpendingLimitIsInvalid()
+    
+    def testAmountCannotBeEqualToZero(self):
+        self.spendingLimit.amount = 0
+        self._assertSpendingLimitIsInvalid()
+    
+    def testAmountMustHaveMaximum20Digits(self):
+        self.spendingLimit.amount = int('1'+'0'*19)
+        self._assertSpendingLimitIsInvalid()
+
+    def testAmountMinimumValueCannotBeLessThanNoughtPointNoughtOne(self):
+        self.spendingLimit.amount = Decimal('0.00').normalize()
+        self._assertSpendingLimitIsInvalid()
+
+    def testAmountMinimumValueMustBeGreaterThanNoughtPointNoughtOne(self):
+        self.spendingLimit.amount =  Decimal('0.02').normalize()
+        self._assertSpendingLimitIsValid()
 
     def testCorrectAmountReturned(self):
         self.assertEqual(self.spendingLimit.amount, self.spendingLimit.getNumber())
+
+    def _assertSpendingLimitIsInvalid(self):
+        with self.assertRaises(ValidationError):
+            self.spendingLimit.full_clean()
+    
+    def _assertSpendingLimitIsValid(self):
+        try:
+            self.spendingLimit.full_clean()
+        except:
+            self.fail('Test spending limit should be valid')
