@@ -84,7 +84,8 @@ https://getbootstrap.com/docs/4.0/components/pagination/
 https://nemecek.be/blog/105/how-to-use-elided-pagination-in-django-and-solve-too-many-pages-problem
 
 User search bar:
-Django Search Tutorial | LearnDjango.com
+https://learndjango.com/tutorials/django-search-tutorial
+
 
 User, Testing and User follow functionality:
 Clucker Django Project Final - Kings College London Year 2 Semester 1
