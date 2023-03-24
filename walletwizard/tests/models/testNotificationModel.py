@@ -80,10 +80,8 @@ class NotificationModelTestCase(TestCase):
         self.assertEqual(self.notification.message, str(self.notification))
 
     def _assertNotificationIsValid(self):
-        try:
-            self.notification.full_clean()
-        except:
-            self.fail('Test notification should be valid')
+        self.notification.full_clean()
+
     
     def _assertNotificationIsInvalid(self):
         with self.assertRaises(ValidationError):

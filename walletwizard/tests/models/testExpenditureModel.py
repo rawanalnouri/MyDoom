@@ -119,10 +119,8 @@ class ExpenditureModelTestCase(TestCase):
 
 
     def _assertExpenditureIsValid(self):
-        try:
-            self.expenditure.full_clean()
-        except:
-            self.fail('Test expenditure should be valid')
+        self.expenditure.full_clean()
+
 
     def _assertExpenditureIsInvalid(self):
         with self.assertRaises(ValidationError):

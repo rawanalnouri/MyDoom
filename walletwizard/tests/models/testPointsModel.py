@@ -41,7 +41,5 @@ class PointsModelTestCase(TestCase):
             self.points.full_clean()
     
     def _assertPointsIsValid(self):
-        try:
-            self.points.full_clean()
-        except:
-            self.fail('Test points should be valid')
+        self.points.full_clean()
+

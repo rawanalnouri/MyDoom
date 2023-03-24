@@ -19,10 +19,8 @@ class UserModelTestCase(TestCase):
         )
 
     def _assertUserIsValid(self):
-        try:
-            self.user.full_clean()
-        except:
-            self.fail('Test user should be valid')
+        self.user.full_clean()
+
 
     def _assertUserIsInvalid(self):
         with self.assertRaises(ValidationError):

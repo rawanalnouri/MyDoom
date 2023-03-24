@@ -11,12 +11,6 @@ class ShareCategoryNotificationModelTestCase(TestCase):
     def setUp(self):
         self.notification = ShareCategoryNotification.objects.get(id=3)
 
-    def _assertNotificationIsValid(self):
-        try:
-            self.notification.full_clean()
-        except:
-            self.fail('Test notification should be valid')
-    
     def _assertNotificationIsInvalid(self):
         with self.assertRaises(ValidationError):
             self.notification.full_clean()

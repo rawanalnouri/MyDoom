@@ -73,7 +73,4 @@ class SpendingLimitModelTestCase(TestCase):
             self.spendingLimit.full_clean()
     
     def _assertSpendingLimitIsValid(self):
-        try:
-            self.spendingLimit.full_clean()
-        except:
-            self.fail('Test spending limit should be valid')
+        self.spendingLimit.full_clean()
