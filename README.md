@@ -20,6 +20,9 @@ The project is called `WalletWizard` (Spending Tracker Web Application).  It cur
 
 ## Deployed version of the application
 The deployed version of the application can be found at *[http://walletwizard.pythonanywhere.com/](http://walletwizard.pythonanywhere.com/)*
+Base user access credentials on the deployed version:
+*Username - 'johndoe'
+*Password - 'Password123'
 
 ## Installation instructions
 To install the software and use it in your local development environment, you must first set up and activate a local development environment.  From the root of the project:
