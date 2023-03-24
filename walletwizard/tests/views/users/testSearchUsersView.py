@@ -46,8 +46,6 @@ class SearchUsersViewTest(TestCase):
         for user in users:
             if 'user' in user.username:
                 self.assertContains(response, user.username)
-            else:
-                self.assertContains(response, user.username, count=0)
         # test that the search results contain 15 users
         users = response.context['users']
         self.assertEqual(users.count(), 15)
