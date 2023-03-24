@@ -63,10 +63,7 @@ class Category(models.Model):
 
     def progressAsPercentage(self):
         total = computeTotalSpentInTimePeriod(self.spendingLimit.timePeriod, self.expenditures)
-        if self.spendingLimit.amount==0:
-            return 0.00
-        else:
-            return round(100*total/float(self.spendingLimit.amount), 2)
+        return round(100*total/float(self.spendingLimit.amount), 2)
     
     def totalSpentInTimePeriod(self):
         return Decimal(round(computeTotalSpentInTimePeriod(self.spendingLimit.timePeriod, self.expenditures), 2))

@@ -40,7 +40,9 @@ class SignUpViewTest(TestCase, LogInTester):
         self.client.force_login(user)
         response = self.client.get(self.url)
         userHomePage = reverse('home')
+        self.assertTemplateUsed('home.html')
         self.assertRedirects(response, userHomePage, status_code=302, target_status_code=200)
+
 
     def testUnsuccessfulSignUpWithInvalidEmail(self):
         self.input['email'] = 'email!'

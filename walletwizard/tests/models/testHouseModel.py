@@ -54,11 +54,8 @@ class HouseModelTestCase(TestCase):
         self._assertHouseIsValid()
 
     def _assertHouseIsValid(self):
-        try:
-            self.house.full_clean()
-        except:
-            self.fail('Test house should be valid')
-    
+        self.house.full_clean()
+
     def _assertHouseIsInvalid(self):
         with self.assertRaises(ValidationError):
             self.house.full_clean()

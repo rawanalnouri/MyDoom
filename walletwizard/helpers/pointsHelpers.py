@@ -52,8 +52,6 @@ loseUserPointsData = [
 ]
 
 def loseUserPoints(user, limit, spent):
-    if limit == 0:
-        return
     percentage = 100 * (spent - limit)/limit
     for data in loseUserPointsData: 
         if (percentage > data[0] and percentage <= data[1]):
