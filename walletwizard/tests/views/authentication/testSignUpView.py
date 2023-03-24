@@ -97,3 +97,11 @@ class SignUpViewTest(TestCase, LogInTester):
         self.client.post(self.url, self.input, follow=True)
         totalUsersAfter = User.objects.count()
         self.assertEqual(totalUsersBefore+1, totalUsersAfter)
+
+    def testSignUpProhibitedWhenLoggedIn(self):
+        user = User.objects.get(id=1)
+        self.client.force_login(user)
+        response = self.client.get(reverse('signUp'))
+        self.assertRedirects(response, reverse('home'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTemplateUsed('home.html')
