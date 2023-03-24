@@ -11,7 +11,7 @@ The members of the team are:
 - Areeba Safdar (K20045738)
 - Zahra Amaan (K21011879)
 - Rawan Alnouri (K21023462)
-- Abdulaziz Albanawi (K)
+- Abdulaziz Albanawi (K20114659)
 - Imaan Ghafur (K21012260)
 - Mohammad (Ruhan) Salam (K21056749)
 
@@ -38,6 +38,7 @@ $ pip3 install -r requirements.txt
 Migrate the database:
 
 ```
+$ python3 manage.py makemigrations
 $ python3 manage.py migrate
 ```
 
@@ -83,7 +84,7 @@ https://getbootstrap.com/docs/4.0/components/pagination/
 https://nemecek.be/blog/105/how-to-use-elided-pagination-in-django-and-solve-too-many-pages-problem
 
 User search bar:
-Django Search Tutorial | LearnDjango.com
+https://learndjango.com/tutorials/django-search-tutorial
 
 User, Testing and User follow functionality:
 Clucker Django Project Final - Kings College London Year 2 Semester 1
