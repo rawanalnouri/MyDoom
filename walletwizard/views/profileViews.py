@@ -1,4 +1,5 @@
 """Views for user profile."""
+from decimal import InvalidOperation
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.contrib import messages
@@ -69,8 +70,11 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = OverallSpendingForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
-            messages.add_message(request, messages.SUCCESS, "Your overall spending limit has been updated successfully.")
+            try:
+                form.save()
+                messages.add_message(request, messages.SUCCESS, "Your overall spending limit has been updated successfully.")
+            except InvalidOperation:
+                messages.add_message(request, messages.ERROR, "The amount entered is too large to be stored in our system.")
             return redirect('home')
         else:
             validationErrors = form.errors.get('__all__', [])

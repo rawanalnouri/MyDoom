@@ -148,3 +148,10 @@ class LoginViewTest(TestCase, LogInTester):
         response = self.client.post(self.url, formInput)
         next = response.context['next']
         self.assertEqual(next, redirectUrl)
+
+    def testLogInProhibitedWhenLoggedIn(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('logIn'))
+        self.assertRedirects(response, reverse('home'))
+        self.assertEqual(response.status_code, 302)
+        self.assertTemplateUsed('home.html')
