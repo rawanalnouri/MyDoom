@@ -348,6 +348,12 @@ class OverallSpendingForm(forms.Form):
             raise forms.ValidationError('Your overall spending limit is too low compared to the spending '
                                     +'limits set in your categories.', code='invalid')
 
+    def validateSpendingLimitAmount(self, amount):
+        """Check user's new spending limit amount is not too high to be stored (20 digits allowed)."""
+
+        if(len(str(amount).replace('.', '')) >= 20):
+            raise forms.ValidationError('The amount entered is too large to be stored in our system.', code='invalid')
+
     def clean(self):
         """Clean the data and generate messages for any errors."""
 
@@ -355,5 +361,6 @@ class OverallSpendingForm(forms.Form):
         amount = cleanedData.get('amount')
         timePeriod = cleanedData.get('timePeriod')
         if amount:
+            self.validateSpendingLimitAmount(amount)
             self.validateSpendingLimits(timePeriod, amount)
         return cleanedData

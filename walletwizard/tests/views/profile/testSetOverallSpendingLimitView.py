@@ -1,9 +1,10 @@
 """Tests for set overall spending limit view."""
 from django.test import TestCase
 from django.urls import reverse
-from walletwizard.models import User, Category, Points
+from walletwizard.models import User, Category, Points, SpendingLimit
 from walletwizard.forms import OverallSpendingForm
 from walletwizard.tests.testHelpers import reverse_with_next
+from django.contrib.messages import get_messages
 
 class SetOverallSpendingLimitViewTest(TestCase):
     """Tests for set overall spending limit view."""
@@ -81,6 +82,16 @@ class SetOverallSpendingLimitViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Your overall spending limit is too low compared to the spending limits set in your categories.')
     
+    def testPostWhenAmountIsTooHighIsUnsuccessful(self):
+        self.user.overallSpendingLimit = None
+        self.formInput['amount'] = int('1'+'0'*19)
+        response = self.client.post(self.url, data=self.formInput, follow=True)
+        self.assertRedirects(response, reverse('home'))
+        self.assertEqual(self.user.overallSpendingLimit, None)
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), 'The amount entered is too large to be stored in our system.')
+        
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()
         redirectUrl = reverse_with_next('logIn', self.url)

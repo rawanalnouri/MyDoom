@@ -1,8 +1,7 @@
 """Tests of create category view."""
-from walletwizard.models import User, Category, SpendingLimit
+from walletwizard.models import User, Category
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.messages import get_messages
 from walletwizard.tests.testHelpers import reverse_with_next
 
 class CreateCategoryViewTest(TestCase):
