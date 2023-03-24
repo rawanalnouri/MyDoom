@@ -54,12 +54,15 @@ class SetOverallSpendingLimitView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         spendingLimit = request.user.overallSpendingLimit
-        form = OverallSpendingForm(
-            user = request.user, 
-            initial = {
+        initialData={}
+        if spendingLimit:
+            initialData = {
                 'timePeriod': spendingLimit.timePeriod, 
                 'amount': spendingLimit.amount
             }
+        form = OverallSpendingForm(
+            user = request.user,
+            initial=initialData
         )
         return render(request, 'partials/bootstrapForm.html', {'form': form})
 

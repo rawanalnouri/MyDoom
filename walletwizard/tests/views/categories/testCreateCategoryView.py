@@ -13,22 +13,23 @@ class CreateCategoryViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.get(id=1)
         self.client.force_login(self.user)
-        self.data = {
+        self.formInput = {
             'name': 'Food',
+            'description': 'This is a test category',
             'amount': 20,
             'timePeriod':'daily',
         }
         self.url = reverse('createCategory')
 
     def testCreateCategoryViewRedirectsToCategoryOnSuccess(self):
-        response = self.client.post(self.url, self.data)
+        response = self.client.post(self.url, self.formInput)
         category = Category.objects.get(name='Food')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('category', args=[category.id]))
 
     def testCreateCategoryViewDisplaysErrorsOnFailure(self):
-        self.data['name'] = ''
-        response = self.client.post(self.url, self.data)
+        self.formInput['name'] = ''
+        response = self.client.post(self.url, self.formInput)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This field is required.')
 
@@ -40,30 +41,28 @@ class CreateCategoryViewTest(TestCase):
         self.assertTemplateUsed('logIn.html')
 
     def testCreateCategoryViewSameNameError(self):
-        spendingLimit = SpendingLimit.objects.create(timePeriod='weekly', amount=10)
-        category = Category.objects.create(name='SameName', description='This is another test category', spendingLimit=spendingLimit)
+        category = Category.objects.get(id=1)
+        category.name = 'SameName'
         category.users.add(self.user)
-         # Create a post request data with the same name as the existing category.
-        postData = {
-            'name': 'SameName',
-            'description': 'This is a new test category',
-            'timePeriod': 'daily',
-            'amount': 5
-        }
-        response = self.client.post(self.url, data=postData)
+        self.user.categories.add(category)
+        category.save()
+        self.formInput['name'] = 'SameName'
+        response = self.client.post(self.url, data=self.formInput)
         self.assertEqual(response.status_code, 200)
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Category with this name already exists for this user.")
         self.assertEqual(messages[0].level_tag, "danger")
 
     def testPostInvalidFormWithAmountTooHigh(self):
-        self.user.overallSpendingLimit = None
-        data = {'timePeriod': 'daily', 'amount': 200}
-        response = self.client.post(self.url, data=data)
+        self.formInput['amount'] = 200
+        response = self.client.post(self.url, data=self.formInput)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(self.user.overallSpendingLimit, None)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), 'The amount you\'ve chosen for this category\'s spending limit is too high compared to your overall spending limit.')
+        self.assertEqual(
+            str(messages[0]), 
+            'The amount you\'ve chosen for this category\'s spending limit is too'
+            ' high compared to your overall spending limit.'
+        )
     

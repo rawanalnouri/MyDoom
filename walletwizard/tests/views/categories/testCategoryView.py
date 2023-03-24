@@ -7,16 +7,17 @@ from walletwizard.tests.testHelpers import reverse_with_next
 
 class CategoryViewTest(TestCase):
     """Tests of category view."""
+    
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):
         self.user = User.objects.get(id=1)
-        self.client.force_login(self.user)
         self.expenditure = Expenditure.objects.get(id=1)
         self.expenditure.date = datetime.datetime.now()
         self.category = Category.objects.get(id=1)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
+        self.client.force_login(self.user)
         self.url = reverse('category', args=[self.category.id])
 
     def testCategoryViewGet(self):

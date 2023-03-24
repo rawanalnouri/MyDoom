@@ -22,7 +22,6 @@ class ShowUserViewTest(TestCase):
         self.client.force_login(self.user)
 
     def testGetShowUserView(self):
-        """Test show user view with a logged in user."""
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')
@@ -31,7 +30,6 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['followable'])
 
     def testShowUserViewRedirectsIfUserNotLoggedIn(self):
-        """Test show user view with an anonymous user."""
         self.client.logout()
         redirectUrl = reverse_with_next('logIn', self.url)
         response = self.client.get(self.url)
@@ -39,12 +37,10 @@ class ShowUserViewTest(TestCase):
         self.assertTemplateUsed('logIn.html')
 
     def testShowUserViewWithInvalidIdUser(self):
-        """Test show user view with an invalid user id."""
         response = self.client.get(reverse('showUser', kwargs={'userId': 999}))
         self.assertRedirects(response, reverse('users'))
 
-    def testShowUserViewFollowable(self):
-        """Test show user view when user is followable."""
+    def testShowUserViewWhenShownUserIsFollowable(self):
         user2 = self.secondUser
         response = self.client.get(reverse('showUser', kwargs={'userId': user2.id}))
         self.assertEqual(response.status_code, 200)
@@ -53,8 +49,7 @@ class ShowUserViewTest(TestCase):
         self.assertFalse(response.context['following'])
         self.assertTrue(response.context['followable'])
 
-    def testShowUserViewFollowing(self):
-        """Test show user view when user is being followed."""
+    def testShowUserViewWhenUserIsFollowingShownUser(self):
         user2 = self.secondUser
         user2.followers.add(self.user)
         response = self.client.get(reverse('showUser', kwargs={'userId': user2.id}))
@@ -64,8 +59,7 @@ class ShowUserViewTest(TestCase):
         self.assertTrue(response.context['following'])
         self.assertTrue(response.context['followable'])
 
-    def testShowUserViewSameUser(self):
-        """Test show user view when user is the same user as logged in user."""
+    def testShowUserViewWhenShownUserIsTheLoggedInUser(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'showUser.html')

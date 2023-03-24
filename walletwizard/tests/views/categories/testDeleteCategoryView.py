@@ -20,17 +20,22 @@ class DeleteCategoryViewTest(TestCase):
         self.category.expenditures.add(self.expenditure)
         self.url = reverse('deleteCategory', args=[self.category.id])
 
-    def testDeleteCategoryViewDeletesCategoryExpendituresAndSpendingLimit(self):
-        self.client.get(self.url)
+    def testDeleteCategoryViewGetDeletesCategoryAndItsAssociatedObjects(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 302)
         self.assertFalse(SpendingLimit.objects.filter(id=self.spendingLimit.id).exists())
         self.assertFalse(Expenditure.objects.filter(id=self.expenditure.id).exists())
         self.assertFalse(Category.objects.filter(id=self.category.id).exists())
 
-    def testRedirectToHomeAfterDelete(self):
+    def testRedirectsToHomeAfterDelete(self):
         response = self.client.get(self.url, follow=True)
+        self.assertEqual(response.status_code, 200)
         userRedirect = reverse('home')
         self.assertRedirects(response, userRedirect, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Your category \'testcategory\' was successfully deleted.")
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()

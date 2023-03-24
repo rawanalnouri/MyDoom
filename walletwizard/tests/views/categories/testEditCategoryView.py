@@ -16,7 +16,14 @@ class EditCategoryViewTest(TestCase):
         self.client.force_login(self.user)
         self.category = Category.objects.get(id=1)
         self.category.users.add(self.user)
+        self.user.categories.add(self.category)
         self.category.save()
+        self.formInput = {
+            'name': 'updatedCategory',
+            'description': 'This is a test category.',
+            'timePeriod': 'monthly', 
+            'amount': 100
+        }
         self.url = reverse('editCategory', args=[self.category.id])
 
     def testGetEditCategoryView(self):
@@ -26,29 +33,20 @@ class EditCategoryViewTest(TestCase):
         self.assertIsInstance(response.context['form'], CategorySpendingLimitForm)
 
     def testPostEditCategoryWhenFormIsValid(self):
-        data = {
-            'name': 'Updated Title', 
-            'description': 'Updated Description', 
-            'timePeriod': 'monthly', 
-            'amount': 100 
-        }
-        response = self.client.post(self.url, data, follow=True)
+        response = self.client.post(self.url, self.formInput, follow=True)
         self.assertRedirects(response, '/category/1/')
         self.assertEqual(response.status_code, 200)
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
-        expectedMessage = "Your category 'Updated Title' was updated successfully."
+        expectedMessage = "Your category 'updatedCategory' was updated successfully."
         self.assertEqual(str(messages[0]), expectedMessage)
 
     def testPostEditCategoryWhenFormIsInvalid(self):
-        data = {
-            'name': '', 
-            'description': 'Updated Description', 
-            'timePeriod': 'monthly', 
-            'amount': -1
-        }
-        response = self.client.post(self.url, data)
-        self.assertRedirects(response,  reverse('category', args=[self.category.id]))
+        self.formInput['name'] = ''
+        self.formInput['amount'] = -1
+        response = self.client.post(self.url, self.formInput)
+        self.assertRedirects(response, reverse('category', args=[self.category.id]))
+        self.assertEqual(response.status_code, 302)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         expectedMessage = "Failed to update category."
@@ -63,19 +61,33 @@ class EditCategoryViewTest(TestCase):
 
     def testEditCategoryViewSameNameError(self):
         newSpendingLimit = SpendingLimit.objects.create(timePeriod='weekly', amount=10)
-        newCategory = Category.objects.create(name='Food', description='This is another test category', spendingLimit=newSpendingLimit)
+        newCategory = Category.objects.create(
+            name='sameName', 
+            description='This is another test category', 
+            spendingLimit=newSpendingLimit
+        )
         newCategory.users.add(self.user)
-        # Create a post request data with the same name as the existing category.
-        postData = {
-            'name': 'testcategory',
-            'description': 'This is an edited test category',
-            'timePeriod': 'monthly',
-            'amount': 20
-        }
-        response = self.client.post(reverse('editCategory', args=[newCategory.id]), data=postData)
+        self.user.categories.add(newCategory)
+        self.formInput['name'] = 'sameName'
+        response = self.client.post(self.url, data=self.formInput)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('category', args=[newCategory.id]))
+        self.assertRedirects(response, reverse('category', args=[self.category.id]))
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Category with this name already exists for this user.")
+        self.assertEqual(messages[0].level_tag, "danger")
+
+    def testEditCategoryViewWithAmountTooHigh(self):
+        self.formInput['amount'] = 200
+        self.formInput['timePeriod'] = 'daily'
+        response = self.client.post(self.url, data=self.formInput, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, reverse('category', args=[self.category.id]))
+        messages = list(response.context['messages'])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            'The amount you\'ve chosen for this category\'s spending limit is too'
+            ' high compared to your overall spending limit.'
+        )
         self.assertEqual(messages[0].level_tag, "danger")

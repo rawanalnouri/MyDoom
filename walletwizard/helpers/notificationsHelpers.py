@@ -1,5 +1,5 @@
 ''''Helpers file to create different types of notifications.'''
-from walletwizard.models import *
+from walletwizard.models import Notification, ShareCategoryNotification, FollowRequestNotification
 
 def createBasicNotification(toUser, title, message):
     Notification.objects.create(

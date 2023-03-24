@@ -23,7 +23,7 @@ class ProfileViewTest(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'profile.html')
-        self.assertContains(response,self.user.username)
+        self.assertContains(response, self.user.username)
 
     def testRedirectIfNotLoggedIn(self):
         self.client.logout()

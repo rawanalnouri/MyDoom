@@ -1,10 +1,11 @@
 """Forms for the walletwizards app."""
 from django import forms
 from django.contrib.auth.forms import PasswordChangeForm
+from PersonalSpendingTracker import settings
 from .models import User, Category, SpendingLimit, Expenditure
 from django.core.validators import RegexValidator
-from walletwizard.helpers.notificationsHelpers import *
-from walletwizard.helpers.modelHelpers import *
+from walletwizard.helpers.notificationsHelpers import createShareCategoryNotification
+from walletwizard.helpers.modelHelpers import computeTotalSpendingLimitByMonth
 import os
 from django.contrib.auth import authenticate
 from decimal import Decimal

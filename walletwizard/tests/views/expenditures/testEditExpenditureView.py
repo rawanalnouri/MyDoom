@@ -19,42 +19,42 @@ class EditExpenditureViewTest(TestCase):
         self.category.users.add(self.user)
         self.user.categories.add(self.category)
         self.category.expenditures.add(self.expenditure)
+        self.formInput = {
+            'title': 'updatedExpenditure',
+            'description': 'This is a test expenditure.',
+            'amount': 200.00,
+            'date': datetime.date.today(),
+            'receipt': '',
+            'otherCategory': -1,
+        }
         self.url = reverse('editExpenditure', args=[self.category.id, self.expenditure.id])
     
     def testGetEditExpenditureView(self):
-        response = self.client.get(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}))
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'partials/bootstrapForm.html')
         self.assertIsInstance(response.context['form'], ExpenditureForm)
         self.assertEqual(response.context['form'].instance, self.expenditure)
 
     def testPostMethodValidData(self):
-        response = self.client.post(self.url, data={
-            'title': 'Updated Title',
-            'description': 'Updated Description',
-            'amount': 200.00,
-            'date': datetime.date.today(),
-            'receipt': '',
-            'otherCategory': -1,
-        })
-        updated_expenditure = Expenditure.objects.get(id=self.expenditure.id)
+        response = self.client.post(self.url, data=self.formInput)
+        updatedExpenditure = Expenditure.objects.get(id=self.expenditure.id)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('category', args=[self.category.id]))
-        self.assertEqual(updated_expenditure.title, 'Updated Title')
-        self.assertEqual(updated_expenditure.description, 'Updated Description')
-        self.assertEqual(updated_expenditure.amount, 200.00)
+        self.assertEqual(updatedExpenditure.title, 'updatedExpenditure')
+        self.assertEqual(updatedExpenditure.description, 'This is a test expenditure.')
+        self.assertEqual(updatedExpenditure.amount, 200.00)
 
     def testPostMethodWithInvalidData(self):
-        response = self.client.post(reverse('editExpenditure', kwargs={'categoryId': self.category.id, 'expenditureId': self.expenditure.id}), data={
-            'title': '',
-            'description': '',
-            'amount': '',
-            'date': '',
-            'otherCategory': -1,
-        }, follow=True) 
-        userRedirect =  reverse('category', args=[self.category.id])
+        self.formInput['title'] = '',
+        self.formInput['description'] = '',
+        self.formInput['amount'] = '',
+        self.formInput['date'] = '',
+        self.formInput['otherCategory'] = -1
+        response = self.client.post(self.url, data=self.formInput, follow=True) 
+        redirectUrl =  reverse('category', args=[self.category.id])
         self.assertEqual(response.status_code, 200)
-        self.assertRedirects(response, userRedirect)
+        self.assertRedirects(response, redirectUrl)
         self.assertTemplateUsed(response, 'category.html')
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 3)
@@ -68,27 +68,20 @@ class EditExpenditureViewTest(TestCase):
 
     def testExpenditureIsSharedWithCorrectCategory(self):
         category2 = Category.objects.create(
-            name = "test",
+            name = "notUpdatedCategory",
             spendingLimit = SpendingLimit.objects.get(id=1)
         )
         category2.users.add(self.user)
         category2.save()
         self.user.categories.add(category2)
-
-        expndituresBefore = category2.expenditures.count()
-        self.client.post(self.url, data={
-            'title': 'Updated Title',
-            'description': 'Updated Description',
-            'amount': 200.00,
-            'date': datetime.date.today(),
-            'receipt': '',
-            'otherCategory': 2,
-        })
-        expndituresAfter = category2.expenditures.count()
-        expenditureAdded = category2.expenditures.all()[0]
-        self.assertEqual(expndituresAfter, expndituresBefore+1)
-        self.assertEqual(expenditureAdded.title, 'Updated Title')
-        self.assertEqual(expenditureAdded.description, 'Updated Description')
+        expendituresBefore = category2.expenditures.count()
+        self.formInput['otherCategory'] = 2
+        response = self.client.post(self.url, data=self.formInput)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('category', args=[self.category.id]))
+        expendituresAfter = category2.expenditures.count()
+        expenditureAdded = category2.expenditures.first()
+        self.assertEqual(expendituresAfter, expendituresBefore+1)
+        self.assertEqual(expenditureAdded.title, 'updatedExpenditure')
+        self.assertEqual(expenditureAdded.description, 'This is a test expenditure.')
         self.assertEqual(expenditureAdded.amount, 200.00)
-
-        

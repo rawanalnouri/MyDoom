@@ -41,6 +41,12 @@ class ScoresViewTest(TestCase):
         users = response.context['userPoints']
         self.assertEqual(users[0], self.points2)
         self.assertEqual(users[1], self.points1)
+    
+    def testTopPointsOrder(self):
+        response = self.client.get(self.url)
+        topUsers = response.context['topPoints']
+        self.assertEqual(topUsers[0], self.points2)
+        self.assertEqual(topUsers[1], self.points1)
 
     def testScoresViewRedirectsToLoginIfNotLoggedIn(self):
         self.client.logout()

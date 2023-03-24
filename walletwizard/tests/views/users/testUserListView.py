@@ -6,6 +6,8 @@ from walletwizard.tests.testHelpers import createUsers
 from walletwizard.tests.testHelpers import reverse_with_next
 
 class UserListViewTest(TestCase):
+    """Tests of users view."""
+    
     fixtures = ['walletwizard/tests/fixtures/defaultObjects.json']
 
     def setUp(self):

@@ -68,11 +68,11 @@ class EditCategoryView(LoginRequiredMixin, View):
             # add points for editing category
             updateUserPoints(self.request.user, 2)
             createBasicNotification(self.request.user, "New Points Earned!", "2 points earned for editing a new category.")
-            return redirect(reverse('category', args=[category.id]))
         else:
-            errorMessages = [error for error in form.non_field_errors()] or ["Failed to update category."]
-            messages.error(self.request, "\n".join(errorMessages))
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
+            formErrors = form.non_field_errors()
+            errorMessage =  'Failed to update category.' if not formErrors else "\n".join(formErrors)
+            messages.error(self.request, errorMessage)
+        return redirect(reverse('category', args=[category.id]))
 
 
 class CreateCategoryView(LoginRequiredMixin, CreateView):
@@ -97,8 +97,9 @@ class CreateCategoryView(LoginRequiredMixin, CreateView):
         return redirect(reverse('category', args=[category.id]))
 
     def form_invalid(self, form):
-        for error in form.non_field_errors():
-            messages.error(self.request, error)
+        formErrors = form.non_field_errors()
+        errorMessage =  'Failed to create category.' if not formErrors else "\n".join(formErrors)
+        messages.error(self.request, errorMessage)
         return super().form_invalid(form)
 
 
@@ -118,7 +119,7 @@ class DeleteCategoryView(LoginRequiredMixin, View):
 
 
 class ShareCategoryView(LoginRequiredMixin, View):
-    '''View to send a share request for a category from logged-in user to another user.'''
+    '''View to send a share category request for a category from the logged-in user to another user.'''
 
     def get(self, request, *args, **kwargs):
         category = Category.objects.get(id=kwargs['categoryId'])
@@ -131,7 +132,6 @@ class ShareCategoryView(LoginRequiredMixin, View):
         if form.is_valid():
             toUser = form.save()
             messages.add_message(request, messages.SUCCESS, f'A request to share category \'{category.name}\' has been sent to \'{toUser.username}\'.')
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
         else:
             validationErrors = form.errors.get('__all__', [])
             if validationErrors:
@@ -139,4 +139,4 @@ class ShareCategoryView(LoginRequiredMixin, View):
                     messages.error(request, error)
             else:
                 messages.error(request, 'Failed to send share category request.')
-            return redirect(reverse('category', args=[kwargs['categoryId']]))
+        return redirect(reverse('category', args=[kwargs['categoryId']]))

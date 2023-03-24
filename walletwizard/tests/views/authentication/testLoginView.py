@@ -32,7 +32,6 @@ class LoginViewTest(TestCase, LogInTester):
         listOfMessages = list(response.context['messages'])
         self.assertEqual(len(listOfMessages),0)
 
-
     def testGetLogInWithRedirect(self):
         destinationUrl = reverse('scores')
         self.url = reverse_with_next('logIn', destinationUrl)
