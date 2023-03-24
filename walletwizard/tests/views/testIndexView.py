@@ -3,6 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from walletwizard.models import User
+from PersonalSpendingTracker.settings import REDIRECT_URL_WHEN_LOGGED_IN 
 
 class IndexViewTest(TestCase):
     """Tests of the index view."""
@@ -24,6 +25,6 @@ class IndexViewTest(TestCase):
     def testIndexRedirectsToHomeWhenLoggedIn(self):
         self.client.force_login(self.user)
         response = self.client.get(self.url, follow=True)
-        redirectUrl = reverse('home')
+        redirectUrl = reverse(REDIRECT_URL_WHEN_LOGGED_IN)
         self.assertRedirects(response, redirectUrl, status_code=302, target_status_code=200)
         self.assertTemplateUsed(response, 'home.html')
