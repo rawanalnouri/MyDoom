@@ -5,15 +5,15 @@ A Django Web application that allows users to track their expenditures.
 
 ## Team members
 The members of the team are:
-- Sabeeka Ahmed
-- Lina Namoun
-- Katia Bennamane
-- Areeba Safdar
-- Zahra Amaan
-- Rawan Alnouri
-- Abdulaziz Albanawi
-- Imaan Ghafur
-- Mohammad (Ruhan) Salam
+- Sabeeka Ahmed (K20012890)
+- Lina Namoun (K21005410)
+- Katia Bennamane (K21005541)
+- Areeba Safdar (K20045738)
+- Zahra Amaan (K21011879)
+- Rawan Alnouri (K21023462)
+- Abdulaziz Albanawi (K)
+- Imaan Ghafur (K21012260)
+- Mohammad (Ruhan) Salam (K21056749)
 
 ## Project structure
 The project is called `WalletWizard` (Spending Tracker Web Application).  It currently consists of a single app `walletwizard` where all functionality resides.
@@ -38,7 +38,6 @@ $ pip3 install -r requirements.txt
 Migrate the database:
 
 ```
-$ python3 manage.py makemigrations
 $ python3 manage.py migrate
 ```
 
@@ -84,8 +83,7 @@ https://getbootstrap.com/docs/4.0/components/pagination/
 https://nemecek.be/blog/105/how-to-use-elided-pagination-in-django-and-solve-too-many-pages-problem
 
 User search bar:
-https://learndjango.com/tutorials/django-search-tutorial
-
+Django Search Tutorial | LearnDjango.com
 
 User, Testing and User follow functionality:
 Clucker Django Project Final - Kings College London Year 2 Semester 1
