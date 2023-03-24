@@ -79,5 +79,11 @@ Side menu styling:
 https://www.codingsnow.com/2021/01/sidebar-menu-with-sub-menu-dashboard.html
 
 Users list pagination:
-https://onaircode.com/best-html-css-pagination-templates/
 https://getbootstrap.com/docs/4.0/components/pagination/
+https://nemecek.be/blog/105/how-to-use-elided-pagination-in-django-and-solve-too-many-pages-problem
+
+User search bar:
+Django Search Tutorial | LearnDjango.com
+
+User, Testing and User follow functionality:
+Clucker Django Project Final - Kings College London Year 2 Semester 1
