@@ -21,11 +21,8 @@ class SignUpView(LoginProhibitedMixin, View):
     redirect_when_logged_in_url = REDIRECT_URL_WHEN_LOGGED_IN
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('home')
-        else:
-            signUpForm = SignUpForm()
-            return render(request, 'signUp.html', {'form': signUpForm})
+        signUpForm = SignUpForm()
+        return render(request, 'signUp.html', {'form': signUpForm})
 
     def post(self, request, *args, **kwargs):
         signUpForm = SignUpForm(request.POST)
@@ -102,7 +99,4 @@ class IndexView(LoginProhibitedMixin, View):
     redirect_when_logged_in_url = REDIRECT_URL_WHEN_LOGGED_IN
 
     def get(self, request):
-        if request.user.is_authenticated:
-            return redirect(REDIRECT_URL_WHEN_LOGGED_IN)
-        else:
-            return render(request, 'index.html')
+        return render(request, 'index.html')
