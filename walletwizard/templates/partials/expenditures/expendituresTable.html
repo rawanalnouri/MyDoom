@@ -21,7 +21,7 @@
                                 <img class="img receipt" src="{{expenditure.receipt.url}}" width="60" height="35">
                             </a>
                         </div>
-                        {% include 'modals/receiptModal.html' with expenditure=expenditure %}
+                        {% include 'modals/expenditures/receiptModal.html' with expenditure=expenditure %}
                     {% else %}
                         <!-- No receipt -->
                         <a type="button" class="open-edit-expenditure-modal btn btn-sm btn-outline-dark" data-expenditure="{{ expenditure.id }}" data-category="{{ category.id }}""> 

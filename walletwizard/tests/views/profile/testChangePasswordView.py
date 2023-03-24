@@ -2,7 +2,9 @@
 from django.test import TestCase
 from walletwizard.models import User
 from django.urls import reverse
+from walletwizard.forms import PasswordChangeForm
 from walletwizard.tests.testHelpers import reverse_with_next
+from django.contrib.auth.hashers import check_password
 
 class ChangeProfileViewTest(TestCase):
     """Tests of the change password view."""
@@ -18,16 +20,22 @@ class ChangeProfileViewTest(TestCase):
         self.input = {
             'user': self.user,
             'old_password': "Password123",
-            'new_password1': "Password123!",
-            'new_password2': "Password123!",
+            'new_password1': "NewPassword123",
+            'new_password2': "NewPassword123",
         }
 
-    def testRedirectsToHomeOnSuccess(self):
-        response = self.client.post(self.url, self.input)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('home'))
+    def testChangePasswordUrl(self):
+        self.assertEqual(self.url, '/changePassword/')
 
-    def testDisplaysErrorsOnFailure(self):
+    def testRedirectsToHomeOnSuccess(self):
+        response = self.client.post(self.url, self.input, follow=True)
+        responseUrl = reverse('home')
+        self.assertRedirects(response, responseUrl, status_code=302, target_status_code=200)
+        self.user.refresh_from_db()
+        isPasswordCorrect = check_password('NewPassword123', self.user.password)
+        self.assertTrue(isPasswordCorrect)
+
+    def testChangePasswordIsUnsuccesfulIfOldPasswordIsBlank(self):
         self.input['old_password'] = ''
         response = self.client.post(self.url, self.input)
         self.assertEqual(response.status_code, 200)
@@ -35,6 +43,28 @@ class ChangeProfileViewTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), 'Please correct the errors below.')
         self.assertContains(response, 'This field is required.')
+    
+    def testChangePasswordIsUnsuccesfulWithIncorrectOldPassword(self):
+        self.input['old_password'] = 'WrongPassword123'
+        response = self.client.post(self.url, self.input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'changePassword.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, PasswordChangeForm))
+        self.user.refresh_from_db()
+        isPasswordCorrect = check_password('Password123', self.user.password)
+        self.assertTrue(isPasswordCorrect)
+
+    def testChangePasswordUnsuccesfulIfPasswordConfirmationDoesNotMatch(self):
+        self.input['new_password2'] = 'WrongPassword123'
+        response = self.client.post(self.url, self.input, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'changePassword.html')
+        form = response.context['form']
+        self.assertTrue(isinstance(form, PasswordChangeForm))
+        self.user.refresh_from_db()
+        isPasswordCorrect = check_password('Password123', self.user.password)
+        self.assertTrue(isPasswordCorrect)
 
     def testRedirectsToLoginIfUserNotLoggedIn(self):
         self.client.logout()

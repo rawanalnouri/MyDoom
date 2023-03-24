@@ -1,10 +1,10 @@
-''' Helper file containg method to generate data for graphs '''
+'''Helper file containing methods to generate graph data for reports.'''
 
 from datetime import datetime
 from datetime import timedelta
-from walletwizard.models import *
+from walletwizard.models import Category
 
-# constant numbers to use later for calculating averages across time periods
+# Constants used in calculations.
 DAYS_PER_WEEK = 7
 DAYS_PER_MONTH = 30
 DAYS_PER_YEAR = 365
@@ -12,9 +12,11 @@ WEEKS_PER_MONTH = 4
 WEEKS_PER_YEAR = 52
 MONTHS_PER_YEAR = 12
 
+'''Spending Limit (Budget) Calculations'''
 
-# Converts the user's spending limit into a daily spending limit
 def convertBudgetToDaily(category):
+    '''Convert the category's spending limit into a daily spending limit.'''
+
     currentTimePeriod = category.spendingLimit.timePeriod
     amount = category.spendingLimit.getNumber()
 
@@ -27,8 +29,9 @@ def convertBudgetToDaily(category):
     else:
         return amount
 
-# Converts the user's spending limit into a weekly spending limit
 def convertBudgetToWeekly(category):
+    '''Convert the category's spending limit into a weekly spending limit.'''
+
     currentTimePeriod = category.spendingLimit.timePeriod
     amount = category.spendingLimit.getNumber()
 
@@ -41,8 +44,9 @@ def convertBudgetToWeekly(category):
     else:
         return amount
 
-# Converts the user's spending limit into a monthly spending limit
 def convertBudgetToMonthly(category):
+    '''Convert the category's spending limit into a weekly spending limit.'''
+    
     currentTimePeriod = category.spendingLimit.timePeriod
     amount = category.spendingLimit.getNumber()
 
@@ -54,12 +58,13 @@ def convertBudgetToMonthly(category):
         return amount / MONTHS_PER_YEAR
     else:
         return amount
+    
+'''Data and Label generation for reports page graphs.'''
 
-# Genrating data for the graphs on the reports page
-'''This function generates 2 arrays (graph data points as well as their
-allocated labels). The data consistes of the expenditures within the last 'day',
-'week', or 'month', according to the user's choice'''
 def createDataAndLabelArrays(categories, timePeriod):
+    '''Create 2 arrays (graph data points as well as their labels). The data consists of the expenditures
+    within the last 'day', 'week', or 'month', according to the user's choice.'''
+
     today = datetime.now()
     names = []
     data =[]
@@ -106,11 +111,10 @@ def createDataAndLabelArrays(categories, timePeriod):
     return returnedArrays
 
 
-'''This function generates a single data array. The data calculations are made
-according to the user's choice of whether they want an mean analysis of 'daily',
-'weekly', or 'monthly' ependitures.'''
 def createDataAverageArrays(categories, timePeriod, pastMonthsFilterApplied, numberOfDaysWeeksMonthsArray):
-    today = datetime.now()
+    '''Generate a single array. Data calculations are made according to user's choice of whether they want 
+    a mean analysis of 'daily', 'weekly', or 'monthly' ependitures.'''
+
     data = []
     filteredCategories=''
 

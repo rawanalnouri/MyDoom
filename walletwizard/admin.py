@@ -1,6 +1,6 @@
 """Configuration of the administrative interface for walletwizard."""
 from django.contrib import admin
-from .models import User, Category, Expenditure, SpendingLimit, Notification, Points
+from .models import User, Category, Expenditure, SpendingLimit, Notification, House
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
@@ -26,11 +26,19 @@ class ExpenditureAdmin(admin.ModelAdmin):
     ]
 
 @admin.register(SpendingLimit)
-class SpendingLimitAdmin(admin.ModelAdmin):
+class HouseAdmin(admin.ModelAdmin):
     """Configuration of the admin interface for spending limits."""
 
     list_display = [
         'amount', 'timePeriod',
+    ]
+
+@admin.register(House)
+class HouseAdmin(admin.ModelAdmin):
+    """Configuration of the admin interface for houses."""
+
+    list_display = [
+        'name', 'points', 'memberCount',
     ]
 
 @admin.register(Notification)

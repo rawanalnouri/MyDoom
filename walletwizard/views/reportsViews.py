@@ -91,22 +91,22 @@ class ReportsView(LoginRequiredMixin, View):
             graphData.update({"form": form, "text": f"An overview of your spending within the last {timePeriod}."})
 
             # generate a graph for historical data
-            first_day_this_month = today.replace(day=1)
-            first_day_next_month = (first_day_this_month + timedelta(days=32)).replace(day=1)
-            first_day_twelve_months_ago = first_day_next_month - relativedelta(years=1)
-            data1 = createDataAverageArrays(selectedCategories, timePeriod, first_day_twelve_months_ago,  [365, 52, 12])
+            firstDayThisMonth = today.replace(day=1)
+            firstDayNextMonth = (firstDayThisMonth + timedelta(days=32)).replace(day=1)
+            firstDayTwelveMonthsAgo = firstDayNextMonth - relativedelta(years=1)
+            data1 = createDataAverageArrays(selectedCategories, timePeriod, firstDayTwelveMonthsAgo,  [365, 52, 12])
 
             graphData.update({'data1':data1})
             graphData.update({'text2':"Comparison to average over last 12 months"})
 
-            six_months_ago = today + relativedelta(months=-6)
-            data2 = createDataAverageArrays(selectedCategories, timePeriod, six_months_ago,  [180, 24, 6])
+            sixMonthsAgo = today + relativedelta(months=-6)
+            data2 = createDataAverageArrays(selectedCategories, timePeriod, sixMonthsAgo,  [180, 24, 6])
 
             graphData.update({'data2':data2})
             graphData.update({'text2':f"Compare your average spendings per {timePeriod} in the past"})
 
-            three_months_ago = today + relativedelta(months=-3)
-            data3 = createDataAverageArrays(selectedCategories, timePeriod, three_months_ago,  [90, 12, 3])
+            threeMonthsAgo = today + relativedelta(months=-3)
+            data3 = createDataAverageArrays(selectedCategories, timePeriod, threeMonthsAgo,  [90, 12, 3])
 
             graphData.update({'data3':data3})
             graphData.update({'text3':f"Your average spending per {timePeriod}"})

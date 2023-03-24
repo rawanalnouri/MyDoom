@@ -74,7 +74,7 @@ class SignUpFormTest(TestCase):
  
     def testUsernameHasToBeUnique(self):
         self.client.post(reverse('signUp'), self.input)
-        #change other unique field so should fail at fact username not unique
+        # Change other unique field so should fail at fact username not unique
         self.input['email'] = "john@email.com"
         self.assertFalse(SignUpForm(data=self.input).is_valid())
         

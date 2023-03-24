@@ -41,7 +41,7 @@
                 <h6 class="card-title m-t-40 m-l-120">House Progress:</h6>
                 <div class="card-body">
                   <div class="card-text">
-                      {% include 'partials/charts/chart.html' with resizeChart=1 height=15 width=15 type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
+                      {% include 'partials/charts/singleChart.html' with resizeChart=1 height=15 width=15 type=type2 num=2 data=data2 labels=labels2 displayLabels=True %}
                    </div>
                 </div>
               </div>
@@ -80,9 +80,9 @@
         <h6 class="card-text m-t-40 m-l-70">Category Spending this Month:</h6>
         <div class="card-body" style="padding-top: 1.2rem;">
           {% if not user.categories.all %}
-            <p class="card-text" style="text-align: center;">No expenditures made yet!</p>
+            <p class="card-text" style="text-align: center;">No categories made yet!</p>
           {% else %}
-            {% include 'partials/charts/chart.html' with  resizeChart=1 height=15 width=15 %}
+            {% include 'partials/charts/singleChart.html' with  resizeChart=1 height=15 width=15 %}
           {% endif %}
         </div>
       </div>

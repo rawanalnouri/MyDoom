@@ -4,10 +4,9 @@
 
 
 {% block content %}
+
 <h3 id="category-header">Analyse your spendings</h3>
 <hr>
-
-
 
 <div class="row">
   <div class="card w-25">
@@ -26,7 +25,7 @@
   <div class="card w-75">
     <div class="card-body">
       <p class="card-text text-center">{{ text }}</p>
-      {% include 'partials/charts/chart.html' with resizeChart=0 num=1 %}
+      {% include 'partials/charts/singleChart.html' with resizeChart=0 num=1 %}
     </div>
   </div>
 </div>
@@ -45,7 +44,6 @@
       {% include 'partials/charts/mixedChart.html' with num=3 %}
     </div>
   </div>
-
 </div>
 
 

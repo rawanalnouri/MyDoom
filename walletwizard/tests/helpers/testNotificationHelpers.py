@@ -1,6 +1,6 @@
 ''''Tests for creating differnt types of notifcations functions'''
 
-from walletwizard.models import User, Notification
+from walletwizard.models import User, Notification, Category
 from django.test import TestCase
 from walletwizard.helpers.notificationsHelpers import *
 
