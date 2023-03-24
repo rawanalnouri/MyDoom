@@ -61,6 +61,16 @@ class OverallSpendingLimitFormTest(TestCase):
                 code='invalid'
             ):
             form.clean()
+    
+    def testFormWhenSpendingLimitAmountIsTooHigh(self):
+        self.formInput['amount'] = int('1'+'0'*19)
+        form = OverallSpendingForm(data=self.formInput, user=self.user)
+        self.assertFalse(form.is_valid())
+        with self.assertRaisesMessage(forms.ValidationError, 
+                'The amount entered is too large to be stored in our system.', 
+                code='invalid'
+            ):
+            form.clean()
 
     def testSpendingLimitIsConvertedToMonthlyLimit(self):
         self.category.spendingLimit.timePeriod = 'yearly'
